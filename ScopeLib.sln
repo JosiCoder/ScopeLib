@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{2CF7F6D1-46D3-4FBC-8D98-9D4A1AD2083A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4DF5921B-E8CD-4AEB-8E7A-699764A31750}"
+	ProjectSection(SolutionItems) = preProject
+		TODOs.txt = TODOs.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{1DC0553F-3D45-46F6-9418-E49717BA5E95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Display", "Display\Display.csproj", "{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DC0553F-3D45-46F6-9418-E49717BA5E95}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1DC0553F-3D45-46F6-9418-E49717BA5E95}.Debug|x86.Build.0 = Debug|Any CPU
+		{1DC0553F-3D45-46F6-9418-E49717BA5E95}.Release|x86.ActiveCfg = Release|Any CPU
+		{1DC0553F-3D45-46F6-9418-E49717BA5E95}.Release|x86.Build.0 = Release|Any CPU
+		{2CF7F6D1-46D3-4FBC-8D98-9D4A1AD2083A}.Debug|x86.ActiveCfg = Debug|x86
+		{2CF7F6D1-46D3-4FBC-8D98-9D4A1AD2083A}.Debug|x86.Build.0 = Debug|x86
+		{2CF7F6D1-46D3-4FBC-8D98-9D4A1AD2083A}.Release|x86.ActiveCfg = Release|x86
+		{2CF7F6D1-46D3-4FBC-8D98-9D4A1AD2083A}.Release|x86.Build.0 = Release|x86
+		{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}.Debug|x86.Build.0 = Debug|Any CPU
+		{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.FileWidth = 120
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
+		$1.scope = text/plain
+	EndGlobalSection
+EndGlobal

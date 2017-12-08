@@ -1,0 +1,8 @@
+﻿OK limit cursor positions to graphics area
+OK Margin around graphics area
+OK extra space around graphics area for readouts?
+OK new Method GetScopeArea, returning a ScopeArea (rename?) object
+OK automatically determine the bottom area height necessary to show readouts (instead of using constant _bottomAreaHeight).
+OK additional parameters for DrawReadouts to pass readout values and metadata (similar to captions and cursors)
+- digital phospor
+- Cursor optionally unselectable
