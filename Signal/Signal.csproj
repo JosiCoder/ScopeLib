@@ -32,17 +32,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wavefrom\MemoryWaveform.cs" />
-    <Compile Include="Wavefrom\StreamWaveform.cs" />
-    <Compile Include="Wavefrom\WaveForm16BitFrame.cs" />
-    <Compile Include="Wavefrom\WaveformBase.cs" />
-    <Compile Include="Wavefrom\WaveformFileFormat.cs" />
-    <Compile Include="Wavefrom\WaveformFormat.cs" />
     <Compile Include="Utilities\LittleEndianByteArrayExtensions.cs" />
     <Compile Include="Waveform Readers and Writers\WaveformFileWaveformWriter.cs" />
     <Compile Include="Waveform Readers and Writers\WaveformFileWaveformReader.cs" />
     <Compile Include="Waveform Readers and Writers\WaveformFileWaveformReader.FrameStream.cs" />
     <Compile Include="Utilities\WaveformFileStreamExtensions.cs" />
+    <Compile Include="Waveform\MemoryWaveform.cs" />
+    <Compile Include="Waveform\StreamWaveform.cs" />
+    <Compile Include="Waveform\WaveForm16BitFrame.cs" />
+    <Compile Include="Waveform\WaveformBase.cs" />
+    <Compile Include="Waveform\WaveformFileFormat.cs" />
+    <Compile Include="Waveform\WaveformFormat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -54,6 +54,6 @@
   <ItemGroup>
     <Folder Include="Utilities\" />
     <Folder Include="Waveform Readers and Writers\" />
-    <Folder Include="Wavefrom\" />
+    <Folder Include="Waveform\" />
   </ItemGroup>
 </Project>
