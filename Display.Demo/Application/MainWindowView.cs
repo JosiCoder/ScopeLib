@@ -25,6 +25,7 @@ using Gtk;
 using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
 using System.Collections.Specialized;
+using ScopeLib.Utilities;
 using ScopeLib.Display;
 
 namespace ScopeLib.Display.Demo
@@ -123,10 +124,8 @@ namespace ScopeLib.Display.Demo
 
         private IEnumerable<PointD> GenerateSine()
         {
-            for (var x = 0.0; x <= 2 * Math.PI; x += 0.1)
-            {
-                yield return new PointD (x, Math.Sin (x));
-            }
+            return FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, 2 * Math.PI / 40,
+                (x, y) => new PointD (x, y));
         }
 
         private void InitializeScopeDemo()

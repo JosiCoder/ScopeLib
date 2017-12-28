@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Media;
+using ScopeLib.Utilities;
 
 // https://de.wikipedia.org/wiki/RIFF_WAVE
 // https://csharp-tricks.blogspot.de/2011/03/wave-dateien-einlesen.html
@@ -103,19 +104,17 @@ namespace ScopeLib.Signal.Demo
             int samplesPerSecond = 44100;
             short bitsPerSample = 16;
 
-            var durationInSeconds = 1;
             var frequency = 440;
+            var durationInSeconds = 2;
             var amplitude = 0.1;
-            var phaseIncrement = 2 * Math.PI * frequency / samplesPerSecond;
 
-            var frames = new List<WaveForm16BitFrame>(samplesPerSecond * durationInSeconds);
-            var phaseValue = 0d;
-            for (var i = 0; i < samplesPerSecond * durationInSeconds; i++)
-            {
-                var value = amplitude * Math.Sin(phaseValue += phaseIncrement);
-                var samples = new []{ value, value };
-                frames.Add(new WaveForm16BitFrame(samples));
-            }
+            var frames = FunctionValueGenerator
+                .GenerateSineValuesForFrequency(frequency, samplesPerSecond, durationInSeconds,
+                    (x, y) =>
+                {                
+                    var samples = new []{ amplitude * y, amplitude * y };
+                    return new WaveForm16BitFrame(samples);
+                });
 
             var format = new WaveformFormat(channelsCount, samplesPerSecond, bitsPerSample);
             var waveForm = new MemoryWaveform(format, frames);
