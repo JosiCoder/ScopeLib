@@ -32,11 +32,19 @@ namespace ScopeLib.Display.Demo
 {
     public partial class DemoWindowView: Gtk.Window
     {
+        private const bool _captureContinuously = true;
+
         private readonly double _xMinimumGraticuleUnits = 10.0;
         private readonly double _yMinimumGraticuleUnits = 8.0;
         private readonly ScopeGraphics _scopeGraphics;
 
         private uint _currentMouseButtons;
+
+        private DateTime _captureDateTime;
+        private int _frameCounter;
+        private int _framesPerSecond;
+        private int _lastDrawSecond;
+
         [UI] Gtk.DrawingArea scopeDrawingArea;
 
         public static DemoWindowView Create()
@@ -62,6 +70,12 @@ namespace ScopeLib.Display.Demo
                 _scopeGraphics.Draw(scopeDrawingArea.Window);
     //            OnDrawn1 (o, args);
     //            OnDrawn2 (o, args);
+
+                if (_captureContinuously)
+                {
+                    Capture();
+                    TriggerRedraw();
+                }
             };
 
             InitializeScopeDemo ();
@@ -70,13 +84,22 @@ namespace ScopeLib.Display.Demo
                 
             ButtonPressEvent += MainWindow_ButtonPressEventHandler;
             ButtonReleaseEvent += MainWindow_ButtonReleaseEventHandler;
+
+            Capture();
+        }
+
+        private void Capture()
+        {
+            _captureDateTime = DateTime.Now;
+
+            // Here we could capture more data.
         }
 
         private void MainWindow_ButtonPressEventHandler (object o, ButtonPressEventArgs args)
         {
             _currentMouseButtons = args.Event.Button;
             FindAndSelectCursorLines (new PointD(args.Event.X, args.Event.Y));
-            Redraw ();
+            TriggerRedraw ();
         }
 
         private void MainWindow_ButtonReleaseEventHandler (object o, ButtonReleaseEventArgs args)
@@ -84,7 +107,7 @@ namespace ScopeLib.Display.Demo
             _currentMouseButtons = 0;
             _scopeGraphics.DeselectScopeCursorLines ();
             FindAndHighlightCursorLines (new PointD(args.Event.X, args.Event.Y));
-            Redraw ();
+            TriggerRedraw ();
         }
 
         private void MainWindow_MotionNotifyEventHandler (object o, MotionNotifyEventArgs args)
@@ -98,7 +121,7 @@ namespace ScopeLib.Display.Demo
                 FindAndHighlightCursorLines(new PointD(args.Event.X, args.Event.Y));
             }
 
-            Redraw ();
+            TriggerRedraw ();
         }
       
         private void SetSelectedCursorLinesToPosition(PointD pointerPosition)
@@ -116,8 +139,19 @@ namespace ScopeLib.Display.Demo
             _scopeGraphics.FindAndHighlightCursorLines (pointerPosition);
         }
 
-        private void Redraw()
+        private void TriggerRedraw()
         {
+            var currentDrawSecond = _captureDateTime.Second;
+            if (currentDrawSecond == _lastDrawSecond)
+            {
+                _frameCounter++;
+            }
+            else
+            {
+                _framesPerSecond = _frameCounter;
+                _frameCounter = 0;
+                _lastDrawSecond = currentDrawSecond;
+            }
             scopeDrawingArea.Window.InvalidateRect(new Gdk.Rectangle(0, 0, scopeDrawingArea.Window.Width, scopeDrawingArea.Window.Height), false);
         }
 
@@ -253,12 +287,6 @@ namespace ScopeLib.Display.Demo
                 new ScopeReadout
                 {
                     Line = 0,
-                    Column = 4,
-                    TextProvider = () => DateTime.Now.ToString(),
-                },
-                new ScopeReadout
-                {
-                    Line = 0,
                     Column = 0,
                     TextProvider = () => "hor: 1 ms/div",
                 },
@@ -274,6 +302,19 @@ namespace ScopeLib.Display.Demo
                     Column = 1,
                     TextProvider = () => "Ch2: 1 mV/div",
                     Color = new Color (.5,1,1),
+                },
+                new ScopeReadout
+                {
+                    Line = 0,
+                    Column = 4,
+                    TextProvider = () => _captureDateTime.ToString(),
+                },
+                new ScopeReadout
+                {
+                    Line = 1,
+                    Column = 4,
+                    TextProvider = () =>
+                        _captureContinuously ? string.Format ("{0} fps", _framesPerSecond) : "hold",
                 },
             };
         }
