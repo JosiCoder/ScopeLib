@@ -97,7 +97,6 @@ namespace ScopeLib.Signal
             {
                 var frameSampleByteGroups = ReadFrameSampleByteGroups();
 
-                // TODO support more sample wodths
                 switch (_format.BitsPerSample)
                 {
                     case 16:

@@ -41,7 +41,6 @@ namespace ScopeLib.Display.Demo
 
         public static DemoWindowView Create()
         {
-            // TODO: load ScopeView.glade
             var builder = new Builder (null, "DemoWindowView.glade", null);
             return new DemoWindowView (builder, builder.GetObject ("window1").Handle);
         }
@@ -136,7 +135,6 @@ namespace ScopeLib.Display.Demo
             Color cursor3Color = new Color (0.5, 0.5, 1);
             Color triggerCursorColor = new Color (0.5, 0.5, 0.0);
 
-            //TODO: demo only
             _scopeGraphics.Graphs = new []
             {
                 new ScopeGraph
@@ -165,7 +163,6 @@ namespace ScopeLib.Display.Demo
                 },
             };
 
-            //TODO: demo only
             _scopeGraphics.Cursors = new []
             {
                 new ScopeCursor
@@ -251,7 +248,6 @@ namespace ScopeLib.Display.Demo
             _scopeGraphics.Cursors.First().Captions.First().TextProvider = () =>
                 string.Format("x={0:F2}/y={1:F2}", _scopeGraphics.Cursors.First().Position.X,  _scopeGraphics.Cursors.First().Position.Y);
 
-            //TODO: demo only
             _scopeGraphics.Readouts = new []
             {
                 new ScopeReadout

@@ -23,27 +23,6 @@ using System.IO;
 using System.Media;
 using ScopeLib.Utilities;
 
-// https://de.wikipedia.org/wiki/RIFF_WAVE
-// https://csharp-tricks.blogspot.de/2011/03/wave-dateien-einlesen.html
-// https://blogs.msdn.microsoft.com/dawate/2009/06/23/intro-to-audio-programming-part-2-demystifying-the-wav-format/
-// https://channel9.msdn.com/coding4fun/articles/Generating-Sound-Waves-with-C-Wave-Oscillators
-// https://web.archive.org/web/20160104081350/http://www.iem.thm.de/telekom-labor/zinke/nw/vp/doku/dito41.htm#Heading54
-
-// short-Bereich nur von -32760 to 32760 ?
-
-// Im Fall von PCM-Daten enthält jeder Frame ein „Sample“ von Abtastwerten, einen pro Kanal.
-// Bei zwei Kanälen (Stereo) wird erst der linke, dann der rechte Kanal gespeichert.
-// Abtastwerte sind für Bit-Tiefen bis 8 als unsigned char kodiert, sonst signed int.
-// Bei Bit-Tiefen, die nicht durch 8 teilbar sind, wird das niederwertigste Byte (LSB)
-// rechts mit Nullen aufgefüllt (Zero-Padding).
-// Das ergibt beispielsweise für den größten positiven 12-Bit-Wert „0x7FF“ die Bytefolge
-// „0xF0 0x7F“. 
-
-// This appears to be wrong.  Again, I haven't touched raw samples myself, but everything I've read says that 8-bit values
-// are stored as Offset Binary (0-255).  Treating them as 8-bit signed is going to irreparably mangle the audio.
-// If you want to *convert* them to signed, I believe you can just flip the "sign" bit.  (XOR with 0x80.)  This will have
-// the effect of converting them to 2's complement values instead.
-
 namespace ScopeLib.Signal.Demo
 {
     class MainClass

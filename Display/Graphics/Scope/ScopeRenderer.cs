@@ -363,7 +363,6 @@ namespace ScopeLib.Display
                     ? _cursorHighlightLineWidth : _cursorLineWidth;
                 Context.Stroke ();
 
-                //TODO
                 if ((markers & ScopeCursorMarkers.XLeft) != ScopeCursorMarkers.None)
                 {
                     AddXCursorMarkerPairPathFromCurrentPosition (
@@ -679,17 +678,6 @@ namespace ScopeLib.Display
 
                 Context.SetSourceColor (backGroundColor);
                 Context.Fill ();
-
-//                //TODO: Demo diagonal
-//                using (CreateContextState(userToDeviceMatrix))
-//                {
-//                    Context.MoveTo (rectangleRange.MinX, rectangleRange.MinY);
-//                    Context.LineTo (rectangleRange.MaxX, rectangleRange.MaxY);
-//                }
-//
-//                Context.SetSourceColor (new Color (0,0,0));
-//                Context.LineWidth = 5;
-//                Context.Stroke ();
             }
         }
 

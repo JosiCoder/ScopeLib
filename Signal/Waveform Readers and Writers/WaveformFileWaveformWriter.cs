@@ -149,7 +149,6 @@ namespace ScopeLib.Signal
             var format = waveForm.Format;
             var frames = waveForm.GetFrames();
 
-            // TODO support more sample wodths
             switch (format.BitsPerSample)
             {
                 case 16:
