@@ -32,6 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scope Screen\IScopeScreenViewModel.cs" />
+    <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -39,5 +41,8 @@
       <Project>{1DC0553F-3D45-46F6-9418-E49717BA5E95}</Project>
       <Name>Utilities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scope Screen\" />
   </ItemGroup>
 </Project>

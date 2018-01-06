@@ -79,5 +79,13 @@
       <Project>{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}</Project>
       <Name>Display.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Display.ViewModels\Display.ViewModels.csproj">
+      <Project>{0FA7462A-C224-4DAD-B21F-BDBC4F14D134}</Project>
+      <Name>Display.ViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Display.Views\Display.Views.csproj">
+      <Project>{E18A3F24-1950-4172-8089-9CEC4ADD76D0}</Project>
+      <Name>Display.Views</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
