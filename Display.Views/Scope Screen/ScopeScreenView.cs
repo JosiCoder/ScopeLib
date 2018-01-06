@@ -22,7 +22,7 @@ using System.ComponentModel;
 using Gtk;
 using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
-//using PB = Praeclarum.Bind;
+using PB = Praeclarum.Bind;
 using System.Collections.Specialized;
 using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;

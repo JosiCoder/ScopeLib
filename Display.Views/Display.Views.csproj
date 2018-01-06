@@ -53,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\submodules\Bind\src\Bind.cs">
+      <Link>Praeclarum.Bind\Bind.cs</Link>
+    </Compile>
     <Compile Include="Scope Screen\ScopeScreenView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
