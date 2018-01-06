@@ -76,6 +76,15 @@ namespace ScopeLib.Display.Views
 
             // === Register event handlers. ===
 
+            scopeDrawingArea.Drawn += ScopeDrawingArea_DrawnEventHandler;
+
+            // Raise motion events even if no button is pressed.
+            scopeEventBox.Events |= Gdk.EventMask.PointerMotionMask;
+
+            scopeEventBox.MotionNotifyEvent += ScopeEventBox_MotionNotifyEventHandler;
+            scopeEventBox.ButtonPressEvent += ScopeEventBox_ButtonPressEventHandler;
+            scopeEventBox.ButtonReleaseEvent += ScopeEventBox_ButtonReleaseEventHandler;
+
             // === Create value converters. ===
 
             // === Create bindings. ===
@@ -86,40 +95,26 @@ namespace ScopeLib.Display.Views
                 _xMinimumGraticuleUnits, _yMinimumGraticuleUnits);
 
             InitializeGraphics();
+            RefreshData();
         }
 
-        private void InitializeGraphics()
-        {
-            // Raise motion events even if no button is pressed.
-            Events |= Gdk.EventMask.PointerMotionMask;
-
-            scopeDrawingArea.Drawn += ScopeDrawingArea_DrawnEventHandler;
-
-            scopeEventBox.Events =
-                Gdk.EventMask.PointerMotionMask |
-                Gdk.EventMask.ButtonPressMask |
-                Gdk.EventMask.ButtonReleaseMask;
-
-            scopeEventBox.MotionNotifyEvent += ScopeEventBox_MotionNotifyEventHandler;
-            scopeEventBox.ButtonPressEvent += ScopeEventBox_ButtonPressEventHandler;
-            scopeEventBox.ButtonReleaseEvent += ScopeEventBox_ButtonReleaseEventHandler;
-
-            ShowScopeDemo ();
-
-            Capture();
-        }
-
+        /// <summary>
+        /// Performs actions whenever the scope drawing area has been drawn.
+        /// </summary>
         private void ScopeDrawingArea_DrawnEventHandler (object o, DrawnArgs args)
         {
             _scopeGraphics.Draw(scopeDrawingArea.Window);
 
             if (_captureContinuously)
             {
-                Capture();
-                TriggerRedraw();
+                RefreshData();
+                RefreshGraphics();
             }
         }
 
+        /// <summary>
+        /// Performs actions whenever the mouse has been moved within the scope drawing area.
+        /// </summary>
         private void ScopeEventBox_MotionNotifyEventHandler (object o, MotionNotifyEventArgs args)
         {
             if (_currentMouseButtons != 0)
@@ -130,26 +125,34 @@ namespace ScopeLib.Display.Views
             {
                 _scopeGraphics.FindAndHighlightCursorLines(new PointD(args.Event.X, args.Event.Y));
             }
-
-            TriggerRedraw ();
+            RefreshGraphics ();
         }
 
+        /// <summary>
+        /// Performs actions whenever a mouse button has been pressed within the scope drawing area.
+        /// </summary>
         private void ScopeEventBox_ButtonPressEventHandler (object o, ButtonPressEventArgs args)
         {
             _currentMouseButtons = args.Event.Button;
             _scopeGraphics.FindAndSelectCursorLines (new PointD(args.Event.X, args.Event.Y));
-            TriggerRedraw ();
+            RefreshGraphics ();
         }
 
+        /// <summary>
+        /// Performs actions whenever a mouse button has been released within the scope drawing area.
+        /// </summary>
         private void ScopeEventBox_ButtonReleaseEventHandler (object o, ButtonReleaseEventArgs args)
         {
             _currentMouseButtons = 0;
             _scopeGraphics.DeselectScopeCursorLines ();
             _scopeGraphics.FindAndHighlightCursorLines (new PointD(args.Event.X, args.Event.Y));
-            TriggerRedraw ();
+            RefreshGraphics ();
         }
 
-        private void TriggerRedraw()
+        /// <summary>
+        /// Initiates a refresh of the scope graphics.
+        /// </summary>
+        private void RefreshGraphics()
         {
             var currentDrawSecond = _captureDateTime.Second;
             if (currentDrawSecond == _lastDrawSecond)
@@ -162,17 +165,21 @@ namespace ScopeLib.Display.Views
                 _frameCounter = 0;
                 _lastDrawSecond = currentDrawSecond;
             }
+
             scopeDrawingArea.Window.InvalidateRect(new Gdk.Rectangle(0, 0, scopeDrawingArea.Window.Width, scopeDrawingArea.Window.Height), false);
         }
 
-        private void Capture()
+        /// <summary>
+        /// Refreshes the data shown on the scope screen.
+        /// </summary>
+        private void RefreshData()
         {
             _captureDateTime = DateTime.Now;
 
             // Here we could capture more data.
         }
 
-        // === From here to the end for demo purposes only ===
+        // === From here to the end for demo purposes ===
 
 //        private IEnumerable<PointD> GenerateSine()
 //        {
@@ -180,7 +187,11 @@ namespace ScopeLib.Display.Views
 //                (x, y) => new PointD (x, y));
 //        }
 //
-        private void ShowScopeDemo()
+
+        /// <summary>
+        /// Initializes the scope graphics.
+        /// </summary>
+        private void InitializeGraphics()
         {
             Color textColor = new Color (1, 1, 0);
             Color cursor1Color = new Color (1, 0.5, 0.5);

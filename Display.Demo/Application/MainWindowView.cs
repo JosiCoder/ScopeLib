@@ -50,6 +50,10 @@ namespace ScopeLib.Display.Demo
 
             var scopeScreenView = ScopeScreenView.Create(new ScopeScreenViewModel());
             graphicsContainer.Add(scopeScreenView);
+
+            // === Register event handlers. ===
+
+            DeleteEvent += OnDeleteEvent;
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
