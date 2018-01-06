@@ -24,6 +24,7 @@ using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
 //using PB = Praeclarum.Bind;
 using System.Collections.Specialized;
+using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;
 using ScopeLib.Display.Graphics;
 
@@ -181,12 +182,11 @@ namespace ScopeLib.Display.Views
 
         // === From here to the end for demo purposes ===
 
-//        private IEnumerable<PointD> GenerateSine()
-//        {
-//            return FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, 2 * Math.PI / 40,
-//                (x, y) => new PointD (x, y));
-//        }
-//
+        private IEnumerable<PointD> GenerateSine()
+        {
+            return FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, 2 * Math.PI / 40,
+                (x, y) => new PointD (x, y));
+        }
 
         /// <summary>
         /// Initializes the scope graphics.
@@ -222,7 +222,7 @@ namespace ScopeLib.Display.Views
                     ReferencePointPosition = new PointD(-Math.PI, 0),
                     XScaleFactor = 1,
                     YScaleFactor = 2,
-//                    Vertices = GenerateSine(),
+                    Vertices = GenerateSine(),
                     LineType = ScopeLineType.LineAndDots,
                 },
             };
