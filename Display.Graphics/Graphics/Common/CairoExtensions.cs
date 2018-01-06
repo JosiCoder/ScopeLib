@@ -19,7 +19,7 @@ using System;
 using System.Reflection;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides some extension methods used with Cairo.

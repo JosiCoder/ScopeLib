@@ -17,10 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using Gtk;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides a cursor used on scope displays.

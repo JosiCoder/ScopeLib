@@ -18,10 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gtk;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides the extents of a rectangular device area, in device units.

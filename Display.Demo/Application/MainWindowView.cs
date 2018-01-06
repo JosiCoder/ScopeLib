@@ -24,9 +24,8 @@ using System.Threading.Tasks;
 using Gtk;
 using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
-using System.Collections.Specialized;
 using ScopeLib.Utilities;
-using ScopeLib.Display;
+using ScopeLib.Display.Graphics;
 
 namespace ScopeLib.Display.Demo
 {
@@ -44,7 +43,6 @@ namespace ScopeLib.Display.Demo
         private int _frameCounter;
         private int _framesPerSecond;
         private int _lastDrawSecond;
-
         [UI] Gtk.DrawingArea scopeDrawingArea;
 
         public static DemoWindowView Create()

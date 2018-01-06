@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Renders the contents of a scope to a Cairo context.

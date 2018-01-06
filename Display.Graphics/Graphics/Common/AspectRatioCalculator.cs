@@ -15,7 +15,7 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 //--------------------------------------------------------------------------------
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Calculates the aspect ratios of the specified user-specific and device-related

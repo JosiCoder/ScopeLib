@@ -16,10 +16,9 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using Gtk;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides a base implementation for Cairo-based renderers, i.e. classes that render

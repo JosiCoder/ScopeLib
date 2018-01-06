@@ -17,53 +17,36 @@
 
 using System;
 using System.Collections.Generic;
-using Gtk;
-using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
-    /// Provides a value tick used with scope cursors.
+    /// Provides information about a cursor and the selection state of its cursor lines.
     /// </summary>
-    public class ScopeCursorValueTick
+    public class ScopeCursorSelection
     {
-        private readonly Color _defaultCaptionColor = new Color(1,1,1);
-
-        /// <summary>
-        /// Initializes an instance of this class with default settings.
-        /// </summary>
-        public ScopeCursorValueTick ()
-        {
-        }
-
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="captions">A list of captions.</param>
-        public ScopeCursorValueTick (double value, IEnumerable<ScopePositionCaption> captions = null)
+        /// <param name="cursor">The cursor this object belongs to.</param>
+        /// <param name="selectedLines">A value indicating which lines are selected.</param>
+        public ScopeCursorSelection (ScopeCursor cursor, ScopeCursorLines selectedLines)
         {
-            Value = value;
-
-            // By default, the tick has one caption showing its value.
-            Captions = captions ?? new []
-            {
-                new ScopePositionCaption(() => this.Value.ToString(),
-                    ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top,
-                    ScopeAlignmentReference.Position, false, _defaultCaptionColor)
-            };
+            Cursor = cursor;
+            SelectedLines = selectedLines;
         }
 
         /// <summary>
-        /// Gets or sets the value.
+        /// Gets or sets the cursor this object belongs to.
         /// </summary>
-        public double Value
+        /// <value>The cursor.</value>
+        public ScopeCursor Cursor
         { get; set; }
 
         /// <summary>
-        /// Gets or sets a list of captions.
+        /// Gets or sets a value indicating which lines are selected.
         /// </summary>
-        public IEnumerable<ScopePositionCaption> Captions
+        public ScopeCursorLines SelectedLines
         { get; set; }
     }
 }

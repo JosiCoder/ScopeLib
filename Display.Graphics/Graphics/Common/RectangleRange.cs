@@ -18,7 +18,7 @@
 using System;
 using Cairo;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides a rectangular range graphics is rendered to, based on device and user-specific

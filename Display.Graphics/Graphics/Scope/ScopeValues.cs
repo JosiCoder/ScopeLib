@@ -17,7 +17,7 @@
 
 using System;
 
-namespace ScopeLib.Display
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Specifies the resize modes available for a scope.

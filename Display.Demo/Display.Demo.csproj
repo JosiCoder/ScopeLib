@@ -75,9 +75,9 @@
       <Project>{1DC0553F-3D45-46F6-9418-E49717BA5E95}</Project>
       <Name>Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Display\Display.csproj">
+    <ProjectReference Include="..\Display.Graphics\Display.Graphics.csproj">
       <Project>{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}</Project>
-      <Name>Display</Name>
+      <Name>Display.Graphics</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
