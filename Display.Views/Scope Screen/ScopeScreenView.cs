@@ -155,7 +155,7 @@ namespace ScopeLib.Display.Views
         /// </summary>
         private void RefreshGraphics()
         {
-            var currentDrawSecond = _captureDateTime.Second;
+            var currentDrawSecond = DateTime.Now.Second;
             if (currentDrawSecond == _lastDrawSecond)
             {
                 _frameCounter++;

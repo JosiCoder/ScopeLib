@@ -22,7 +22,7 @@ namespace ScopeLib.Display.ViewModels
     /// <summary>
     /// Provides the viewmodel of a scope screen.
     /// </summary>
-    public class ScopeScreenViewModel : /*ViewModelBase,*/ IScopeScreenViewModel
+    public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
     }
 }

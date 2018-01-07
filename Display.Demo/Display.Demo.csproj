@@ -56,13 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Application\MainWindowView.cs" />
     <Compile Include="Application\Program.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Application\DemoWindow.glade">
-      <LogicalName>DemoWindowView.glade</LogicalName>
-    </EmbeddedResource>
+    <Compile Include="Application\DemoWindowView.cs" />
+    <Compile Include="Application\DemoViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets" Condition="Exists('..\packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets')" />
@@ -87,5 +83,10 @@
       <Project>{E18A3F24-1950-4172-8089-9CEC4ADD76D0}</Project>
       <Name>Display.Views</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Application\DemoWindowView.glade">
+      <LogicalName>DemoWindowView.glade</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

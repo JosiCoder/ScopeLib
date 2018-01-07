@@ -31,24 +31,38 @@ using ScopeLib.Display.Graphics;
 
 namespace ScopeLib.Display.Demo
 {
+    /// <summary>
+    /// Provides the Gtk# view of the demo window.
+    /// </summary>
     public partial class DemoWindowView: Gtk.Window
     {
-        private const bool _captureContinuously = true;
+        private readonly DemoViewModel _viewModel;
         [UI] Gtk.Container graphicsContainer;
 
-        public static DemoWindowView Create()
+        /// <summary>
+        /// Creates a new instance of this class.
+        /// </summary>
+        /// <param name="viewModel">The viewmodel represented by the instance created.</param>
+        public static DemoWindowView Create(DemoViewModel viewModel)
         {
             var builder = new Builder (null, "DemoWindowView.glade", null);
-            return new DemoWindowView (builder, builder.GetObject ("mainWidget").Handle);
+            return new DemoWindowView (viewModel, builder, builder.GetObject ("mainWidget").Handle);
         }
 
-        protected DemoWindowView(Builder builder, IntPtr handle) : base (handle)
+        /// <summary>
+        /// Initializes an instance of this class.
+        /// </summary>
+        /// <param name="viewModel">The viewmodel represented by this view.</param>
+        /// <param name="builder">The Gtk# builder used to build this view.</param>
+        /// <param name="handle">The handle of the main widget.</param>
+        protected DemoWindowView(DemoViewModel viewModel, Builder builder, IntPtr handle) : base (handle)
         {
+            _viewModel = viewModel;
             builder.Autoconnect(this);
 
             //  === Create sub-views. ===
 
-            var scopeScreenView = ScopeScreenView.Create(new ScopeScreenViewModel());
+            var scopeScreenView = ScopeScreenView.Create(_viewModel.ScopeScreenVM);
             graphicsContainer.Add(scopeScreenView);
 
             // === Register event handlers. ===
@@ -56,6 +70,9 @@ namespace ScopeLib.Display.Demo
             DeleteEvent += OnDeleteEvent;
         }
 
+        /// <summary>
+        /// Performs actions whenever the window has been closed.
+        /// </summary>
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
         {
             Application.Quit ();

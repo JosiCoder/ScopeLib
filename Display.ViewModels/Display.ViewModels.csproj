@@ -34,6 +34,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scope Screen\IScopeScreenViewModel.cs" />
     <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
+    <Compile Include="MVVM\ViewModelBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -44,5 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scope Screen\" />
+    <Folder Include="MVVM\" />
   </ItemGroup>
 </Project>

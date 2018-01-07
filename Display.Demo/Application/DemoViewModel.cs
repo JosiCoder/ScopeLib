@@ -16,18 +16,24 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using Gtk;
+using ScopeLib.Display.ViewModels;
 
 namespace ScopeLib.Display.Demo
 {
-    class MainClass
+    /// <summary>
+    /// Provides the demo viewmodel that acts as the entry point.
+    /// </summary>
+    public class DemoViewModel
     {
-        public static void Main (string[] args)
+        private readonly IScopeScreenViewModel _scopeScreenVM = new ScopeScreenViewModel();
+
+        /// <summary>
+        /// Gets the scope screen viewmodel.
+        /// </summary>
+        public IScopeScreenViewModel ScopeScreenVM
         {
-            Application.Init ();
-            var mainWindowView = DemoWindowView.Create (new DemoViewModel());
-            mainWindowView.Show ();
-            Application.Run ();
+            get { return _scopeScreenVM; }
         }
     }
 }
+
