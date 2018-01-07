@@ -16,6 +16,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace ScopeLib.Display.ViewModels
 {
@@ -24,6 +25,17 @@ namespace ScopeLib.Display.ViewModels
     /// </summary>
     public interface IScopeScreenViewModel
     {
+        /// <summary>
+        /// Gets or sets the channel configuration, one item per channel.
+        /// </summary>
+        IEnumerable<ChannelConfiguration> ChannelConfigurations
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current signal frames, one item per channel.
+        /// </summary>
+        IEnumerable<SignalFrame> CurrentSignalFrames
+        { get; set; }
     }
 }
 

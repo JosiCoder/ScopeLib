@@ -16,6 +16,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;
 
 namespace ScopeLib.Display.Demo
@@ -26,6 +27,26 @@ namespace ScopeLib.Display.Demo
     public class DemoViewModel
     {
         private readonly IScopeScreenViewModel _scopeScreenVM = new ScopeScreenViewModel();
+
+        public DemoViewModel ()
+        {
+            var channel2TimeIncrement = 2 * Math.PI / 40;
+            var channel2values =
+                FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
+                (x, y) => y);
+
+            _scopeScreenVM.ChannelConfigurations = new[]
+            {
+                new ChannelConfiguration(new Point(1.0, 1.0), 0.5, 0.3, new Color(1, 1, 0)),
+                new ChannelConfiguration(new Point(-Math.PI, 0), 1, 2, new Color(0, 1, 0)),
+            };
+
+            _scopeScreenVM.CurrentSignalFrames = new[]
+            {
+                new SignalFrame(1, 2, new []{-1d, 0d, 2d, 3d}),
+                new SignalFrame(channel2TimeIncrement, 0,  channel2values),
+            };
+        }
 
         /// <summary>
         /// Gets the scope screen viewmodel.

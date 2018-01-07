@@ -35,6 +35,8 @@
     <Compile Include="Scope Screen\IScopeScreenViewModel.cs" />
     <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
     <Compile Include="MVVM\ViewModelBase.cs" />
+    <Compile Include="Scope Screen\SignalFrame.cs" />
+    <Compile Include="Scope Screen\ChannelConfiguration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

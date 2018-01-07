@@ -24,7 +24,6 @@ using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
 using PB = Praeclarum.Bind;
 using System.Collections.Specialized;
-using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;
 using ScopeLib.Display.Graphics;
 
@@ -95,7 +94,7 @@ namespace ScopeLib.Display.Views
             _scopeGraphics = new ScopeGraphics (ScopeStretchMode.Stretch,
                 _xMinimumGraticuleUnits, _yMinimumGraticuleUnits);
 
-            InitializeGraphics();
+            InitializeGraphics(viewModel);
             RefreshData();
         }
 
@@ -182,49 +181,51 @@ namespace ScopeLib.Display.Views
 
         // === From here to the end for demo purposes ===
 
-        private IEnumerable<PointD> GenerateSine()
+        /// <summary>
+        /// Creates a scope graph from a channel configuration and a signal frame
+        /// </summary>
+        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration,
+            SignalFrame signalFrame)
         {
-            return FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, 2 * Math.PI / 40,
-                (x, y) => new PointD (x, y));
+            var lineType = ScopeLineType.LineAndDots;
+
+            var pos = channelConfiguration.ReferencePointPosition;
+            var col = channelConfiguration.Color;
+
+            var vertices = signalFrame.Values
+                .Select((value, counter) => new PointD (counter * signalFrame.TimeIncrement, value));
+
+            return new ScopeGraph
+            {
+                LineType = lineType,
+                ReferencePointPosition = new Cairo.PointD(pos.X, pos.Y),
+                Color = new Cairo.Color(col.R, col.G, col.B),
+                XScaleFactor = channelConfiguration.TimeScaleFactor,
+                YScaleFactor = channelConfiguration.ValueScaleFactor,
+                ReferencePoint = new PointD(signalFrame.ReferenceTime, 0),
+                Vertices = vertices,
+            };
         }
 
         /// <summary>
         /// Initializes the scope graphics.
         /// </summary>
-        private void InitializeGraphics()
+        private void InitializeGraphics(IScopeScreenViewModel viewModel)
         {
-            Color textColor = new Color (1, 1, 0);
-            Color cursor1Color = new Color (1, 0.5, 0.5);
-            Color cursor2Color = new Color (0.5, 1, 0.5);
-            Color cursor3Color = new Color (0.5, 0.5, 1);
-            Color triggerCursorColor = new Color (0.5, 0.5, 0.0);
+            var textColor = new Cairo.Color (1, 1, 0);
+            var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
+            var cursor2Color = new Cairo.Color (0.5, 1, 0.5);
+            var cursor3Color = new Cairo.Color (0.5, 0.5, 1);
+            var triggerCursorColor = new Cairo.Color (0.5, 0.5, 0.0);
 
-            _scopeGraphics.Graphs = new []
+            var channelConfigAsArray = viewModel.ChannelConfigurations.ToArray();
+            var framesAsArray = viewModel.CurrentSignalFrames.ToArray();
+
+            // TODO: generalize
+            _scopeGraphics.Graphs = new ScopeGraph[]
             {
-                new ScopeGraph
-                {
-                    ReferencePoint = new PointD(1, 2),
-                    ReferencePointPosition = new PointD(1.0, 1.0),
-                    XScaleFactor = 0.5,
-                    YScaleFactor = 0.3,
-                    Vertices = new []
-                    {
-                        new PointD (-1, -1), 
-                        new PointD (0, -0),
-                        new PointD (1, 2),
-                        new PointD (2, 3),
-                    },
-                    LineType = ScopeLineType.LineAndDots,
-                },
-                new ScopeGraph
-                {
-                    ReferencePoint = new PointD(0, 0),
-                    ReferencePointPosition = new PointD(-Math.PI, 0),
-                    XScaleFactor = 1,
-                    YScaleFactor = 2,
-                    Vertices = GenerateSine(),
-                    LineType = ScopeLineType.LineAndDots,
-                },
+                CreateScopeGraph(channelConfigAsArray[0], framesAsArray[0]),
+                CreateScopeGraph(channelConfigAsArray[1], framesAsArray[1]),
             };
 
             _scopeGraphics.Cursors = new []
@@ -331,7 +332,7 @@ namespace ScopeLib.Display.Views
                     Line = 1,
                     Column = 1,
                     TextProvider = () => "Ch2: 1 mV/div",
-                    Color = new Color (.5,1,1),
+                    Color = new Cairo.Color (.5,1,1),
                 },
                 new ScopeReadout
                 {
