@@ -34,9 +34,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GlobalAssemblyInfo.cs" />
     <Compile Include="Function Helpers\FunctionValueGenerator.cs" />
+    <Compile Include="Miscellaneous\CollectionUtilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Function Helpers\" />
+    <Folder Include="Miscellaneous\" />
   </ItemGroup>
 </Project>

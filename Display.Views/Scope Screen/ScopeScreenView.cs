@@ -24,6 +24,7 @@ using Cairo;
 using UI = Gtk.Builder.ObjectAttribute;
 using PB = Praeclarum.Bind;
 using System.Collections.Specialized;
+using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;
 using ScopeLib.Display.Graphics;
 
@@ -36,9 +37,12 @@ namespace ScopeLib.Display.Views
     {
         private readonly IScopeScreenViewModel _viewModel;
 
+        private const double _referenceLevel = 0.0;
         private const bool _captureContinuously = true;
         private const double _xMinimumGraticuleUnits = 10.0;
         private const double _yMinimumGraticuleUnits = 8.0;
+
+        private const ScopeLineType _graphLineType = ScopeLineType.LineAndDots;
         private readonly ScopeGraphics _scopeGraphics;
 
         private uint _currentMouseButtons;
@@ -94,7 +98,7 @@ namespace ScopeLib.Display.Views
             _scopeGraphics = new ScopeGraphics (ScopeStretchMode.Stretch,
                 _xMinimumGraticuleUnits, _yMinimumGraticuleUnits);
 
-            InitializeGraphics(viewModel);
+            InitializeGraphics();
             RefreshData();
         }
 
@@ -179,56 +183,160 @@ namespace ScopeLib.Display.Views
             // Here we could capture more data.
         }
 
-        // === From here to the end for demo purposes ===
+        /// <summary>
+        /// Converts a view model point to a Cairo point.
+        /// </summary>
+        private static Cairo.PointD ToCairoPointD(ScopeLib.Display.ViewModels.Point point)
+        {
+            return new Cairo.PointD(point.X, point.Y);
+        }
 
         /// <summary>
-        /// Creates a scope graph from a channel configuration and a signal frame
+        /// Converts a view model color to a Cairo color.
         /// </summary>
-        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration,
+        private static Cairo.Color ToCairoColor(ScopeLib.Display.ViewModels.Color color)
+        {
+            return new Cairo.Color(color.R, color.G, color.B);
+        }
+
+        /// <summary>
+        /// Creates a scope graph from a channel configuration and a signal frame.
+        /// </summary>
+        private static ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration,
             SignalFrame signalFrame)
         {
-            var lineType = ScopeLineType.LineAndDots;
-
-            var pos = channelConfiguration.ReferencePointPosition;
-            var col = channelConfiguration.Color;
-
-            var vertices = signalFrame.Values
-                .Select((value, counter) => new PointD (counter * signalFrame.TimeIncrement, value));
-
             return new ScopeGraph
             {
-                LineType = lineType,
-                ReferencePointPosition = new Cairo.PointD(pos.X, pos.Y),
-                Color = new Cairo.Color(col.R, col.G, col.B),
+                LineType = _graphLineType,
+                ReferencePointPosition = ToCairoPointD(channelConfiguration.ReferencePointPosition),
+                Color = ToCairoColor(channelConfiguration.Color),
                 XScaleFactor = channelConfiguration.TimeScaleFactor,
                 YScaleFactor = channelConfiguration.ValueScaleFactor,
-                ReferencePoint = new PointD(signalFrame.ReferenceTime, 0),
-                Vertices = vertices,
+                ReferencePoint = new PointD(signalFrame.ReferenceTime, _referenceLevel),
+                Vertices = signalFrame.Values
+                    .Select((value, counter) => new PointD (counter * signalFrame.TimeIncrement, value)),
             };
+        }
+
+        /// <summary>
+        /// Creates the trigger cursors.
+        /// </summary>
+        private IEnumerable<ScopeCursor> CreateTriggerCursors()
+        {
+            var triggerConfiguration = _viewModel.TriggerConfiguration;
+
+            var channelConfig = _viewModel.ChannelConfigurations
+                .Skip(triggerConfiguration.ChannelNumber)
+                .FirstOrDefault();
+
+            if (channelConfig == null)
+            {
+                return new ScopeCursor[0];
+            }
+
+            var referencePointPosition = channelConfig.ReferencePointPosition;
+
+            IEnumerable<ScopeCursor> triggerCriteriaCursors = new ScopeCursor[0];
+
+            if (triggerConfiguration is LevelTriggerConfiguration)
+            {
+                triggerCriteriaCursors = CreateTriggerCriteriaCursors(
+                    triggerConfiguration as LevelTriggerConfiguration, channelConfig);
+            }
+
+            var timeReferenceCursors = CreateTriggerPointCursors(referencePointPosition.X);
+
+            return triggerCriteriaCursors.Concat(timeReferenceCursors);
+        }
+
+        /// <summary>
+        /// Creates the trigger criteria cursors for a level-based trigger.
+        /// </summary>
+        private IEnumerable<ScopeCursor> CreateTriggerCriteriaCursors(LevelTriggerConfiguration triggerConfiguration,
+            ChannelConfiguration triggerChannelConfiguration)
+        {
+            var referencePointPosition = triggerChannelConfiguration.ReferencePointPosition;
+            var levelColor = ToCairoColor(triggerChannelConfiguration.Color);
+
+            var cursorPointPosition = new PointD
+                (
+                    0,
+                    referencePointPosition.Y + triggerConfiguration.Level - _referenceLevel
+                );
+
+            const string triggerCaption = "T";
+            Func<String> levelTextProvider = () =>
+                string.Format("{0:F2}", triggerConfiguration.Level);
+
+            return new []
+            {
+                new ScopeCursor
+                {
+                    Position = cursorPointPosition,
+                    Lines = ScopeCursorLines.Y,
+                    SelectableLines = ScopeCursorLines.Y,
+                    Markers = ScopeCursorMarkers.YFull,
+                    Color = levelColor,
+                    Captions = new []
+                    {
+                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+                        new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+                    },
+                },
+            };
+        }
+
+        /// <summary>
+        /// Creates the trigger point cursors at the specified position.
+        /// </summary>
+        private IEnumerable<ScopeCursor> CreateTriggerPointCursors(double triggerPointXPosition)
+        {
+            var markerColor = new Cairo.Color (0.0, 0.5, 1.0);
+
+            var cursorPointPosition = new PointD
+                (
+                    triggerPointXPosition,
+                    0
+                );
+
+            const string triggerCaption = "T";
+
+            var cursors = new []
+            {
+                new ScopeCursor
+                {
+                    Position = cursorPointPosition,
+                    Lines = ScopeCursorLines.X,
+                    SelectableLines = ScopeCursorLines.X,
+                    Markers = ScopeCursorMarkers.XFull,
+                    Color = markerColor,
+                    Captions = new []
+                    {
+                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                    },
+                },
+            };
+
+            return cursors;
         }
 
         /// <summary>
         /// Initializes the scope graphics.
         /// </summary>
-        private void InitializeGraphics(IScopeScreenViewModel viewModel)
+        private void InitializeGraphics()
         {
             var textColor = new Cairo.Color (1, 1, 0);
             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
             var cursor2Color = new Cairo.Color (0.5, 1, 0.5);
             var cursor3Color = new Cairo.Color (0.5, 0.5, 1);
-            var triggerCursorColor = new Cairo.Color (0.5, 0.5, 0.0);
 
-            var channelConfigAsArray = viewModel.ChannelConfigurations.ToArray();
-            var framesAsArray = viewModel.CurrentSignalFrames.ToArray();
+            _scopeGraphics.Graphs = CollectionUtilities.Zip(
+                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
+                _viewModel.ChannelConfigurations, _viewModel.CurrentSignalFrames);
 
-            // TODO: generalize
-            _scopeGraphics.Graphs = new ScopeGraph[]
-            {
-                CreateScopeGraph(channelConfigAsArray[0], framesAsArray[0]),
-                CreateScopeGraph(channelConfigAsArray[1], framesAsArray[1]),
-            };
-
-            _scopeGraphics.Cursors = new []
+            var demoCursors = new []
             {
                 new ScopeCursor
                 {
@@ -263,9 +371,9 @@ namespace ScopeLib.Display.Views
                     Color = cursor2Color,
                     Captions = new []
                     {
-                        new ScopePositionCaption(() => "yLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, textColor),
-                        new ScopePositionCaption(() => "yLT", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, textColor),
-                        new ScopePositionCaption(() => "yRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
+                        new ScopePositionCaption(() => "yLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
+                        new ScopePositionCaption(() => "yLT", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
+                        new ScopePositionCaption(() => "yRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, false, textColor),
                     },
                     YTicks = new []
                     {
@@ -282,9 +390,9 @@ namespace ScopeLib.Display.Views
                     Color = cursor3Color,
                     Captions = new []
                     {
-                        new ScopePositionCaption(() => "xRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
-                        new ScopePositionCaption(() => "xRB", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, false, textColor),
-                        new ScopePositionCaption(() => "xLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, false, textColor),
+                        new ScopePositionCaption(() => "xRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, textColor),
+                        new ScopePositionCaption(() => "xRB", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
+                        new ScopePositionCaption(() => "xLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
                     },
                     XTicks = new []
                     {
@@ -293,26 +401,13 @@ namespace ScopeLib.Display.Views
                         new ScopeCursorValueTick(2.8)
                     },
                 },
-                new ScopeCursor
-                {
-                    Position = new PointD (1.5, 1.5),
-                    Lines = ScopeCursorLines.Both,
-                    SelectableLines = ScopeCursorLines.None,
-                    Markers = ScopeCursorMarkers.Full,
-                    Color = triggerCursorColor,
-                    Captions = new []
-                    {
-                        new ScopePositionCaption(() => "T", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, triggerCursorColor),
-                        new ScopePositionCaption(() => "T", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, triggerCursorColor),
-                        new ScopePositionCaption(() => "T", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, triggerCursorColor),
-                        new ScopePositionCaption(() => "T", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, triggerCursorColor),
-                    },
-                },
             };
 
-            _scopeGraphics.Cursors.First().Captions.First().TextProvider = () =>
-                string.Format("x={0:F2}/y={1:F2}", _scopeGraphics.Cursors.First().Position.X,  _scopeGraphics.Cursors.First().Position.Y);
+            _scopeGraphics.Cursors = CreateTriggerCursors().Concat(demoCursors);
 
+//            _scopeGraphics.Cursors.First().Captions.First().TextProvider = () =>
+//                string.Format("x={0:F2}/y={1:F2}", _scopeGraphics.Cursors.First().Position.X,  _scopeGraphics.Cursors.First().Position.Y);
+//
             _scopeGraphics.Readouts = new []
             {
                 new ScopeReadout

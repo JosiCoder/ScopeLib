@@ -16,32 +16,48 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides access to a viewmodel of a scope screen.
+    /// Provides a position on the scope display.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public struct Point
     {
-        /// <summary>
-        /// Gets or sets the trigger configuration.
-        /// </summary>
-        TriggerConfigurationBase TriggerConfiguration
+        public Point (double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public double X
         { get; set; }
 
-        /// <summary>
-        /// Gets or sets the channel configuration, one item per channel.
-        /// </summary>
-        IEnumerable<ChannelConfiguration> ChannelConfigurations
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current signal frames, one item per channel.
-        /// </summary>
-        IEnumerable<SignalFrame> CurrentSignalFrames
+        public double Y
         { get; set; }
     }
+
+    /// <summary>
+    /// Provides a color.
+    /// </summary>
+    public struct Color
+    {
+        public Color (double r, double g, double b)
+        {
+            R = r;
+            G = g;
+            B = b;
+        }
+
+        public double R
+        { get; set; }
+
+        public double G
+        { get; set; }
+
+        public double B
+        { get; set; }
+    }
+
 }
 

@@ -21,26 +21,31 @@ using System.Collections.Generic;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides access to a viewmodel of a scope screen.
+    /// Provides the base implementation for trigger configurations.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public abstract class TriggerConfigurationBase
     {
         /// <summary>
-        /// Gets or sets the trigger configuration.
+        /// Initializes an instance of this class with default settings.
         /// </summary>
-        TriggerConfigurationBase TriggerConfiguration
-        { get; set; }
+        protected TriggerConfigurationBase ()
+        {
+        }
 
         /// <summary>
-        /// Gets or sets the channel configuration, one item per channel.
+        /// Initializes an instance of this class.
         /// </summary>
-        IEnumerable<ChannelConfiguration> ChannelConfigurations
-        { get; set; }
+        /// <param name="level">The number of the scope channel the trigger is assigned to.</param>
+        protected TriggerConfigurationBase (ushort channel)
+            : this()
+        {
+            ChannelNumber = channel;
+        }
 
         /// <summary>
-        /// Gets or sets the current signal frames, one item per channel.
+        /// Gets or sets the number of the scope channel the trigger is assigned to.
         /// </summary>
-        IEnumerable<SignalFrame> CurrentSignalFrames
+        public ushort ChannelNumber
         { get; set; }
     }
 }

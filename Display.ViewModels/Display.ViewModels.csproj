@@ -37,6 +37,9 @@
     <Compile Include="MVVM\ViewModelBase.cs" />
     <Compile Include="Scope Screen\SignalFrame.cs" />
     <Compile Include="Scope Screen\ChannelConfiguration.cs" />
+    <Compile Include="Trigger\TriggerConfigurationBase.cs" />
+    <Compile Include="Trigger\LevelTriggerConfiguration.cs" />
+    <Compile Include="Miscellaneous\CommonTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -48,5 +51,7 @@
   <ItemGroup>
     <Folder Include="Scope Screen\" />
     <Folder Include="MVVM\" />
+    <Folder Include="Trigger\" />
+    <Folder Include="Miscellaneous\" />
   </ItemGroup>
 </Project>

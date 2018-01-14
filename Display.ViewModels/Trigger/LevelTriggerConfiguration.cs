@@ -21,26 +21,34 @@ using System.Collections.Generic;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides access to a viewmodel of a scope screen.
+    /// Provides the configuration of a level-based scope trigger.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public class LevelTriggerConfiguration : TriggerConfigurationBase
     {
         /// <summary>
-        /// Gets or sets the trigger configuration.
+        /// Initializes an instance of this class with default settings.
         /// </summary>
-        TriggerConfigurationBase TriggerConfiguration
-        { get; set; }
+        public LevelTriggerConfiguration ()
+            : base()
+        {
+            Level = 0.0;
+        }
 
         /// <summary>
-        /// Gets or sets the channel configuration, one item per channel.
+        /// Initializes an instance of this class.
         /// </summary>
-        IEnumerable<ChannelConfiguration> ChannelConfigurations
-        { get; set; }
+        /// <param name="level">The number of the scope channel the trigger is assigned to.</param>
+        /// <param name="level">The trigger level.</param>
+        public LevelTriggerConfiguration (ushort channel, double level)
+            : base(channel)
+        {
+            Level = level;
+        }
 
         /// <summary>
-        /// Gets or sets the current signal frames, one item per channel.
+        /// Gets or sets the trigger level.
         /// </summary>
-        IEnumerable<SignalFrame> CurrentSignalFrames
+        public double Level
         { get; set; }
     }
 }

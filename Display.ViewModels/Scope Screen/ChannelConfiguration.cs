@@ -21,46 +21,6 @@ using System.Collections.Generic;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides a position on the scope display.
-    /// </summary>
-    public struct Point
-    {
-        public Point (double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public double X
-        { get; set; }
-
-        public double Y
-        { get; set; }
-    }
-
-    /// <summary>
-    /// Provides a color.
-    /// </summary>
-    public struct Color
-    {
-        public Color (double r, double g, double b)
-        {
-            R = r;
-            G = g;
-            B = b;
-        }
-
-        public double R
-        { get; set; }
-
-        public double G
-        { get; set; }
-
-        public double B
-        { get; set; }
-    }
-
-    /// <summary>
     /// Provides the configuration of a scope channel.
     /// </summary>
     public class ChannelConfiguration

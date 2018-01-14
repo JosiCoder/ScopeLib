@@ -508,7 +508,7 @@ namespace ScopeLib.Display.Graphics
 
                 switch (caption.AlignmentReference)
                 {
-                    case ScopeAlignmentReference.XPositionAndVerticalRangeEdge:
+                    case ScopeAlignmentReference.YPositionAndHorizontalRangeEdge:
                         alignmentDistance = caption.YieldToMarker
                             ? new Distance(alignmentDistance.Dx, alignmentDistance.Dy + _lateralCursorMarkerSize)
                             : alignmentDistance;
@@ -516,7 +516,7 @@ namespace ScopeLib.Display.Graphics
                             caption.HorizontalAlignment, caption.VerticalAlignment, alignmentDistance);
                         break;
 
-                    case ScopeAlignmentReference.YPositionAndHorizontalRangeEdge:
+                    case ScopeAlignmentReference.XPositionAndVerticalRangeEdge:
                         alignmentDistance = caption.YieldToMarker
                             ? new Distance(alignmentDistance.Dx + _lateralCursorMarkerSize, alignmentDistance.Dy)
                             : alignmentDistance;

@@ -26,6 +26,12 @@ namespace ScopeLib.Display.ViewModels
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
         /// <summary>
+        /// Gets or sets the trigger configuration.
+        /// </summary>
+        public TriggerConfigurationBase TriggerConfiguration
+        { get; set; }
+
+        /// <summary>
         /// Gets or sets the channel configuration, one item per channel.
         /// </summary>
         public IEnumerable<ChannelConfiguration> ChannelConfigurations
