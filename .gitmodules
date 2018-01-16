@@ -1,3 +1,3 @@
 [submodule "submodules/Bind"]
 	path = submodules/Bind
-	url = /home/werner/Server/Werner/Projekte/Elektronik/c´t-Lab/Git-Repository/Bind.git
+	url = https://github.com/JosiCoder/Bind.git
