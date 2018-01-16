@@ -44,10 +44,10 @@ namespace ScopeLib.Display.Graphics
         private const double _graticuleLineWidth = 0.5;
         private const double _graticuleAxesLineWidth = 1.0;
         private const double _graticuleAxesTicksLineWidth = 0.5;
-        private const double _cursorLineWidth = 1.0;
-        private const double _cursorHighlightLineWidth = 2.0;
-        private const double _cursorTickLineWidth = 1.0;
-        private const double _cursorMarkersLineWidth = 1.0;
+        private const double _cursorLineWidth = 0.5;
+        private const double _cursorHighlightLineWidth = 1.0;
+        private const double _cursorTickLineWidth = 0.5;
+        private const double _cursorMarkersLineWidth = 0.5;
         private const int _longitudinalCursorMarkerSize = 10;
         private const int _lateralCursorMarkerSize = 3;
         private const double _cursorTickLength = 10.0;
