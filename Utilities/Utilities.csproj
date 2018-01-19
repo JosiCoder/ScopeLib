@@ -35,10 +35,14 @@
     <Compile Include="GlobalAssemblyInfo.cs" />
     <Compile Include="Function Helpers\FunctionValueGenerator.cs" />
     <Compile Include="Miscellaneous\CollectionUtilities.cs" />
+    <Compile Include="Notification\NotifyingBase.cs" />
+    <Compile Include="Notification\ValueConverter.cs" />
+    <Compile Include="Notification\ValueConverterBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Function Helpers\" />
     <Folder Include="Miscellaneous\" />
+    <Folder Include="Notification\" />
   </ItemGroup>
 </Project>

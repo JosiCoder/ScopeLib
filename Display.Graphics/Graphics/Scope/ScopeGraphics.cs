@@ -154,7 +154,7 @@ namespace ScopeLib.Display.Graphics
             return Cursors
                 .Select (cursor =>
                 {
-                    var deviceCursorPosition = userRange.Matrix.TransformPoint (cursor.Position);
+                    var deviceCursorPosition = userRange.Matrix.TransformPoint (cursor.Position.CairoPoint);
 
                     // Select each axis we are nearby and which a visible line exists for.
                     return new ScopeCursorSelection (cursor,
@@ -206,7 +206,7 @@ namespace ScopeLib.Display.Graphics
                 var newY = (_cursorSelection.SelectedLines & ScopeCursorLines.Y) != ScopeCursorLines.None
                     ? userPointerPosition.Y : _cursorSelection.Cursor.Position.Y;
 
-                _cursorSelection.Cursor.Position = new PointD(newX, newY);
+                _cursorSelection.Cursor.Position = new ScopePosition(newX, newY);
             }
         }
 

@@ -23,7 +23,7 @@ namespace ScopeLib.Display.ViewModels
     /// <summary>
     /// Provides the base implementation for trigger configurations.
     /// </summary>
-    public abstract class TriggerConfigurationBase
+    public abstract class TriggerConfigurationBase : ViewModelBase
     {
         /// <summary>
         /// Initializes an instance of this class with default settings.

@@ -22,21 +22,17 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
     /// Provides a base implementation for viewmodels.
     /// </summary>
-    public abstract class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : NotifyingBase
     {
         private readonly TaskScheduler _scheduler;
         private readonly Thread _uiThread;
-
-        /// <summary>
-        /// Occurs when a property has changed.
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Initializes a new instance of this class.
@@ -55,7 +51,12 @@ namespace ScopeLib.Display.ViewModels
             }
         }
 
-        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        /// <summary>
+        /// Raises this object's PropertyChanged event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that has a new value.
+        /// This defaults to the name of the calling member.</param>
+        protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (Thread.CurrentThread != _uiThread)
             {
@@ -65,44 +66,7 @@ namespace ScopeLib.Display.ViewModels
                 return;
             }
 
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if(handler != null)
-            {
-                try
-                {
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
-        /// <summary>
-        /// Raises this object's PropertyChanged event.
-        /// </summary>
-        /// <typeparam name="T">The type of the property that has a new value</typeparam>
-        /// <param name="propertyExpression">A lambda expression representing the property that has a new value.</param>
-        protected void RaisePropertyChanged<T>(Expression<Func<T>> propertyExpression)
-        {
-            string propertyName = ExtractPropertyName(propertyExpression);
-            RaisePropertyChanged(propertyName);
-        }
-
-        /// <summary>
-        /// Extracts the property name from a lambda expression referencing that property.
-        /// </summary>
-        public static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
-        {
-            var memberExpression = propertyExpression.Body as MemberExpression;
-            var propertyInfo = memberExpression != null ? memberExpression.Member as PropertyInfo : null;
-            var getMethod = propertyInfo != null ? propertyInfo.GetGetMethod(true) : null;
-            if( getMethod == null || getMethod.IsStatic )
-            {
-                throw new ArgumentException("Invalid expression", "propertyExpression");
-            }
-            return memberExpression.Member.Name;
+            base.RaisePropertyChanged(propertyName);
         }
 
         /// <summary>

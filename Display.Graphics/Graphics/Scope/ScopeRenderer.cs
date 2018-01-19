@@ -320,7 +320,7 @@ namespace ScopeLib.Display.Graphics
                 DrawCaptions (rectangleRange, tick.Captions, tickPosition);
             }
 
-            DrawCaptions (rectangleRange, cursor.Captions, cursor.Position);
+            DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
         }
 
         /// <summary>

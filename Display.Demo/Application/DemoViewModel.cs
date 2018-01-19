@@ -41,7 +41,7 @@ namespace ScopeLib.Display.Demo
             _scopeScreenVM.ChannelConfigurations = new[]
             {
                 new ChannelConfiguration(new Point(1.0, 1.0), 0.5, 0.3, new Color(1, 1, 0)),
-                new ChannelConfiguration(new Point(-Math.PI, 0), 1, 1, new Color(0, 1, 0)),
+                new ChannelConfiguration(new Point(-Math.PI, -2), 1, 1, new Color(0, 1, 0)),
             };
 
             _scopeScreenVM.CurrentSignalFrames = new[]

@@ -18,13 +18,14 @@
 using System;
 using System.Collections.Generic;
 using Cairo;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Display.Graphics
 {
     /// <summary>
     /// Provides a cursor used on scope displays.
     /// </summary>
-    public class ScopeCursor
+    public class ScopeCursor : NotifyingBase
     {
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
@@ -50,7 +51,7 @@ namespace ScopeLib.Display.Graphics
         /// <param name="color">The cursor color.</param>
         /// <param name="markers">A value indicating which markers are visible.</param>
         /// <param name="captions">A list of captions.</param>
-        public ScopeCursor (PointD position, ScopeCursorLines lines, ScopeCursorLines selectableLines,
+        public ScopeCursor (ScopePosition position, ScopeCursorLines lines, ScopeCursorLines selectableLines,
             Color color,
             ScopeCursorMarkers markers, IEnumerable<ScopePositionCaption> captions)
         {
@@ -63,11 +64,22 @@ namespace ScopeLib.Display.Graphics
             Captions = captions;
         }
 
+        private ScopePosition _position;
         /// <summary>
         /// Gets or sets the position.
         /// </summary>
-        public PointD Position
-        { get; set; }
+        public ScopePosition Position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                _position = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating which lines are visible.

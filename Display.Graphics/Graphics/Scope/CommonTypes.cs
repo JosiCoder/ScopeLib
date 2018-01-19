@@ -16,50 +16,51 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using ScopeLib.Utilities;
 
-namespace ScopeLib.Display.ViewModels
+namespace ScopeLib.Display.Graphics
 {
     /// <summary>
-    /// Provides the configuration of a level-based scope trigger.
+    /// Provides a modifyable position on the scope display.
     /// </summary>
-    public class LevelTriggerConfiguration : TriggerConfigurationBase
+    public class ScopePosition : NotifyingBase
     {
-        /// <summary>
-        /// Initializes an instance of this class with default settings.
-        /// </summary>
-        public LevelTriggerConfiguration ()
-            : base()
+        private Cairo.PointD _nativePoint;
+
+        public ScopePosition (double x, double y)
         {
-            Level = 0.0;
+            _nativePoint = new Cairo.PointD(x, y);
         }
 
-        /// <summary>
-        /// Initializes an instance of this class.
-        /// </summary>
-        /// <param name="level">The number of the scope channel the trigger is assigned to.</param>
-        /// <param name="level">The trigger level.</param>
-        public LevelTriggerConfiguration (ushort channel, double level)
-            : base(channel)
-        {
-            Level = level;
-        }
-
-        private double _level;
-        /// <summary>
-        /// Gets or sets the trigger level.
-        /// </summary>
-        public double Level
+        public double X
         {
             get
             {
-                return _level;
+                return _nativePoint.X;
             }
             set
             {
-                _level = value;
+                _nativePoint.X = value;
                 RaisePropertyChanged();
             }
+        }
+
+        public double Y
+        {
+            get
+            {
+                return _nativePoint.Y;
+            }
+            set
+            {
+                _nativePoint.Y = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public Cairo.PointD CairoPoint
+        {
+            get{ return _nativePoint; }
         }
     }
 }

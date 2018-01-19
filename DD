@@ -1,0 +1,785 @@
+diff --git a/Display.Demo/Application/DemoViewModel.cs b/Display.Demo/Application/DemoViewModel.cs
+index 91163a8..452af73 100644
+--- a/Display.Demo/Application/DemoViewModel.cs
++++ b/Display.Demo/Application/DemoViewModel.cs
+@@ -41,7 +41,7 @@ namespace ScopeLib.Display.Demo
+             _scopeScreenVM.ChannelConfigurations = new[]
+             {
+                 new ChannelConfiguration(new Point(1.0, 1.0), 0.5, 0.3, new Color(1, 1, 0)),
+-                new ChannelConfiguration(new Point(-Math.PI, 0), 1, 1, new Color(0, 1, 0)),
++                new ChannelConfiguration(new Point(-Math.PI, -2), 1, 1, new Color(0, 1, 0)),
+             };
+ 
+             _scopeScreenVM.CurrentSignalFrames = new[]
+diff --git a/Display.Graphics/Display.Graphics.csproj b/Display.Graphics/Display.Graphics.csproj
+index 16206da..3b1696b 100644
+--- a/Display.Graphics/Display.Graphics.csproj
++++ b/Display.Graphics/Display.Graphics.csproj
+@@ -66,6 +66,7 @@
+     <Compile Include="Graphics\Scope\ScopeReadout.cs" />
+     <Compile Include="Graphics\Scope\ScopeRenderer.cs" />
+     <Compile Include="Graphics\Scope\ScopeValues.cs" />
++    <Compile Include="Graphics\Scope\CommonTypes.cs" />
+   </ItemGroup>
+   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+   <Import Project="..\packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets" Condition="Exists('..\packages\GtkSharp.3.1.3\build\net45\GtkSharp.targets')" />
+diff --git a/Display.Graphics/Graphics/Scope/CommonTypes.cs b/Display.Graphics/Graphics/Scope/CommonTypes.cs
+index 89c0e41..ba8ff9b 100644
+--- a/Display.Graphics/Graphics/Scope/CommonTypes.cs
++++ b/Display.Graphics/Graphics/Scope/CommonTypes.cs
+@@ -1,11 +1,66 @@
+-﻿using System;
++﻿//------------------------------------------------------------------------------
++// Copyright (C) 2017 Josi Coder
++
++// This program is free software: you can redistribute it and/or modify it
++// under the terms of the GNU General Public License as published by the Free
++// Software Foundation, either version 3 of the License, or (at your option)
++// any later version.
++
++// This program is distributed in the hope that it will be useful, but WITHOUT
++// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
++// more details.
++
++// You should have received a copy of the GNU General Public License along with
++// this program. If not, see <http://www.gnu.org/licenses/>.
++//--------------------------------------------------------------------------------
++
++using System;
++using ScopeLib.Utilities;
+ 
+ namespace ScopeLib.Display.Graphics
+ {
+-    public class CommonTypes
++    /// <summary>
++    /// Provides a modifyable position on the scope display.
++    /// </summary>
++    public class ScopePosition : NotifyingBase
+     {
+-        public CommonTypes ()
++        private Cairo.PointD _nativePoint;
++
++        public ScopePosition (double x, double y)
++        {
++            _nativePoint = new Cairo.PointD(x, y);
++        }
++
++        public double X
++        {
++            get
++            {
++                return _nativePoint.X;
++            }
++            set
++            {
++                _nativePoint.X = value;
++                RaisePropertyChanged();
++            }
++        }
++
++        public double Y
++        {
++            get
++            {
++                return _nativePoint.Y;
++            }
++            set
++            {
++                _nativePoint.Y = value;
++                RaisePropertyChanged();
++            }
++        }
++
++        public Cairo.PointD CairoPoint
+         {
++            get{ return _nativePoint; }
+         }
+     }
+ }
+diff --git a/Display.Graphics/Graphics/Scope/ScopeCursor.cs b/Display.Graphics/Graphics/Scope/ScopeCursor.cs
+index 1dac618..db4897d 100644
+--- a/Display.Graphics/Graphics/Scope/ScopeCursor.cs
++++ b/Display.Graphics/Graphics/Scope/ScopeCursor.cs
+@@ -18,13 +18,14 @@
+ using System;
+ using System.Collections.Generic;
+ using Cairo;
++using ScopeLib.Utilities;
+ 
+ namespace ScopeLib.Display.Graphics
+ {
+     /// <summary>
+     /// Provides a cursor used on scope displays.
+     /// </summary>
+-    public class ScopeCursor
++    public class ScopeCursor : NotifyingBase
+     {
+         private readonly Color _defaultColor = new Color (1, 1, 1);
+ 
+@@ -50,7 +51,7 @@ namespace ScopeLib.Display.Graphics
+         /// <param name="color">The cursor color.</param>
+         /// <param name="markers">A value indicating which markers are visible.</param>
+         /// <param name="captions">A list of captions.</param>
+-        public ScopeCursor (PointD position, ScopeCursorLines lines, ScopeCursorLines selectableLines,
++        public ScopeCursor (ScopePosition position, ScopeCursorLines lines, ScopeCursorLines selectableLines,
+             Color color,
+             ScopeCursorMarkers markers, IEnumerable<ScopePositionCaption> captions)
+         {
+@@ -63,11 +64,22 @@ namespace ScopeLib.Display.Graphics
+             Captions = captions;
+         }
+ 
++        private ScopePosition _position;
+         /// <summary>
+         /// Gets or sets the position.
+         /// </summary>
+-        public PointD Position
+-        { get; set; }
++        public ScopePosition Position
++        {
++            get
++            {
++                return _position;
++            }
++            set
++            {
++                _position = value;
++                RaisePropertyChanged();
++            }
++        }
+ 
+         /// <summary>
+         /// Gets or sets a value indicating which lines are visible.
+diff --git a/Display.Graphics/Graphics/Scope/ScopeGraphics.cs b/Display.Graphics/Graphics/Scope/ScopeGraphics.cs
+index c482660..99fb199 100644
+--- a/Display.Graphics/Graphics/Scope/ScopeGraphics.cs
++++ b/Display.Graphics/Graphics/Scope/ScopeGraphics.cs
+@@ -154,7 +154,7 @@ namespace ScopeLib.Display.Graphics
+             return Cursors
+                 .Select (cursor =>
+                 {
+-                    var deviceCursorPosition = userRange.Matrix.TransformPoint (cursor.Position);
++                    var deviceCursorPosition = userRange.Matrix.TransformPoint (cursor.Position.CairoPoint);
+ 
+                     // Select each axis we are nearby and which a visible line exists for.
+                     return new ScopeCursorSelection (cursor,
+@@ -206,7 +206,7 @@ namespace ScopeLib.Display.Graphics
+                 var newY = (_cursorSelection.SelectedLines & ScopeCursorLines.Y) != ScopeCursorLines.None
+                     ? userPointerPosition.Y : _cursorSelection.Cursor.Position.Y;
+ 
+-                _cursorSelection.Cursor.Position = new PointD(newX, newY);
++                _cursorSelection.Cursor.Position = new ScopePosition(newX, newY);
+             }
+         }
+ 
+diff --git a/Display.Graphics/Graphics/Scope/ScopeRenderer.cs b/Display.Graphics/Graphics/Scope/ScopeRenderer.cs
+index cb80086..2711414 100644
+--- a/Display.Graphics/Graphics/Scope/ScopeRenderer.cs
++++ b/Display.Graphics/Graphics/Scope/ScopeRenderer.cs
+@@ -320,7 +320,7 @@ namespace ScopeLib.Display.Graphics
+                 DrawCaptions (rectangleRange, tick.Captions, tickPosition);
+             }
+ 
+-            DrawCaptions (rectangleRange, cursor.Captions, cursor.Position);
++            DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
+         }
+ 
+         /// <summary>
+diff --git a/Display.ViewModels/MVVM/ViewModelBase.cs b/Display.ViewModels/MVVM/ViewModelBase.cs
+index 1ef6f13..80ca38e 100644
+--- a/Display.ViewModels/MVVM/ViewModelBase.cs
++++ b/Display.ViewModels/MVVM/ViewModelBase.cs
+@@ -22,23 +22,19 @@ using System.ComponentModel;
+ using System.Linq.Expressions;
+ using System.Reflection;
+ using System.Runtime.CompilerServices;
++using ScopeLib.Utilities;
+ 
+ namespace ScopeLib.Display.ViewModels
+ {
+     /// <summary>
+     /// Provides a base implementation for viewmodels.
+     /// </summary>
+-    public abstract class ViewModelBase : INotifyPropertyChanged
++    public abstract class ViewModelBase : NotifyingBase
+     {
+         private readonly TaskScheduler _scheduler;
+         private readonly Thread _uiThread;
+ 
+         /// <summary>
+-        /// Occurs when a property has changed.
+-        /// </summary>
+-        public event PropertyChangedEventHandler PropertyChanged;
+-
+-        /// <summary>
+         /// Initializes a new instance of this class.
+         /// </summary>
+         public ViewModelBase()
+@@ -55,7 +51,12 @@ namespace ScopeLib.Display.ViewModels
+             }
+         }
+ 
+-        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
++        /// <summary>
++        /// Raises this object's PropertyChanged event.
++        /// </summary>
++        /// <param name="propertyName">The name of the property that has a new value.
++        /// This defaults to the name of the calling member.</param>
++        protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+         {
+             if (Thread.CurrentThread != _uiThread)
+             {
+@@ -65,44 +66,7 @@ namespace ScopeLib.Display.ViewModels
+                 return;
+             }
+ 
+-            PropertyChangedEventHandler handler = PropertyChanged;
+-            if(handler != null)
+-            {
+-                try
+-                {
+-                    handler(this, new PropertyChangedEventArgs(propertyName));
+-                }
+-                catch
+-                {
+-
+-                }
+-            }
+-        }
+-
+-        /// <summary>
+-        /// Raises this object's PropertyChanged event.
+-        /// </summary>
+-        /// <typeparam name="T">The type of the property that has a new value</typeparam>
+-        /// <param name="propertyExpression">A lambda expression representing the property that has a new value.</param>
+-        protected void RaisePropertyChanged<T>(Expression<Func<T>> propertyExpression)
+-        {
+-            string propertyName = ExtractPropertyName(propertyExpression);
+-            RaisePropertyChanged(propertyName);
+-        }
+-
+-        /// <summary>
+-        /// Extracts the property name from a lambda expression referencing that property.
+-        /// </summary>
+-        public static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
+-        {
+-            var memberExpression = propertyExpression.Body as MemberExpression;
+-            var propertyInfo = memberExpression != null ? memberExpression.Member as PropertyInfo : null;
+-            var getMethod = propertyInfo != null ? propertyInfo.GetGetMethod(true) : null;
+-            if( getMethod == null || getMethod.IsStatic )
+-            {
+-                throw new ArgumentException("Invalid expression", "propertyExpression");
+-            }
+-            return memberExpression.Member.Name;
++            base.RaisePropertyChanged(propertyName);
+         }
+ 
+         /// <summary>
+diff --git a/Display.ViewModels/Miscellaneous/CommonTypes.cs b/Display.ViewModels/Miscellaneous/CommonTypes.cs
+index fdaf629..6bec1fe 100644
+--- a/Display.ViewModels/Miscellaneous/CommonTypes.cs
++++ b/Display.ViewModels/Miscellaneous/CommonTypes.cs
+@@ -20,7 +20,7 @@ using System;
+ namespace ScopeLib.Display.ViewModels
+ {
+     /// <summary>
+-    /// Provides a position on the scope display.
++    /// Provides a point on the scope display.
+     /// </summary>
+     public struct Point
+     {
+diff --git a/Display.ViewModels/Trigger/LevelTriggerConfiguration.cs b/Display.ViewModels/Trigger/LevelTriggerConfiguration.cs
+index 2d4343c..2a401eb 100644
+--- a/Display.ViewModels/Trigger/LevelTriggerConfiguration.cs
++++ b/Display.ViewModels/Trigger/LevelTriggerConfiguration.cs
+@@ -45,11 +45,22 @@ namespace ScopeLib.Display.ViewModels
+             Level = level;
+         }
+ 
++        private double _level;
+         /// <summary>
+         /// Gets or sets the trigger level.
+         /// </summary>
+         public double Level
+-        { get; set; }
++        {
++            get
++            {
++                return _level;
++            }
++            set
++            {
++                _level = value;
++                RaisePropertyChanged();
++            }
++        }
+     }
+ }
+ 
+diff --git a/Display.ViewModels/Trigger/TriggerConfigurationBase.cs b/Display.ViewModels/Trigger/TriggerConfigurationBase.cs
+index 1b86b32..fc7a7e5 100644
+--- a/Display.ViewModels/Trigger/TriggerConfigurationBase.cs
++++ b/Display.ViewModels/Trigger/TriggerConfigurationBase.cs
+@@ -23,7 +23,7 @@ namespace ScopeLib.Display.ViewModels
+     /// <summary>
+     /// Provides the base implementation for trigger configurations.
+     /// </summary>
+-    public abstract class TriggerConfigurationBase
++    public abstract class TriggerConfigurationBase : ViewModelBase
+     {
+         /// <summary>
+         /// Initializes an instance of this class with default settings.
+diff --git a/Display.Views/Scope Screen/ScopeScreenView.cs b/Display.Views/Scope Screen/ScopeScreenView.cs
+index ff690ca..37044b1 100644
+--- a/Display.Views/Scope Screen/ScopeScreenView.cs	
++++ b/Display.Views/Scope Screen/ScopeScreenView.cs	
+@@ -20,7 +20,6 @@ using System.Linq;
+ using System.Collections.Generic;
+ using System.ComponentModel;
+ using Gtk;
+-using Cairo;
+ using UI = Gtk.Builder.ObjectAttribute;
+ using PB = Praeclarum.Bind;
+ using System.Collections.Specialized;
+@@ -93,7 +92,7 @@ namespace ScopeLib.Display.Views
+ 
+             // === Create bindings. ===
+ 
+-            //  === Do any additional stuff. ===
++            // === Do any additional stuff. ===
+ 
+             _scopeGraphics = new ScopeGraphics (ScopeStretchMode.Stretch,
+                 _xMinimumGraticuleUnits, _yMinimumGraticuleUnits);
+@@ -123,11 +122,11 @@ namespace ScopeLib.Display.Views
+         {
+             if (_currentMouseButtons != 0)
+             {
+-                _scopeGraphics.SetSelectedCursorLinesToPosition (new PointD (args.Event.X, args.Event.Y));
++                _scopeGraphics.SetSelectedCursorLinesToPosition (new Cairo.PointD (args.Event.X, args.Event.Y));
+             }
+             else
+             {
+-                _scopeGraphics.FindAndHighlightCursorLines(new PointD(args.Event.X, args.Event.Y));
++                _scopeGraphics.FindAndHighlightCursorLines(new Cairo.PointD(args.Event.X, args.Event.Y));
+             }
+             RefreshGraphics ();
+         }
+@@ -138,7 +137,7 @@ namespace ScopeLib.Display.Views
+         private void ScopeEventBox_ButtonPressEventHandler (object o, ButtonPressEventArgs args)
+         {
+             _currentMouseButtons = args.Event.Button;
+-            _scopeGraphics.FindAndSelectCursorLines (new PointD(args.Event.X, args.Event.Y));
++            _scopeGraphics.FindAndSelectCursorLines (new Cairo.PointD(args.Event.X, args.Event.Y));
+             RefreshGraphics ();
+         }
+ 
+@@ -149,7 +148,7 @@ namespace ScopeLib.Display.Views
+         {
+             _currentMouseButtons = 0;
+             _scopeGraphics.DeselectScopeCursorLines ();
+-            _scopeGraphics.FindAndHighlightCursorLines (new PointD(args.Event.X, args.Event.Y));
++            _scopeGraphics.FindAndHighlightCursorLines (new Cairo.PointD(args.Event.X, args.Event.Y));
+             RefreshGraphics ();
+         }
+ 
+@@ -212,9 +211,9 @@ namespace ScopeLib.Display.Views
+                 Color = ToCairoColor(channelConfiguration.Color),
+                 XScaleFactor = channelConfiguration.TimeScaleFactor,
+                 YScaleFactor = channelConfiguration.ValueScaleFactor,
+-                ReferencePoint = new PointD(signalFrame.ReferenceTime, _referenceLevel),
++                ReferencePoint = new Cairo.PointD(signalFrame.ReferenceTime, _referenceLevel),
+                 Vertices = signalFrame.Values
+-                    .Select((value, counter) => new PointD (counter * signalFrame.TimeIncrement, value)),
++                    .Select((value, counter) => new Cairo.PointD (counter * signalFrame.TimeIncrement, value)),
+             };
+         }
+ 
+@@ -258,33 +257,42 @@ namespace ScopeLib.Display.Views
+             var referencePointPosition = triggerChannelConfiguration.ReferencePointPosition;
+             var levelColor = ToCairoColor(triggerChannelConfiguration.Color);
+ 
+-            var cursorPointPosition = new PointD
+-                (
+-                    0,
+-                    referencePointPosition.Y + triggerConfiguration.Level - _referenceLevel
+-                );
+-
+             const string triggerCaption = "T";
+             Func<String> levelTextProvider = () =>
+                 string.Format("{0:F2}", triggerConfiguration.Level);
+ 
+-            return new []
++            var cursor = new ScopeCursor
+             {
+-                new ScopeCursor
++                Position = new ScopePosition(0, 0),
++                Lines = ScopeCursorLines.Y,
++                SelectableLines = ScopeCursorLines.Y,
++                Markers = ScopeCursorMarkers.YFull,
++                Color = levelColor,
++                Captions = new []
+                 {
+-                    Position = cursorPointPosition,
+-                    Lines = ScopeCursorLines.Y,
+-                    SelectableLines = ScopeCursorLines.Y,
+-                    Markers = ScopeCursorMarkers.YFull,
+-                    Color = levelColor,
+-                    Captions = new []
+-                    {
+-                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+-                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+-                        new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+-                    },
++                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
++                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
++                    new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+                 },
+             };
++
++            // === Create value converters. ===
++
++            Func<double> triggerLevelReference = () => referencePointPosition.Y - _referenceLevel;
++            var triggerLevelConverter = new ValueConverter<double, double>(
++                val => val + triggerLevelReference(),
++                val => val - triggerLevelReference());
++
++            // === Create bindings. ===
++
++            // Bind the cursor's position.
++            PB.Binding.Create (() => cursor.Position.Y == triggerLevelConverter.DerivedValue);
++            PB.Binding.Create (() => triggerLevelConverter.OriginalValue == triggerConfiguration.Level);
++
++            return new []
++            {
++                cursor,
++            };
+         }
+ 
+         /// <summary>
+@@ -294,7 +302,7 @@ namespace ScopeLib.Display.Views
+         {
+             var markerColor = new Cairo.Color (0.0, 0.5, 1.0);
+ 
+-            var cursorPointPosition = new PointD
++            var cursorPointPosition = new ScopePosition
+                 (
+                     triggerPointXPosition,
+                     0
+@@ -329,8 +337,8 @@ namespace ScopeLib.Display.Views
+         {
+             var textColor = new Cairo.Color (1, 1, 0);
+             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
+-            var cursor2Color = new Cairo.Color (0.5, 1, 0.5);
+-            var cursor3Color = new Cairo.Color (0.5, 0.5, 1);
++//            var cursor2Color = new Cairo.Color (0.5, 1, 0.5);
++//            var cursor3Color = new Cairo.Color (0.5, 0.5, 1);
+ 
+             _scopeGraphics.Graphs = CollectionUtilities.Zip(
+                 objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
+@@ -340,7 +348,7 @@ namespace ScopeLib.Display.Views
+             {
+                 new ScopeCursor
+                 {
+-                    Position = new PointD(1, 1),
++                    Position = new ScopePosition(1, 1),
+                     Lines = ScopeCursorLines.Both,
+                     Markers = ScopeCursorMarkers.Full,
+                     Color = cursor1Color,
+@@ -363,44 +371,44 @@ namespace ScopeLib.Display.Views
+                         new ScopeCursorValueTick(2.5),
+                     },
+                 },
+-                new ScopeCursor
+-                {
+-                    Position = new PointD (-2.5, -2.7),
+-                    Lines = ScopeCursorLines.X,
+-                    Markers = ScopeCursorMarkers.XRight,
+-                    Color = cursor2Color,
+-                    Captions = new []
+-                    {
+-                        new ScopePositionCaption(() => "yLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
+-                        new ScopePositionCaption(() => "yLT", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
+-                        new ScopePositionCaption(() => "yRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, false, textColor),
+-                    },
+-                    YTicks = new []
+-                    {
+-                        new ScopeCursorValueTick(-0.5),
+-                        new ScopeCursorValueTick(0.5),
+-                        new ScopeCursorValueTick(3.0)
+-                    },
+-                },
+-                new ScopeCursor
+-                {
+-                    Position = new PointD (-3.5, -3.7),
+-                    Lines = ScopeCursorLines.Y,
+-                    Markers = ScopeCursorMarkers.YLower,
+-                    Color = cursor3Color,
+-                    Captions = new []
+-                    {
+-                        new ScopePositionCaption(() => "xRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, textColor),
+-                        new ScopePositionCaption(() => "xRB", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
+-                        new ScopePositionCaption(() => "xLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
+-                    },
+-                    XTicks = new []
+-                    {
+-                        new ScopeCursorValueTick(-0.3),
+-                        new ScopeCursorValueTick(0.3),
+-                        new ScopeCursorValueTick(2.8)
+-                    },
+-                },
++//                new ScopeCursor
++//                {
++//                    Position = new PointD (-2.5, -2.7),
++//                    Lines = ScopeCursorLines.X,
++//                    Markers = ScopeCursorMarkers.XRight,
++//                    Color = cursor2Color,
++//                    Captions = new []
++//                    {
++//                        new ScopePositionCaption(() => "yLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
++//                        new ScopePositionCaption(() => "yLT", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, textColor),
++//                        new ScopePositionCaption(() => "yRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, false, textColor),
++//                    },
++//                    YTicks = new []
++//                    {
++//                        new ScopeCursorValueTick(-0.5),
++//                        new ScopeCursorValueTick(0.5),
++//                        new ScopeCursorValueTick(3.0)
++//                    },
++//                },
++//                new ScopeCursor
++//                {
++//                    Position = new PointD (-3.5, -3.7),
++//                    Lines = ScopeCursorLines.Y,
++//                    Markers = ScopeCursorMarkers.YLower,
++//                    Color = cursor3Color,
++//                    Captions = new []
++//                    {
++//                        new ScopePositionCaption(() => "xRT", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, textColor),
++//                        new ScopePositionCaption(() => "xRB", ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
++//                        new ScopePositionCaption(() => "xLB", ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, false, textColor),
++//                    },
++//                    XTicks = new []
++//                    {
++//                        new ScopeCursorValueTick(-0.3),
++//                        new ScopeCursorValueTick(0.3),
++//                        new ScopeCursorValueTick(2.8)
++//                    },
++//                },
+             };
+ 
+             _scopeGraphics.Cursors = CreateTriggerCursors().Concat(demoCursors);
+diff --git a/Utilities/Notification/NotifyingBase.cs b/Utilities/Notification/NotifyingBase.cs
+index bdba633..01c97f4 100644
+--- a/Utilities/Notification/NotifyingBase.cs
++++ b/Utilities/Notification/NotifyingBase.cs
+@@ -1,12 +1,82 @@
+-﻿using System;
++﻿//------------------------------------------------------------------------------
++// Copyright (C) 2017 Josi Coder
++
++// This program is free software: you can redistribute it and/or modify it
++// under the terms of the GNU General Public License as published by the Free
++// Software Foundation, either version 3 of the License, or (at your option)
++// any later version.
++
++// This program is distributed in the hope that it will be useful, but WITHOUT
++// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
++// more details.
++
++// You should have received a copy of the GNU General Public License along with
++// this program. If not, see <http://www.gnu.org/licenses/>.
++//--------------------------------------------------------------------------------
++
++using System;
++using System.ComponentModel;
++using System.Linq.Expressions;
++using System.Reflection;
++using System.Runtime.CompilerServices;
+ 
+ namespace ScopeLib.Utilities
+ {
+-    public class NotifyingBase
++    /// <summary>
++    /// Provides a base implementation for objects that can notify property changes.
++    /// </summary>
++    public abstract class NotifyingBase : INotifyPropertyChanged
+     {
+-        public NotifyingBase ()
++        /// <summary>
++        /// Occurs when a property has changed.
++        /// </summary>
++        public event PropertyChangedEventHandler PropertyChanged;
++
++        /// <summary>
++        /// Raises this object's PropertyChanged event.
++        /// </summary>
++        /// <param name="propertyName">The name of the property that has a new value.
++        /// This defaults to the name of the calling member.</param>
++        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
++        {
++            var handler = PropertyChanged;
++            if(handler != null)
++            {
++                try
++                {
++                    handler(this, new PropertyChangedEventArgs(propertyName));
++                }
++                catch {}
++            }
++        }
++
++        /// <summary>
++        /// Raises this object's PropertyChanged event.
++        /// </summary>
++        /// <typeparam name="T">The type of the property that has a new value</typeparam>
++        /// <param name="propertyExpression">A lambda expression representing the property that has a new value.</param>
++        protected void RaisePropertyChanged<T>(Expression<Func<T>> propertyExpression)
++        {
++            string propertyName = ExtractPropertyName(propertyExpression);
++            RaisePropertyChanged(propertyName);
++        }
++
++        /// <summary>
++        /// Extracts the property name from a lambda expression referencing that property.
++        /// </summary>
++        public static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
+         {
++            var memberExpression = propertyExpression.Body as MemberExpression;
++            var propertyInfo = memberExpression != null ? memberExpression.Member as PropertyInfo : null;
++            var getMethod = propertyInfo != null ? propertyInfo.GetGetMethod(true) : null;
++            if( getMethod == null || getMethod.IsStatic )
++            {
++                throw new ArgumentException("Invalid expression", "propertyExpression");
++            }
++            return memberExpression.Member.Name;
+         }
+     }
++
+ }
+ 
+diff --git a/Utilities/Notification/ValueConverter.cs b/Utilities/Notification/ValueConverter.cs
+index 65503bb..2cb9d10 100644
+--- a/Utilities/Notification/ValueConverter.cs
++++ b/Utilities/Notification/ValueConverter.cs
+@@ -1,11 +1,96 @@
+-﻿using System;
++﻿//------------------------------------------------------------------------------
++// Copyright (C) 2017 Josi Coder
++
++// This program is free software: you can redistribute it and/or modify it
++// under the terms of the GNU General Public License as published by the Free
++// Software Foundation, either version 3 of the License, or (at your option)
++// any later version.
++
++// This program is distributed in the hope that it will be useful, but WITHOUT
++// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
++// more details.
++
++// You should have received a copy of the GNU General Public License along with
++// this program. If not, see <http://www.gnu.org/licenses/>.
++//--------------------------------------------------------------------------------
++
++using System;
+ 
+ namespace ScopeLib.Utilities
+ {
+-    public class ValueConverter
++    /// <summary>
++    /// Converts original to derived values and vice versa.
++    /// </summary>
++    /// <typeparam name="TOriginalValue">The type of the original values.</param>
++    /// <typeparam name="TDerivedValue">The type of the derived values.</param>
++    public class ValueConverter<TOriginalValue, TDerivedValue> : NotifyingBase
+     {
+-        public ValueConverter ()
++        private readonly Func<TOriginalValue, TDerivedValue> _originalToDerivedValueConverter;
++        private readonly Func<TDerivedValue, TOriginalValue> _derivedToOriginalValueConverter;
++
++        /// <summary>
++        /// Initializes a new instance of this class.
++        /// </summary>
++        /// <param name="originalToDerivedValueConverter">
++        /// The function used to convert an original value to its derived counterpart.
++        /// </param>
++        /// <param name="derivedToOriginalValueConverter">
++        /// The function used to convert a derived value to its original counterpart.
++        /// </param>
++        public ValueConverter (
++            Func<TOriginalValue, TDerivedValue> originalToDerivedValueConverter,
++            Func<TDerivedValue, TOriginalValue> derivedToOriginalValueConverter)
++        {
++            _originalToDerivedValueConverter = originalToDerivedValueConverter;
++            _derivedToOriginalValueConverter = derivedToOriginalValueConverter;
++        }
++
++        /// <summary>
++        /// Gets or sets the orifginal value.
++        /// </summary>
++        private TOriginalValue _originalValue;
++        public TOriginalValue OriginalValue
++        {
++            get
++            {
++                return _originalValue;
++            }
++            set
++            {
++                _originalValue = value;
++                RaisePropertyChanged ();
++                RaisePropertyChanged (() => DerivedValue);
++            }
++        }
++
++        /// <summary>
++        /// Gets or sets the derived value.
++        /// </summary>
++        public TDerivedValue DerivedValue
+         {
++            get
++            {
++                try
++                {
++                    return _originalToDerivedValueConverter(OriginalValue);
++                }
++                catch
++                {
++                    return default(TDerivedValue);
++                }
++            }
++            set
++            {
++                try
++                {
++                    OriginalValue = _derivedToOriginalValueConverter(value);
++                }
++                catch
++                {
++                    OriginalValue = default(TOriginalValue);
++                }
++            }
+         }
+     }
+ }
+diff --git a/Utilities/Utilities.csproj b/Utilities/Utilities.csproj
+index d36c9c5..c6ff8fa 100644
+--- a/Utilities/Utilities.csproj
++++ b/Utilities/Utilities.csproj
+@@ -35,10 +35,14 @@
+     <Compile Include="GlobalAssemblyInfo.cs" />
+     <Compile Include="Function Helpers\FunctionValueGenerator.cs" />
+     <Compile Include="Miscellaneous\CollectionUtilities.cs" />
++    <Compile Include="Notification\NotifyingBase.cs" />
++    <Compile Include="Notification\ValueConverter.cs" />
++    <Compile Include="Notification\ValueConverterBuilder.cs" />
+   </ItemGroup>
+   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <Folder Include="Function Helpers\" />
+     <Folder Include="Miscellaneous\" />
++    <Folder Include="Notification\" />
+   </ItemGroup>
+ </Project>
+\ No newline at end of file

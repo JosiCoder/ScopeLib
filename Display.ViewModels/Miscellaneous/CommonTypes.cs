@@ -20,7 +20,7 @@ using System;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides a position on the scope display.
+    /// Provides a point on the scope display.
     /// </summary>
     public struct Point
     {
