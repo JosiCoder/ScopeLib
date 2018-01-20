@@ -16,9 +16,58 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Display.ViewModels
 {
+    /// <summary>
+    /// Provides a modifyable position on the scope display.
+    /// </summary>
+    public class Position : NotifyingBase
+    {
+        private Point _nativePoint;
+
+        public Position ()
+            : this (0, 0)
+        {}
+
+        public Position (double x, double y)
+        {
+            _nativePoint = new Point(x, y);
+        }
+
+        public double X
+        {
+            get
+            {
+                return _nativePoint.X;
+            }
+            set
+            {
+                _nativePoint.X = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public double Y
+        {
+            get
+            {
+                return _nativePoint.Y;
+            }
+            set
+            {
+                _nativePoint.Y = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public Point Point
+        {
+            get{ return _nativePoint; }
+        }
+    }
+
     /// <summary>
     /// Provides a point on the scope display.
     /// </summary>
@@ -58,6 +107,5 @@ namespace ScopeLib.Display.ViewModels
         public double B
         { get; set; }
     }
-
 }
 

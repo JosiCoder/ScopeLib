@@ -234,14 +234,13 @@ namespace ScopeLib.Display.Views
                 .Skip(triggerConfiguration.ChannelNumber)
                 .FirstOrDefault();
 
-            if (channelConfig == null)
-            {
-                return new ScopeCursor[0];
-            }
-
             IEnumerable<ScopeCursor> triggerCriteriaCursors = new ScopeCursor[0];
 
-            if (triggerConfiguration is LevelTriggerConfiguration)
+            if (channelConfig == null)
+            {
+                ; // intentionally left blank
+            }
+            else if (triggerConfiguration is LevelTriggerConfiguration)
             {
                 triggerCriteriaCursors = CreateTriggerCriteriaCursors(
                     triggerConfiguration as LevelTriggerConfiguration, channelConfig);
@@ -256,7 +255,8 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates the trigger criteria cursors for a level-based trigger.
         /// </summary>
-        private IEnumerable<ScopeCursor> CreateTriggerCriteriaCursors(LevelTriggerConfiguration triggerConfiguration,
+        private IEnumerable<ScopeCursor> CreateTriggerCriteriaCursors(
+            LevelTriggerConfiguration triggerConfiguration,
             ChannelConfiguration triggerChannelConfiguration)
         {
             const string triggerCaption = "T";
@@ -267,7 +267,6 @@ namespace ScopeLib.Display.Views
 
             var cursor = new ScopeCursor
             {
-                Position = new ScopePosition(0, 0),
                 Lines = ScopeCursorLines.Y,
                 SelectableLines = ScopeCursorLines.Y,
                 Markers = ScopeCursorMarkers.YFull,
@@ -303,9 +302,10 @@ namespace ScopeLib.Display.Views
         }
 
         /// <summary>
-        /// Creates the trigger point cursors at the specified position.
+        /// Creates the trigger point cursors.
         /// </summary>
-        private IEnumerable<ScopeCursor> CreateTriggerPointCursors(TriggerConfigurationBase triggerConfiguration)
+        private IEnumerable<ScopeCursor> CreateTriggerPointCursors(
+            TriggerConfigurationBase triggerConfiguration)
         {
             const string triggerCaption = "T";
             Func<String> positionTextProvider = () =>
@@ -315,7 +315,6 @@ namespace ScopeLib.Display.Views
 
             var cursor = new ScopeCursor
             {
-                Position = new ScopePosition(0, 0),
                 Lines = ScopeCursorLines.X,
                 SelectableLines = ScopeCursorLines.X,
                 Markers = ScopeCursorMarkers.XFull,
@@ -332,6 +331,50 @@ namespace ScopeLib.Display.Views
 
             // Bind the cursor's position.
             PB.Binding.Create (() => cursor.Position.X == triggerConfiguration.HorizontalPosition);
+
+            return new []
+            {
+                cursor,
+            };
+        }
+
+        /// <summary>
+        /// Creates the reference line cursors for all channels.
+        /// </summary>
+        private IEnumerable<ScopeCursor> CreateChannelCursors()
+        {
+            // Create the cursors immediately and just once.
+            return _viewModel.ChannelConfigurations
+                .SelectMany((channelConf, index) => CreateChannelCursors(channelConf, index+1))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Creates the reference line cursors for a single channel.
+        /// </summary>
+        private IEnumerable<ScopeCursor> CreateChannelCursors(ChannelConfiguration channelConfiguration,
+            int channelNumber)
+        {
+            var channelCaption = channelNumber.ToString();
+            var channelColor = ToCairoColor(channelConfiguration.Color);
+
+            var cursor = new ScopeCursor
+            {
+                Lines = ScopeCursorLines.Y,
+                SelectableLines = ScopeCursorLines.Y,
+                Markers = ScopeCursorMarkers.YFull,
+                Color = channelColor,
+                Captions = new []
+                {
+                    new ScopePositionCaption(() => channelCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, channelColor),
+                    new ScopePositionCaption(() => channelCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, channelColor),
+                },
+            };
+
+            // === Create bindings. ===
+
+            // Bind the cursor's position.
+            PB.Binding.Create (() => cursor.Position.Y == channelConfiguration.ReferencePointPosition.Y);
 
             return new []
             {
@@ -358,7 +401,7 @@ namespace ScopeLib.Display.Views
             {
                 new ScopeCursor
                 {
-                    Position = new ScopePosition(1, 1),
+                    Position = new ScopePosition(3, 3),
                     Lines = ScopeCursorLines.Both,
                     Markers = ScopeCursorMarkers.Full,
                     Color = cursor1Color,
@@ -381,6 +424,7 @@ namespace ScopeLib.Display.Views
                         new ScopeCursorValueTick(2.5),
                     },
                 },
+
 //                new ScopeCursor
 //                {
 //                    Position = new PointD (-2.5, -2.7),
@@ -421,7 +465,10 @@ namespace ScopeLib.Display.Views
 //                },
             };
 
-            _scopeGraphics.Cursors = CreateTriggerCursors().Concat(demoCursors);
+            _scopeGraphics.Cursors =
+                CreateTriggerCursors()
+                    .Concat(CreateChannelCursors())
+                    .Concat(demoCursors);
 
 //            _scopeGraphics.Cursors.First().Captions.First().TextProvider = () =>
 //                string.Format("x={0:F2}/y={1:F2}", _scopeGraphics.Cursors.First().Position.X,  _scopeGraphics.Cursors.First().Position.Y);

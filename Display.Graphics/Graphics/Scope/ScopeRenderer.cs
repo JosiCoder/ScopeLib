@@ -328,6 +328,7 @@ namespace ScopeLib.Display.Graphics
             using (CreateContextState())
             {
                 ClipToRange(rectangleRange);
+
                 DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
             }
         }

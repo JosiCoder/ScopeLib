@@ -27,6 +27,10 @@ namespace ScopeLib.Display.Graphics
     {
         private Cairo.PointD _nativePoint;
 
+        public ScopePosition ()
+            : this (0, 0)
+        {}
+
         public ScopePosition (double x, double y)
         {
             _nativePoint = new Cairo.PointD(x, y);

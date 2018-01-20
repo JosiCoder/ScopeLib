@@ -32,7 +32,7 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public ChannelConfiguration ()
         {
-            ReferencePointPosition = new Point ();
+            ReferencePointPosition = new Position ();
             TimeScaleFactor = 1.0;
             ValueScaleFactor = 1.0;
             Color = _defaultColor;
@@ -47,7 +47,7 @@ namespace ScopeLib.Display.ViewModels
         /// <param name="xScaleFactor">The scaling factor for the time axis.</param>
         /// <param name="yScaleFactor">The scaling factor for the value axis.</param>
         /// <param name="color">The graph color.</param>
-        public ChannelConfiguration (Point referencePointPosition, double timeScaleFactor, double valueScaleFactor,
+        public ChannelConfiguration (Position referencePointPosition, double timeScaleFactor, double valueScaleFactor,
             Color color)
         {
             ReferencePointPosition = referencePointPosition;
@@ -63,7 +63,7 @@ namespace ScopeLib.Display.ViewModels
         /// The Y value specifies the vertical distance of the reference point from
         /// the horizontal center line.
         /// </summary>
-        public Point ReferencePointPosition
+        public Position ReferencePointPosition
         { get; set; }
 
         /// <summary>

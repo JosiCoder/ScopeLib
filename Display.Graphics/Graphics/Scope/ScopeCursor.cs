@@ -34,6 +34,7 @@ namespace ScopeLib.Display.Graphics
         /// </summary>
         public ScopeCursor ()
         {
+            Position = new ScopePosition();
             Lines = ScopeCursorLines.Both;
             HighlightedLines = ScopeCursorLines.None;
             SelectableLines = ScopeCursorLines.Both;
