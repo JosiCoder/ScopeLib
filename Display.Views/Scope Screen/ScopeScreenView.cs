@@ -209,12 +209,15 @@ namespace ScopeLib.Display.Views
             return new ScopeGraph
             {
                 LineType = _graphLineType,
-                ReferencePointPosition = ToCairoPointD(channelConfiguration.ReferencePointPosition),
+                ReferencePointPosition =
+                    new Cairo.PointD(
+                        channelConfiguration.ReferencePointPosition.X + triggerPointPosition,
+                        channelConfiguration.ReferencePointPosition.Y),
                 Color = ToCairoColor(channelConfiguration.Color),
                 XScaleFactor = channelConfiguration.TimeScaleFactor,
                 YScaleFactor = channelConfiguration.ValueScaleFactor,
                 ReferencePoint =
-                    new Cairo.PointD(signalFrame.ReferenceTime - triggerPointPosition, _referenceLevel),
+                    new Cairo.PointD(signalFrame.ReferenceTime, _referenceLevel),
                 Vertices = signalFrame.Values
                     .Select((value, counter) => new Cairo.PointD (counter * signalFrame.TimeIncrement, value)),
             };
@@ -279,11 +282,13 @@ namespace ScopeLib.Display.Views
 
             // === Create value converters. ===
 
-            Func<double> triggerLevelReference = () =>
-                triggerChannelConfiguration.ReferencePointPosition.Y - _referenceLevel;
+            Func<double> valueScaleFactor = () =>
+                triggerChannelConfiguration.ValueScaleFactor;
+            Func<double> triggerLevelReferencePosition = () =>
+                triggerChannelConfiguration.ReferencePointPosition.Y;
             var triggerLevelConverter = new ValueConverter<double, double>(
-                val => val + triggerLevelReference(),
-                val => val - triggerLevelReference());
+                val => (val - _referenceLevel) * valueScaleFactor() + triggerLevelReferencePosition(),
+                val => ((val - triggerLevelReferencePosition()) / valueScaleFactor()) + _referenceLevel);
 
             // === Create bindings. ===
 

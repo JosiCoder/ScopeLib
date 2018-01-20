@@ -58,6 +58,10 @@ namespace ScopeLib.Display.ViewModels
 
         /// <summary>
         /// Gets or sets the position of the reference point on the scope display.
+        /// The X value specifies the horizontal distance of the reference point from
+        /// trigger point position.
+        /// The Y value specifies the vertical distance of the reference point from
+        /// the horizontal center line.
         /// </summary>
         public Point ReferencePointPosition
         { get; set; }

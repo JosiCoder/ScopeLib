@@ -45,9 +45,12 @@ namespace ScopeLib.Display.Graphics
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="referencePoint">The reference point.</param>
+        /// <param name="referencePoint">
+        /// The reference point. The X and Y values refer to the units used for the vertices.
+        /// </param>
         /// <param name="referencePointPosition">
-        /// The the position of the reference point on the scope display.
+        /// The position of the reference point on the scope display.
+        /// The X and Y values refer to the screen graticule.
         /// </param>
         /// <param name="vertices">The vertices describing the graph.</param>
         /// <param name="xScaleFactor">The scaling factor for the horizontal (X) direction.</param>
@@ -67,13 +70,15 @@ namespace ScopeLib.Display.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the reference point.
+        /// Gets or sets the reference point. The X and Y values refer to the units used
+        /// for the vertices.
         /// </summary>
         public PointD ReferencePoint
         { get; set; }
 
         /// <summary>
         /// Gets or sets the position of the reference point on the scope display.
+        /// The X and Y values refer to the screen graticule.
         /// </summary>
         public PointD ReferencePointPosition
         { get; set; }
