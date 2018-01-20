@@ -233,18 +233,23 @@ namespace ScopeLib.Display.Graphics
         {
             var lineType = graph.LineType;
 
-            switch (lineType)
+            using (CreateContextState())
             {
-                case ScopeLineType.Dots:
-                    DrawGraph (rectangleRange, graph, ScopeLineType.Dots, _dotsGraphLineWidth);
-                    break;
-                case ScopeLineType.LineAndDots:
-                    DrawGraph (rectangleRange, graph, ScopeLineType.Line, _reducedGraphLineWidth);
-                    DrawGraph (rectangleRange, graph, ScopeLineType.Dots, _dotsGraphLineWidth);
-                    break;
-                default:
-                    DrawGraph (rectangleRange, graph, lineType, _graphStandardLineWidth);
-                    break;
+                ClipToRange(rectangleRange);
+
+                switch (lineType)
+                {
+                    case ScopeLineType.Dots:
+                        DrawGraph (rectangleRange, graph, ScopeLineType.Dots, _dotsGraphLineWidth);
+                        break;
+                    case ScopeLineType.LineAndDots:
+                        DrawGraph (rectangleRange, graph, ScopeLineType.Line, _reducedGraphLineWidth);
+                        DrawGraph (rectangleRange, graph, ScopeLineType.Dots, _dotsGraphLineWidth);
+                        break;
+                    default:
+                        DrawGraph (rectangleRange, graph, lineType, _graphStandardLineWidth);
+                        break;
+                }
             }
         }
                 
@@ -320,7 +325,11 @@ namespace ScopeLib.Display.Graphics
                 DrawCaptions (rectangleRange, tick.Captions, tickPosition);
             }
 
-            DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
+            using (CreateContextState())
+            {
+                ClipToRange(rectangleRange);
+                DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
+            }
         }
 
         /// <summary>
@@ -679,6 +688,25 @@ namespace ScopeLib.Display.Graphics
                 Context.SetSourceColor (backGroundColor);
                 Context.Fill ();
             }
+        }
+
+        /// <summary>
+        /// Clips any rendering to the specified range.
+        /// </summary>
+        private void ClipToRange(RectangleRange rectangleRange)
+        {
+            var userToDeviceMatrix = rectangleRange.Matrix;
+
+            using (CreateContextState(userToDeviceMatrix))
+            {
+                Context.MoveTo (rectangleRange.MinX, rectangleRange.MinY);
+                Context.LineTo (rectangleRange.MaxX, rectangleRange.MinY);
+                Context.LineTo (rectangleRange.MaxX, rectangleRange.MaxY);
+                Context.LineTo (rectangleRange.MinX, rectangleRange.MaxY);
+                Context.ClosePath ();
+            }
+
+            Context.Clip ();
         }
 
         /// <summary>
