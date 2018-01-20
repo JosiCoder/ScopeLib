@@ -47,6 +47,24 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public ushort ChannelNumber
         { get; set; }
+
+
+        private double _horizontalPosition;
+        /// <summary>
+        /// Gets or sets the horizontal position of the trigger point.
+        /// </summary>
+        public double HorizontalPosition
+        {
+            get
+            {
+                return _horizontalPosition;
+            }
+            set
+            {
+                _horizontalPosition = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }
 

@@ -201,7 +201,9 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a scope graph from a channel configuration and a signal frame.
         /// </summary>
-        private static ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration,
+        private static ScopeGraph CreateScopeGraph(
+            double triggerPointPosition,
+            ChannelConfiguration channelConfiguration,
             SignalFrame signalFrame)
         {
             return new ScopeGraph
@@ -211,7 +213,8 @@ namespace ScopeLib.Display.Views
                 Color = ToCairoColor(channelConfiguration.Color),
                 XScaleFactor = channelConfiguration.TimeScaleFactor,
                 YScaleFactor = channelConfiguration.ValueScaleFactor,
-                ReferencePoint = new Cairo.PointD(signalFrame.ReferenceTime, _referenceLevel),
+                ReferencePoint =
+                    new Cairo.PointD(signalFrame.ReferenceTime - triggerPointPosition, _referenceLevel),
                 Vertices = signalFrame.Values
                     .Select((value, counter) => new Cairo.PointD (counter * signalFrame.TimeIncrement, value)),
             };
@@ -233,8 +236,6 @@ namespace ScopeLib.Display.Views
                 return new ScopeCursor[0];
             }
 
-            var referencePointPosition = channelConfig.ReferencePointPosition;
-
             IEnumerable<ScopeCursor> triggerCriteriaCursors = new ScopeCursor[0];
 
             if (triggerConfiguration is LevelTriggerConfiguration)
@@ -242,8 +243,9 @@ namespace ScopeLib.Display.Views
                 triggerCriteriaCursors = CreateTriggerCriteriaCursors(
                     triggerConfiguration as LevelTriggerConfiguration, channelConfig);
             }
+            // Add more cases for other types of triggers here.
 
-            var timeReferenceCursors = CreateTriggerPointCursors(referencePointPosition.X);
+            var timeReferenceCursors = CreateTriggerPointCursors(triggerConfiguration);
 
             return triggerCriteriaCursors.Concat(timeReferenceCursors);
         }
@@ -254,12 +256,11 @@ namespace ScopeLib.Display.Views
         private IEnumerable<ScopeCursor> CreateTriggerCriteriaCursors(LevelTriggerConfiguration triggerConfiguration,
             ChannelConfiguration triggerChannelConfiguration)
         {
-            var referencePointPosition = triggerChannelConfiguration.ReferencePointPosition;
-            var levelColor = ToCairoColor(triggerChannelConfiguration.Color);
-
             const string triggerCaption = "T";
             Func<String> levelTextProvider = () =>
                 string.Format("{0:F2}", triggerConfiguration.Level);
+
+            var levelColor = ToCairoColor(triggerChannelConfiguration.Color);
 
             var cursor = new ScopeCursor
             {
@@ -278,7 +279,8 @@ namespace ScopeLib.Display.Views
 
             // === Create value converters. ===
 
-            Func<double> triggerLevelReference = () => referencePointPosition.Y - _referenceLevel;
+            Func<double> triggerLevelReference = () =>
+                triggerChannelConfiguration.ReferencePointPosition.Y - _referenceLevel;
             var triggerLevelConverter = new ValueConverter<double, double>(
                 val => val + triggerLevelReference(),
                 val => val - triggerLevelReference());
@@ -298,36 +300,38 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates the trigger point cursors at the specified position.
         /// </summary>
-        private IEnumerable<ScopeCursor> CreateTriggerPointCursors(double triggerPointXPosition)
+        private IEnumerable<ScopeCursor> CreateTriggerPointCursors(TriggerConfigurationBase triggerConfiguration)
         {
+            const string triggerCaption = "T";
+            Func<String> positionTextProvider = () =>
+                string.Format("{0:F2}", triggerConfiguration.HorizontalPosition);
+
             var markerColor = new Cairo.Color (0.0, 0.5, 1.0);
 
-            var cursorPointPosition = new ScopePosition
-                (
-                    triggerPointXPosition,
-                    0
-                );
-
-            const string triggerCaption = "T";
-
-            var cursors = new []
+            var cursor = new ScopeCursor
             {
-                new ScopeCursor
+                Position = new ScopePosition(0, 0),
+                Lines = ScopeCursorLines.X,
+                SelectableLines = ScopeCursorLines.X,
+                Markers = ScopeCursorMarkers.XFull,
+                Color = markerColor,
+                Captions = new []
                 {
-                    Position = cursorPointPosition,
-                    Lines = ScopeCursorLines.X,
-                    SelectableLines = ScopeCursorLines.X,
-                    Markers = ScopeCursorMarkers.XFull,
-                    Color = markerColor,
-                    Captions = new []
-                    {
-                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
-                        new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
-                    },
+                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                    new ScopePositionCaption(positionTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
                 },
             };
 
-            return cursors;
+            // === Create bindings. ===
+
+            // Bind the cursor's position.
+            PB.Binding.Create (() => cursor.Position.X == triggerConfiguration.HorizontalPosition);
+
+            return new []
+            {
+                cursor,
+            };
         }
 
         /// <summary>
@@ -341,7 +345,8 @@ namespace ScopeLib.Display.Views
 //            var cursor3Color = new Cairo.Color (0.5, 0.5, 1);
 
             _scopeGraphics.Graphs = CollectionUtilities.Zip(
-                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
+                objects => CreateScopeGraph(_viewModel.TriggerConfiguration.HorizontalPosition,
+                    objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
                 _viewModel.ChannelConfigurations, _viewModel.CurrentSignalFrames);
 
             var demoCursors = new []
