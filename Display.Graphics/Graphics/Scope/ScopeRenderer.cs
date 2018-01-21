@@ -311,25 +311,25 @@ namespace ScopeLib.Display.Graphics
         /// </summary>
         private void DrawCursor(RectangleRange rectangleRange, ScopeCursor cursor)
         {
-            DrawCursorLinesAndMarkers (rectangleRange, cursor);
-
-            foreach (var tick in cursor.XTicks ?? new ScopeCursorValueTick[0])
-            {
-                var tickPosition = new PointD (tick.Value, cursor.Position.Y);
-                DrawCursorTickLines (rectangleRange, tick, tickPosition, ScopeCursorLines.X, cursor.Color);
-                DrawCaptions (rectangleRange, tick.Captions, tickPosition);
-            }
-
-            foreach (var tick in cursor.YTicks ?? new ScopeCursorValueTick[0])
-            {
-                var tickPosition = new PointD (cursor.Position.X, tick.Value);
-                DrawCursorTickLines (rectangleRange, tick, tickPosition, ScopeCursorLines.Y, cursor.Color);
-                DrawCaptions (rectangleRange, tick.Captions, tickPosition);
-            }
-
             using (CreateContextState())
             {
                 ClipToRange(rectangleRange);
+
+                DrawCursorLinesAndMarkers (rectangleRange, cursor);
+
+                foreach (var tick in cursor.XTicks ?? new ScopeCursorValueTick[0])
+                {
+                    var tickPosition = new PointD (tick.Value, cursor.Position.Y);
+                    DrawCursorTickLines (rectangleRange, tick, tickPosition, ScopeCursorLines.X, cursor.Color);
+                    DrawCaptions (rectangleRange, tick.Captions, tickPosition);
+                }
+
+                foreach (var tick in cursor.YTicks ?? new ScopeCursorValueTick[0])
+                {
+                    var tickPosition = new PointD (cursor.Position.X, tick.Value);
+                    DrawCursorTickLines (rectangleRange, tick, tickPosition, ScopeCursorLines.Y, cursor.Color);
+                    DrawCaptions (rectangleRange, tick.Captions, tickPosition);
+                }
 
                 DrawCaptions (rectangleRange, cursor.Captions, cursor.Position.CairoPoint);
             }

@@ -36,11 +36,12 @@
     <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
     <Compile Include="MVVM\ViewModelBase.cs" />
     <Compile Include="Scope Screen\SignalFrame.cs" />
-    <Compile Include="Scope Screen\ChannelConfiguration.cs" />
     <Compile Include="Trigger\TriggerConfigurationBase.cs" />
     <Compile Include="Trigger\LevelTriggerConfiguration.cs" />
     <Compile Include="Miscellaneous\CommonTypes.cs" />
     <Compile Include="Miscellaneous\UnitHelper.cs" />
+    <Compile Include="Channels\ChannelConfiguration.cs" />
+    <Compile Include="Channels\MeasurementCursorConfiguration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -57,6 +57,18 @@ namespace ScopeLib.Utilities
                 yield return resultFactory(enumerators.Select(e => e.Current).ToArray());
             }
         }
+
+        /// <summary>
+        /// Iterates over an IEnumerable and performs an action
+        /// on each element.
+        /// </summary>
+        public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
+        {
+            foreach(T item in enumeration)
+            {
+                action(item);
+            }
+        }
     }
 }
 

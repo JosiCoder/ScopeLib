@@ -215,7 +215,7 @@ namespace ScopeLib.Display.Views
                     .Skip(triggerConfiguration.ChannelNumber)
                     .FirstOrDefault();
 
-            var triggerCriteriaCursors = new List<BoundCursor>();
+            var triggerCursors = new List<BoundCursor>();
 
             if (channelConfig == null)
                 {
@@ -223,29 +223,41 @@ namespace ScopeLib.Display.Views
                 }
             else if (triggerConfiguration is LevelTriggerConfiguration)
                 {
-                triggerCriteriaCursors.Add(CursorFactory.CreateTriggerCriteriaCursor(
+                triggerCursors.Add(CursorFactory.CreateTriggerCriteriaCursor(
                     triggerConfiguration as LevelTriggerConfiguration, channelConfig,
                     () => _referenceLevel));
                 }
             // Add more cases for other types of triggers here.
             // ...
 
-            triggerCriteriaCursors.Add(CursorFactory.CreateTriggerPointCursor(triggerConfiguration));
+            triggerCursors.Add(CursorFactory.CreateTriggerPointCursor(triggerConfiguration));
 
-            return triggerCriteriaCursors;
+            return triggerCursors;
         }
 
         /// <summary>
-        /// Creates the reference line cursors for all channels.
+        /// Creates the cursors for all channels.
         /// </summary>
-        private IEnumerable<BoundCursor> CreateChannelCursor()
+        private IEnumerable<BoundCursor> CreateChannelCursors()
         {
-            var triggerConfiguration = _viewModel.TriggerConfiguration;
+            var channelConfigurations = _viewModel.ChannelConfigurations;
 
-            // Create the cursors immediately and just once.
-            return _viewModel.ChannelConfigurations
-                .Select((channelConf, index) => CursorFactory.CreateChannelCursor(channelConf, index))
-                .ToArray();
+            // ToList() creates the cursors immediately and just once.
+            var channelCursors = channelConfigurations
+                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index))
+                .ToList();
+
+            channelConfigurations.ForEach(channelConfig =>
+            {
+                channelCursors.Add(CursorFactory.CreateMeasurementCursor("A",
+                    channelConfig.MeasurementCursorA, channelConfig,
+                    () => _referenceLevel, true));
+                channelCursors.Add(CursorFactory.CreateMeasurementCursor("B",
+                    channelConfig.MeasurementCursorB, channelConfig,
+                    () => _referenceLevel, false));
+            });
+
+            return channelCursors;
         }
 
         /// <summary>
@@ -291,7 +303,7 @@ namespace ScopeLib.Display.Views
                 },
             };
 
-            var boundCursors = CreateTriggerCursors().Concat(CreateChannelCursor());
+            var boundCursors = CreateTriggerCursors().Concat(CreateChannelCursors());
 
             _scopeGraphics.Cursors =
                 boundCursors.Select(cursor => cursor.EmbeddedCursor).Concat(demoCursors);

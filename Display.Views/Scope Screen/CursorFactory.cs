@@ -39,8 +39,7 @@ namespace ScopeLib.Display.Views
         {
             const string triggerCaption = "T";
             Func<String> levelTextProvider = () =>
-                UnitHelper.BuildValueText(triggerConfiguration.BaseUnitString,
-                    triggerConfiguration.Level);
+                UnitHelper.BuildValueText(triggerConfiguration.BaseUnitString, triggerConfiguration.Level);
 
             var levelColor = CairoHelpers.ToCairoColor(triggerChannelConfiguration.Color);
 
@@ -129,7 +128,7 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a reference line cursor for a single channel.
         /// </summary>
-        public static BoundCursor CreateChannelCursor(ChannelConfiguration channelConfiguration,
+        public static BoundCursor CreateChannelReferenceCursor(ChannelConfiguration channelConfiguration,
             int channelNumber)
         {
             var channelCaption = (channelNumber+1).ToString();
@@ -153,6 +152,83 @@ namespace ScopeLib.Display.Views
 
             // Bind the cursor's position.
             var binding = PB.Binding.Create (() => cursor.Position.Y == channelConfiguration.ReferencePointPosition.Y);
+
+            return new BoundCursor(cursor, binding);
+        }
+
+        /// <summary>
+        /// Creates a measurement cursor.
+        /// </summary>
+        public static BoundCursor CreateMeasurementCursor(
+            string caption, MeasurementCursorConfiguration cursorConfiguration,
+            ChannelConfiguration cursorChannelConfiguration,
+            Func<double> referenceLevel, bool isMeasurementReference)
+        {
+            Func<String> levelTextProvider = () =>
+                UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString, cursorConfiguration.Level);
+
+            var cursorColor = CairoHelpers.ToCairoColor(cursorChannelConfiguration.Color);
+
+            ScopeCursorMarkers markers;
+            ScopeVerticalAlignment captionAlignment;
+            ScopeVerticalAlignment valueAlignment;
+            if (isMeasurementReference)
+            {
+                markers = ScopeCursorMarkers.YLower;
+                captionAlignment = ScopeVerticalAlignment.Bottom;
+                valueAlignment = ScopeVerticalAlignment.Top;
+            }
+            else
+            {
+                markers = ScopeCursorMarkers.YUpper;
+                captionAlignment = ScopeVerticalAlignment.Top;
+                valueAlignment = ScopeVerticalAlignment.Bottom;
+            }
+
+            var cursor = new ScopeCursor
+            {
+                Lines = ScopeCursorLines.Y,
+                LineWeight = ScopeCursorLineWeight.Low,
+                SelectableLines = ScopeCursorLines.Y,
+                Markers = markers,
+                Color = cursorColor,
+                Captions = new []
+                {
+                    new ScopePositionCaption(() => caption, ScopeHorizontalAlignment.Left, captionAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
+                    new ScopePositionCaption(() => caption, ScopeHorizontalAlignment.Right, captionAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
+                    new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, valueAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
+                },
+            };
+
+            // === Create value converters. ===
+
+            Func<double> valueScaleFactor = () =>
+                cursorChannelConfiguration.ValueScaleFactor;
+
+            Func<double> triggerLevelReferencePosition = () =>
+                cursorChannelConfiguration.ReferencePointPosition.Y;
+
+            var cursorLevelConverter = new ValueConverter<double, double>(
+                val => (val - referenceLevel()) * valueScaleFactor() + triggerLevelReferencePosition(),
+                val => ((val - triggerLevelReferencePosition()) / valueScaleFactor()) + referenceLevel());
+
+            // === Create bindings. ===
+
+            // Bind the cursor's position.
+            var binding = PB.Binding.Create (() =>
+                cursor.Position.Y == cursorLevelConverter.DerivedValue &&
+                cursorLevelConverter.OriginalValue == cursorConfiguration.Level);
+
+            // The measurement cursor's Y position depends on some additional values (except the primary value
+            // it is bound to). Update it if any of these values changes. ===
+            cursorChannelConfiguration.PropertyChanged += (sender, e) =>
+            {
+                PB.Binding.InvalidateMember(() => cursorLevelConverter.DerivedValue);
+            };
+            cursorChannelConfiguration.ReferencePointPosition.PropertyChanged += (sender, e) =>
+            {
+                PB.Binding.InvalidateMember(() => cursorLevelConverter.DerivedValue);
+            };
 
             return new BoundCursor(cursor, binding);
         }

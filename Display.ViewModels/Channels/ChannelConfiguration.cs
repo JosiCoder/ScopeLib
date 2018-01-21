@@ -38,6 +38,7 @@ namespace ScopeLib.Display.ViewModels
             TimeScaleFactor = 1.0;
             ValueScaleFactor = 1.0;
             Color = _defaultColor;
+            Initialize();
         }
 
         /// <summary>
@@ -58,6 +59,16 @@ namespace ScopeLib.Display.ViewModels
             TimeScaleFactor = timeScaleFactor;
             ValueScaleFactor = valueScaleFactor;
             Color = color;
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes an instance of this class.
+        /// </summary>
+        private void Initialize()
+        {
+            MeasurementCursorA = new MeasurementCursorConfiguration(this);
+            MeasurementCursorB = new MeasurementCursorConfiguration(this);
         }
 
         private string _baseUnitString;
@@ -126,6 +137,18 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public Color Color
         { get; set; }
+
+        /// <summary>
+        /// Gets or sets the first measurement cursor.
+        /// </summary>
+        public MeasurementCursorConfiguration MeasurementCursorA
+        { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the second measurement cursor.
+        /// </summary>
+        public MeasurementCursorConfiguration MeasurementCursorB
+        { get; private set; }
     }
 }
 
