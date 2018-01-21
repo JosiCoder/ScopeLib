@@ -281,19 +281,34 @@ namespace ScopeLib.Display.Views
 
             // === Create value converters. ===
 
+            Func<double> referenceLevel = () => _referenceLevel;
+
             Func<double> valueScaleFactor = () =>
                 triggerChannelConfiguration.ValueScaleFactor;
+
             Func<double> triggerLevelReferencePosition = () =>
                 triggerChannelConfiguration.ReferencePointPosition.Y;
+
             var triggerLevelConverter = new ValueConverter<double, double>(
-                val => (val - _referenceLevel) * valueScaleFactor() + triggerLevelReferencePosition(),
-                val => ((val - triggerLevelReferencePosition()) / valueScaleFactor()) + _referenceLevel);
+                val => (val - referenceLevel()) * valueScaleFactor() + triggerLevelReferencePosition(),
+                val => ((val - triggerLevelReferencePosition()) / valueScaleFactor()) + referenceLevel());
 
             // === Create bindings. ===
 
             // Bind the cursor's position.
             PB.Binding.Create (() => cursor.Position.Y == triggerLevelConverter.DerivedValue);
             PB.Binding.Create (() => triggerLevelConverter.OriginalValue == triggerConfiguration.Level);
+
+            // The trigger cursor's Y position depends on some additional values (except the primary value
+            // it is bound to). Update it if any of these values changes. ===
+            triggerChannelConfiguration.PropertyChanged += (sender, e) =>
+            {
+                PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
+            };
+            triggerChannelConfiguration.ReferencePointPosition.PropertyChanged += (sender, e) =>
+            {
+                PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
+            };
 
             return new []
             {

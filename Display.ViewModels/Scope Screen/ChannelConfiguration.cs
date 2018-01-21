@@ -17,13 +17,14 @@
 
 using System;
 using System.Collections.Generic;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
     /// Provides the configuration of a scope channel.
     /// </summary>
-    public class ChannelConfiguration
+    public class ChannelConfiguration : NotifyingBase
     {
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
@@ -66,17 +67,39 @@ namespace ScopeLib.Display.ViewModels
         public Position ReferencePointPosition
         { get; set; }
 
+        private double _timeScaleFactor;
         /// <summary>
         /// Gets or sets the scaling factor for the time axis.
         /// </summary>
         public double TimeScaleFactor
-        { get; set; }
+        {
+            get
+            {
+                return _timeScaleFactor;
+            }
+            set
+            {
+                _timeScaleFactor = value;
+                RaisePropertyChanged();
+            }
+        }
 
+        private double _valueScaleFactor;
         /// <summary>
         /// Gets or sets the scaling factor for the value axis.
         /// </summary>
         public double ValueScaleFactor
-        { get; set; }
+        {
+            get
+            {
+                return _valueScaleFactor;
+            }
+            set
+            {
+                _valueScaleFactor = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the graph color.
