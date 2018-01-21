@@ -45,6 +45,8 @@ namespace ScopeLib.Display.Graphics
         private const double _graticuleAxesLineWidth = 1.0;
         private const double _graticuleAxesTicksLineWidth = 0.5;
         private const double _cursorLineWidth = 0.5;
+        private readonly double[] _cursorLineLowWeightDashes = new []{ 1d, 3d };
+        private readonly double[] _cursorLineMediumWeightDashes = new []{ 1d, 1d };
         private const double _cursorHighlightLineWidth = 1.0;
         private const double _cursorTickLineWidth = 0.5;
         private const double _cursorMarkersLineWidth = 0.5;
@@ -359,6 +361,11 @@ namespace ScopeLib.Display.Graphics
 
                 Context.LineWidth = (cursor.HighlightedLines & ScopeCursorLines.X) != ScopeCursorLines.None
                     ? _cursorHighlightLineWidth : _cursorLineWidth;
+                Context.SetDash(
+                    cursor.LineWeight == ScopeCursorLineWeight.Low ? _cursorLineLowWeightDashes
+                    : cursor.LineWeight == ScopeCursorLineWeight.Medium ? _cursorLineMediumWeightDashes
+                    : new double[0],
+                    0);
                 Context.Stroke ();
 
                 using (CreateContextState(userToDeviceMatrix))

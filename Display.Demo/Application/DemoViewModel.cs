@@ -36,7 +36,7 @@ namespace ScopeLib.Display.Demo
                 (x, y) => y);
 
             _scopeScreenVM.TriggerConfiguration =
-                new LevelTriggerConfiguration(1, 0.5);
+                new LevelTriggerConfiguration(0, 0.5);
 
             _scopeScreenVM.ChannelConfigurations = new[]
             {

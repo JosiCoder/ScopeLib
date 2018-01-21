@@ -36,7 +36,7 @@ namespace ScopeLib.Display.Views
         private readonly IScopeScreenViewModel _viewModel;
 
         private const double _referenceLevel = 0.0;
-        private const bool _captureContinuously = true;
+        private const bool _captureContinuously = false;
         private const double _xMinimumGraticuleUnits = 10.0;
         private const double _yMinimumGraticuleUnits = 8.0;
 
@@ -184,10 +184,8 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a scope graph from a channel configuration and a signal frame.
         /// </summary>
-        private static ScopeGraph CreateScopeGraph(
-            double triggerPointPosition,
-            ChannelConfiguration channelConfiguration,
-            SignalFrame signalFrame)
+        private static ScopeGraph CreateScopeGraph(double triggerPointPosition,
+            ChannelConfiguration channelConfiguration, SignalFrame signalFrame)
         {
             return new ScopeGraph
             {
@@ -269,6 +267,7 @@ namespace ScopeLib.Display.Views
                 {
                     Position = new ScopePosition(3, 3),
                     Lines = ScopeCursorLines.Both,
+                    LineWeight = ScopeCursorLineWeight.Medium,
                     Markers = ScopeCursorMarkers.Full,
                     Color = cursor1Color,
                     Captions = new []

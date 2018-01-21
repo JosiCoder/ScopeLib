@@ -46,6 +46,7 @@ namespace ScopeLib.Display.Views
             var cursor = new ScopeCursor
             {
                 Lines = ScopeCursorLines.Y,
+                LineWeight = ScopeCursorLineWeight.Low,
                 SelectableLines = ScopeCursorLines.Y,
                 Markers = ScopeCursorMarkers.YFull,
                 Color = levelColor,
@@ -99,11 +100,12 @@ namespace ScopeLib.Display.Views
             Func<String> positionTextProvider = () =>
                 string.Format("{0:F2}", triggerConfiguration.HorizontalPosition);
 
-            var markerColor = new Cairo.Color (0.0, 0.5, 1.0);
+            var markerColor = new Cairo.Color (0.5, 0.8, 1.0);
 
             var cursor = new ScopeCursor
             {
                 Lines = ScopeCursorLines.X,
+                LineWeight = ScopeCursorLineWeight.Low,
                 SelectableLines = ScopeCursorLines.X,
                 Markers = ScopeCursorMarkers.XFull,
                 Color = markerColor,
@@ -135,6 +137,7 @@ namespace ScopeLib.Display.Views
             var cursor = new ScopeCursor
             {
                 Lines = ScopeCursorLines.Y,
+                LineWeight = ScopeCursorLineWeight.Low,
                 SelectableLines = ScopeCursorLines.Y,
                 Markers = ScopeCursorMarkers.YFull,
                 Color = channelColor,

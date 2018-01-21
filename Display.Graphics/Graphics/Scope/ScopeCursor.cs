@@ -48,16 +48,18 @@ namespace ScopeLib.Display.Graphics
         /// </summary>
         /// <param name="position">The position.</param>
         /// <param name="lines">A value indicating which lines are visible.</param>
+        /// <param name="lineWeight">The weight of the cursor lines.</param>
         /// <param name="selectableLines">A value indicating which lines are selectable.</param>
         /// <param name="color">The cursor color.</param>
         /// <param name="markers">A value indicating which markers are visible.</param>
         /// <param name="captions">A list of captions.</param>
-        public ScopeCursor (ScopePosition position, ScopeCursorLines lines, ScopeCursorLines selectableLines,
-            Color color,
+        public ScopeCursor (ScopePosition position, ScopeCursorLines lines, ScopeCursorLineWeight lineWeight,
+            ScopeCursorLines selectableLines, Color color,
             ScopeCursorMarkers markers, IEnumerable<ScopePositionCaption> captions)
         {
             Position = position;
             Lines = lines;
+            LineWeight = lineWeight;
             HighlightedLines = ScopeCursorLines.None;
             SelectableLines = selectableLines;
             Color = color;
@@ -86,6 +88,12 @@ namespace ScopeLib.Display.Graphics
         /// Gets or sets a value indicating which lines are visible.
         /// </summary>
         public ScopeCursorLines Lines
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the weight of the cursor lines.
+        /// </summary>
+        public ScopeCursorLineWeight LineWeight
         { get; set; }
 
         /// <summary>

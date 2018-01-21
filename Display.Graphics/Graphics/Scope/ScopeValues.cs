@@ -53,6 +53,16 @@ namespace ScopeLib.Display.Graphics
     }
 
     /// <summary>
+    /// Specifies the weight of a cursor line.
+    /// </summary>
+    public enum ScopeCursorLineWeight : short
+    {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+    }
+
+    /// <summary>
     /// Specifies the markers available for scope cursors.
     /// </summary>
     [Flags]
