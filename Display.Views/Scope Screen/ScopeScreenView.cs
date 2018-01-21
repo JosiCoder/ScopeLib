@@ -242,20 +242,27 @@ namespace ScopeLib.Display.Views
         {
             var channelConfigurations = _viewModel.ChannelConfigurations;
 
-            // ToList() creates the cursors immediately and just once.
-            var channelCursors = channelConfigurations
-                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index))
-                .ToList();
+            // Note that the first cursor in the list has the highest priority when 
+            // searching them after a click.
 
+            var channelCursors = new List<BoundCursor>();
             channelConfigurations.ForEach(channelConfig =>
             {
-                channelCursors.Add(CursorFactory.CreateMeasurementCursor("A",
+                var referenceCursor = CursorFactory.CreateMeasurementCursor("A",
                     channelConfig.MeasurementCursorA, channelConfig,
-                    () => _referenceLevel, true));
+                    () => _referenceLevel, null);
+
+                channelCursors.Add(referenceCursor);
+
                 channelCursors.Add(CursorFactory.CreateMeasurementCursor("B",
                     channelConfig.MeasurementCursorB, channelConfig,
-                    () => _referenceLevel, false));
+                    () => _referenceLevel, channelConfig.MeasurementCursorA));
             });
+
+            // ToList() creates the cursors immediately and just once.
+            channelCursors.AddRange(channelConfigurations
+                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index))
+                .ToList());
 
             return channelCursors;
         }
@@ -303,10 +310,11 @@ namespace ScopeLib.Display.Views
                 },
             };
 
+            // Note that the first cursor in the list has the highest priority when 
+            // searching them after a click.
             var boundCursors = CreateTriggerCursors().Concat(CreateChannelCursors());
-
             _scopeGraphics.Cursors =
-                boundCursors.Select(cursor => cursor.EmbeddedCursor).Concat(demoCursors);
+                demoCursors.Concat(boundCursors.Select(cursor => cursor.EmbeddedCursor));
 
             _scopeGraphics.Readouts = new []
             {

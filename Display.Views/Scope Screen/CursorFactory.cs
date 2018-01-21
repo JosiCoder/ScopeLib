@@ -27,12 +27,12 @@ namespace ScopeLib.Display.Views
     /// <summary>
     /// Creates cursors used on the scope screen.
     /// </summary>
-    public static class CursorFactory
+    internal static class CursorFactory
     {
         /// <summary>
         /// Creates a trigger criteria cursor for a level-based trigger.
         /// </summary>
-        public static BoundCursor CreateTriggerCriteriaCursor(
+        internal static BoundCursor CreateTriggerCriteriaCursor(
             LevelTriggerConfiguration triggerConfiguration,
             ChannelConfiguration triggerChannelConfiguration,
             Func<double> referenceLevel)
@@ -94,7 +94,7 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a trigger point cursor.
         /// </summary>
-        public static BoundCursor CreateTriggerPointCursor(TriggerConfigurationBase triggerConfiguration)
+        internal static BoundCursor CreateTriggerPointCursor(TriggerConfigurationBase triggerConfiguration)
         {
             const string triggerCaption = "T";
             Func<String> positionTextProvider = () =>
@@ -128,7 +128,7 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a reference line cursor for a single channel.
         /// </summary>
-        public static BoundCursor CreateChannelReferenceCursor(ChannelConfiguration channelConfiguration,
+        internal static BoundCursor CreateChannelReferenceCursor(ChannelConfiguration channelConfiguration,
             int channelNumber)
         {
             var channelCaption = (channelNumber+1).ToString();
@@ -159,30 +159,37 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a measurement cursor.
         /// </summary>
-        public static BoundCursor CreateMeasurementCursor(
+        internal static BoundCursor CreateMeasurementCursor(
             string caption, MeasurementCursorConfiguration cursorConfiguration,
             ChannelConfiguration cursorChannelConfiguration,
-            Func<double> referenceLevel, bool isMeasurementReference)
+            Func<double> referenceLevel, MeasurementCursorConfiguration referenceCursorConfiguration)
         {
-            Func<String> levelTextProvider = () =>
+            Func<String> mainTextProvider = () =>
                 UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString, cursorConfiguration.Level);
 
             var cursorColor = CairoHelpers.ToCairoColor(cursorChannelConfiguration.Color);
 
+            Func<String> levelTextProvider;
             ScopeCursorMarkers markers;
             ScopeVerticalAlignment captionAlignment;
             ScopeVerticalAlignment valueAlignment;
-            if (isMeasurementReference)
+            if (referenceCursorConfiguration == null)
             {
                 markers = ScopeCursorMarkers.YLower;
                 captionAlignment = ScopeVerticalAlignment.Bottom;
                 valueAlignment = ScopeVerticalAlignment.Top;
+                levelTextProvider = mainTextProvider;
             }
             else
             {
                 markers = ScopeCursorMarkers.YUpper;
                 captionAlignment = ScopeVerticalAlignment.Top;
                 valueAlignment = ScopeVerticalAlignment.Bottom;
+
+                levelTextProvider = () =>
+                    string.Format("{0} / d = {1}", mainTextProvider(),
+                        UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString,
+                            cursorConfiguration.Level - referenceCursorConfiguration.Level));
             }
 
             var cursor = new ScopeCursor
