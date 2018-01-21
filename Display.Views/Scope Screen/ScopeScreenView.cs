@@ -244,7 +244,7 @@ namespace ScopeLib.Display.Views
 
             // Create the cursors immediately and just once.
             return _viewModel.ChannelConfigurations
-                .Select((channelConf, index) => CursorFactory.CreateChannelCursor(channelConf, index+1))
+                .Select((channelConf, index) => CursorFactory.CreateChannelCursor(channelConf, index))
                 .ToArray();
         }
 
@@ -265,7 +265,7 @@ namespace ScopeLib.Display.Views
             {
                 new ScopeCursor
                 {
-                    Position = new ScopePosition(3, 3),
+                    Position = new ScopePosition(-4.5, -3.5),
                     Lines = ScopeCursorLines.Both,
                     LineWeight = ScopeCursorLineWeight.Medium,
                     Markers = ScopeCursorMarkers.Full,

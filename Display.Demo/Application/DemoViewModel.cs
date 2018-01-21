@@ -35,7 +35,7 @@ namespace ScopeLib.Display.Demo
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                 (x, y) => y);
 
-            _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration("V", 0, 0/*0.5*/);
+            _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration("V", 0, 0.5);
 
             _scopeScreenVM.ChannelConfigurations = new[]
             {

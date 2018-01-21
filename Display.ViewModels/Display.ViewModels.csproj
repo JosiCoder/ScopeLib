@@ -54,5 +54,6 @@
     <Folder Include="MVVM\" />
     <Folder Include="Trigger\" />
     <Folder Include="Miscellaneous\" />
+    <Folder Include="Channels\" />
   </ItemGroup>
 </Project>

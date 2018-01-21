@@ -132,7 +132,7 @@ namespace ScopeLib.Display.Views
         public static BoundCursor CreateChannelCursor(ChannelConfiguration channelConfiguration,
             int channelNumber)
         {
-            var channelCaption = channelNumber.ToString();
+            var channelCaption = (channelNumber+1).ToString();
             var channelColor = CairoHelpers.ToCairoColor(channelConfiguration.Color);
 
             var cursor = new ScopeCursor
