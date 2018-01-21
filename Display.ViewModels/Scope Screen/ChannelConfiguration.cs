@@ -33,6 +33,7 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public ChannelConfiguration ()
         {
+            BaseUnitString = "V";
             ReferencePointPosition = new Position ();
             TimeScaleFactor = 1.0;
             ValueScaleFactor = 1.0;
@@ -42,19 +43,38 @@ namespace ScopeLib.Display.ViewModels
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
+        /// <param name="baseUnitString">The string representing the base unit.</param>
         /// <param name="referencePointPosition">
         /// The the position of the reference point on the scope display.
         /// </param>
         /// <param name="xScaleFactor">The scaling factor for the time axis.</param>
         /// <param name="yScaleFactor">The scaling factor for the value axis.</param>
         /// <param name="color">The graph color.</param>
-        public ChannelConfiguration (Position referencePointPosition, double timeScaleFactor, double valueScaleFactor,
-            Color color)
+        public ChannelConfiguration (string baseUnitString, Position referencePointPosition,
+            double timeScaleFactor, double valueScaleFactor, Color color)
         {
+            BaseUnitString = baseUnitString;
             ReferencePointPosition = referencePointPosition;
             TimeScaleFactor = timeScaleFactor;
             ValueScaleFactor = valueScaleFactor;
             Color = color;
+        }
+
+        private string _baseUnitString;
+        /// <summary>
+        /// Gets or sets the string representing the base unit.
+        /// </summary>
+        public string BaseUnitString
+        {
+            get
+            {
+                return _baseUnitString;
+            }
+            set
+            {
+                _baseUnitString = value;
+                RaisePropertyChanged();
+            }
         }
 
         /// <summary>

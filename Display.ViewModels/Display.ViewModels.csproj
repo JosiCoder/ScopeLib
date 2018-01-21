@@ -40,6 +40,7 @@
     <Compile Include="Trigger\TriggerConfigurationBase.cs" />
     <Compile Include="Trigger\LevelTriggerConfiguration.cs" />
     <Compile Include="Miscellaneous\CommonTypes.cs" />
+    <Compile Include="Miscellaneous\UnitHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -31,18 +31,38 @@ namespace ScopeLib.Display.ViewModels
         public LevelTriggerConfiguration ()
             : base()
         {
+            BaseUnitString = "V";
             Level = 0.0;
         }
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="level">The number of the scope channel the trigger is assigned to.</param>
+        /// <param name="baseUnitString">The string representing the base unit.</param>
+        /// <param name="channel">The number of the scope channel the trigger is assigned to.</param>
         /// <param name="level">The trigger level.</param>
-        public LevelTriggerConfiguration (ushort channel, double level)
+        public LevelTriggerConfiguration (string baseUnitString, ushort channel, double level)
             : base(channel)
         {
+            BaseUnitString = baseUnitString;
             Level = level;
+        }
+
+        private string _baseUnitString;
+        /// <summary>
+        /// Gets or sets the string representing the base unit.
+        /// </summary>
+        public string BaseUnitString
+        {
+            get
+            {
+                return _baseUnitString;
+            }
+            set
+            {
+                _baseUnitString = value;
+                RaisePropertyChanged();
+            }
         }
 
         private double _level;

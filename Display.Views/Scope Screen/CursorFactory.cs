@@ -39,7 +39,8 @@ namespace ScopeLib.Display.Views
         {
             const string triggerCaption = "T";
             Func<String> levelTextProvider = () =>
-                string.Format("{0:F2}", triggerConfiguration.Level);
+                UnitHelper.BuildValueText(triggerConfiguration.BaseUnitString,
+                    triggerConfiguration.Level);
 
             var levelColor = CairoHelpers.ToCairoColor(triggerChannelConfiguration.Color);
 
