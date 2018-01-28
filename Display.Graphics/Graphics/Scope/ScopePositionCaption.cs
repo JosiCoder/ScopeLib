@@ -95,7 +95,7 @@ namespace ScopeLib.Display.Graphics
         { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to provide additional space for the cursor marker..
+        /// Gets or sets a value indicating whether to provide additional space for the cursor marker.
         /// </summary>
         public bool YieldToMarker
         { get; set; }

@@ -59,7 +59,7 @@ namespace ScopeLib.Display.Views
             // Bind the cursor's position.
             var binding = PB.Binding.Create (() => cursor.Position.Y == channelConfiguration.ReferencePointPosition.Y);
 
-            return new BoundCursor(cursor, binding);
+            return new BoundCursor(cursor, new [] {binding});
         }
     }
 }

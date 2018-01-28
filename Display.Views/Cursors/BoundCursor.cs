@@ -16,6 +16,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using PB = Praeclarum.Bind;
 using ScopeLib.Display.Graphics;
 
@@ -26,7 +27,7 @@ namespace ScopeLib.Display.Views
     /// </summary>
     public class BoundCursor : IDisposable
     {
-        private PB.Binding _binding;
+        private IEnumerable<PB.Binding>  _bindings;
 
         /// <summary>
         /// Gets the embedded cursor.
@@ -41,11 +42,11 @@ namespace ScopeLib.Display.Views
         /// Initializes a new instance of this class.
         /// </summary>
         /// <param name="embeddedCursor">The cursor embedded in this object.</param>
-        /// <param name="binding">The binding used by this object.</param>
-        public BoundCursor (ScopeCursor embeddedCursor, PB.Binding binding)
+        /// <param name="bindings">The bindings used by this object.</param>
+        public BoundCursor (ScopeCursor embeddedCursor, IEnumerable<PB.Binding> bindings)
         {
             EmbeddedCursor = embeddedCursor;
-            _binding = binding;
+            _bindings = bindings;
         }
 
         /// <summary>
@@ -53,9 +54,12 @@ namespace ScopeLib.Display.Views
         /// </summary>
         public void Dispose()
         {
-            if (_binding != null)
+            if (_bindings != null)
             {
-                _binding.Unbind();
+                foreach (var binding in _bindings)
+                {
+                    binding.Unbind();
+                }
             }
         }
     }

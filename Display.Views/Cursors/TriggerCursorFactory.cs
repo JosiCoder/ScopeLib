@@ -42,6 +42,12 @@ namespace ScopeLib.Display.Views
             ChannelConfiguration triggerChannelConfiguration,
             Func<double> referenceLevel)
         {
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding =
+                (cursor, valueConverter) =>
+                PB.Binding.Create (() =>
+                    cursor.Position.Y == valueConverter.DerivedValue &&
+                    valueConverter.OriginalValue == triggerConfiguration.Level);
+
             var triggerModeSymbol =
                 triggerConfiguration.Mode == LevelTriggerMode.RisingEdge ? _triggerTypeRisingSymbol
                 : triggerConfiguration.Mode == LevelTriggerMode.FallingEdge ? _triggerTypeFallingSymbol
@@ -53,7 +59,9 @@ namespace ScopeLib.Display.Views
                 triggerChannelConfiguration.ReferencePointPosition
             };
 
-            return  CreateTriggerCriteriaCursor(triggerConfiguration,
+            return  CreateTriggerCriteriaCursor(
+                () => triggerConfiguration.Level,
+                createBinding,
                 triggerModeSymbol,
                 () => triggerChannelConfiguration.ValueScaleFactor,
                 () => triggerChannelConfiguration.ReferencePointPosition.Y,
@@ -67,7 +75,8 @@ namespace ScopeLib.Display.Views
         /// Creates a trigger criteria cursor for a level-based trigger.
         /// </summary>
         internal static BoundCursor CreateTriggerCriteriaCursor(
-            LevelTriggerConfiguration triggerConfiguration,
+            Func<double> value,
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding,
             char triggerModeSymbol,
             Func<double> valueScaleFactor,
             Func<double> triggerReferenceValue,
@@ -78,7 +87,7 @@ namespace ScopeLib.Display.Views
         {
             var triggerCaption = string.Format("{0}{1}", _triggerSymbol, triggerModeSymbol);
             Func<String> levelTextProvider = () =>
-                UnitHelper.BuildValueText(baseUnitString, triggerConfiguration.Level);
+                UnitHelper.BuildValueText(baseUnitString, value());
 
             var cairoColor = CairoHelpers.ToCairoColor(levelColor);
 
@@ -99,16 +108,14 @@ namespace ScopeLib.Display.Views
 
             // === Create value converters. ===
 
-            var triggerLevelConverter = new ValueConverter<double, double>(
+            var valueConverter = new ValueConverter<double, double>(
                 val => (val - referenceLevel()) * valueScaleFactor() + triggerReferenceValue(),
                 val => ((val - triggerReferenceValue()) / valueScaleFactor()) + referenceLevel());
 
             // === Create bindings. ===
 
             // Bind the cursor's position.
-            var binding = PB.Binding.Create (() =>
-                cursor.Position.Y == triggerLevelConverter.DerivedValue &&
-                triggerLevelConverter.OriginalValue == triggerConfiguration.Level);
+            var binding = createBinding(cursor, valueConverter);
 
             // The trigger cursor's position depends on some additional values (except the primary value
             // it is bound to). Update it if any of these values changes. ===
@@ -116,11 +123,11 @@ namespace ScopeLib.Display.Views
             {
                 influencingObject.PropertyChanged += (sender, e) =>
                 {
-                    PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
+                    PB.Binding.InvalidateMember(() => valueConverter.DerivedValue);
                 };
             });
 
-            return new BoundCursor(cursor, binding);
+            return new BoundCursor(cursor, new [] {binding});
         }
 
         /// <summary>
@@ -154,7 +161,7 @@ namespace ScopeLib.Display.Views
             // Bind the cursor's position.
             var binding = PB.Binding.Create (() => cursor.Position.X == triggerConfiguration.HorizontalPosition);
 
-            return new BoundCursor(cursor, binding);
+            return new BoundCursor(cursor, new [] {binding});
         }
     }
 }

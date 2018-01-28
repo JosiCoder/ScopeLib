@@ -41,14 +41,23 @@ namespace ScopeLib.Display.Views
             bool isReferenceCursor, Func<double> deltaReferenceLevelProvider,
             Func<double> referenceLevel)
         {
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding =
+                (cursor, valueConverter) =>
+                PB.Binding.Create (() =>
+                    cursor.Position.Y == valueConverter.DerivedValue &&
+                    valueConverter.OriginalValue == cursorConfiguration.Value);
+            
             var influencingObjects = new INotifyPropertyChanged[]
             {
                 cursorChannelConfiguration,
                 cursorChannelConfiguration.ReferencePointPosition
             };
 
-            return CreateMeasurementCursor(cursorConfiguration,
-                isReferenceCursor, deltaReferenceLevelProvider,
+            return CreateMeasurementCursor(
+                () => cursorConfiguration.Value,
+                createBinding,
+                isReferenceCursor,
+                deltaReferenceLevelProvider,
                 () => cursorChannelConfiguration.ValueScaleFactor,
                 () => cursorChannelConfiguration.ReferencePointPosition.Y,
                 referenceLevel,
@@ -61,7 +70,8 @@ namespace ScopeLib.Display.Views
         /// Creates a measurement cursor.
         /// </summary>
         internal static BoundCursor CreateMeasurementCursor(
-            MeasurementCursorConfiguration cursorConfiguration,
+            Func<double> value,
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding,
             bool isReferenceCursor,
             Func<double> deltaReferenceValueProvider,
             Func<double> valueScaleFactor,
@@ -72,7 +82,7 @@ namespace ScopeLib.Display.Views
             IEnumerable<INotifyPropertyChanged> influencingObjects)
         {
             Func<String> basicValueTextProvider = () =>
-                UnitHelper.BuildValueText(baseUnitString, cursorConfiguration.Value);
+                UnitHelper.BuildValueText(baseUnitString, value());
 
             var cairoColor = CairoHelpers.ToCairoColor(cursorColor);
 
@@ -99,7 +109,7 @@ namespace ScopeLib.Display.Views
                 valueTextProvider = () =>
                     string.Format("{0} / {1} = {2}", basicValueTextProvider(), _deltaSymbol,
                         UnitHelper.BuildValueText(baseUnitString,
-                            cursorConfiguration.Value - deltaReferenceValueProvider()));
+                            value() - deltaReferenceValueProvider()));
             }
 
             var cursor = new ScopeCursor
@@ -117,16 +127,14 @@ namespace ScopeLib.Display.Views
 
             // === Create value converters. ===
 
-            var cursorLevelConverter = new ValueConverter<double, double>(
+            var valueConverter = new ValueConverter<double, double>(
                 val => (val - referenceValue()) * valueScaleFactor() + triggerReferenceValue(),
                 val => ((val - triggerReferenceValue()) / valueScaleFactor()) + referenceValue());
 
             // === Create bindings. ===
 
             // Bind the cursor's position.
-            var binding = PB.Binding.Create (() =>
-                cursor.Position.Y == cursorLevelConverter.DerivedValue &&
-                cursorLevelConverter.OriginalValue == cursorConfiguration.Value);
+            var binding = createBinding(cursor, valueConverter);
 
             // The measurement cursor's position depends on some additional values (except the primary value
             // it is bound to). Update it if any of these values changes. ===
@@ -134,11 +142,11 @@ namespace ScopeLib.Display.Views
             {
                 influencingObject.PropertyChanged += (sender, e) =>
                 {
-                    PB.Binding.InvalidateMember(() => cursorLevelConverter.DerivedValue);
+                    PB.Binding.InvalidateMember(() => valueConverter.DerivedValue);
                 };
             });
 
-            return new BoundCursor(cursor, binding);
+            return new BoundCursor(cursor, new [] {binding});
         }
     }
 }
