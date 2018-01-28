@@ -134,9 +134,12 @@ namespace ScopeLib.Display.Graphics
 
         /// <summary>
         /// Attempts to find a scope cursor's lines at the the specified position.
+        /// Cursors at the end of the cursor list have the highest priority.
         /// </summary>
         /// <param name="searchPosition">The position to search at.</param>
-        /// <param name="selectableOnly">A value indicating whether to restrict the search to selectable cursor lines.</param>
+        /// <param name="selectableOnly">
+        /// A value indicating whether to restrict the search to selectable cursor lines.
+        /// </param>
         /// <returns>A scope cursor selection at the position or <c>null</c>.</returns>
         public ScopeCursorSelection FindScopeCursorLines(PointD searchPosition, bool selectableOnly)
         {
@@ -170,7 +173,7 @@ namespace ScopeLib.Display.Graphics
                             Math.Abs (searchPosition.Y - deviceCursorPosition.Y) < _maxSnapDistance
                             ? ScopeCursorLines.Y : ScopeCursorLines.None));
                 })
-                .FirstOrDefault (cursorSelection => cursorSelection.SelectedLines != ScopeCursorLines.None);
+                .LastOrDefault (cursorSelection => cursorSelection.SelectedLines != ScopeCursorLines.None);
         }
 
         /// <summary>

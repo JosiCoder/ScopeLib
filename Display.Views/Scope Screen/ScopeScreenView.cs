@@ -240,10 +240,14 @@ namespace ScopeLib.Display.Views
         {
             var channelConfigurations = _viewModel.ChannelConfigurations;
 
-            // Note that the first cursor in the list has the highest priority when 
+            // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
 
             var channelCursors = new List<BoundCursor>();
+
+            channelCursors.AddRange(channelConfigurations
+                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index)));
+
             channelConfigurations.ForEach(channelConfig =>
             {
                 channelCursors.Add(CursorFactory.CreateMeasurementCursor(
@@ -254,11 +258,6 @@ namespace ScopeLib.Display.Views
                     channelConfig.MeasurementCursorB, channelConfig,
                     () => _referenceLevel, channelConfig.MeasurementCursorA));
             });
-
-            // ToList() creates the cursors immediately and just once.
-            channelCursors.AddRange(channelConfigurations
-                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index))
-                .ToList());
 
             return channelCursors;
         }
@@ -306,11 +305,11 @@ namespace ScopeLib.Display.Views
                 },
             };
 
-            // Note that the first cursor in the list has the highest priority when 
+            // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
-            var boundCursors = CreateTriggerCursors().Concat(CreateChannelCursors());
+            var boundCursors = CreateChannelCursors().Concat(CreateTriggerCursors());
             _scopeGraphics.Cursors =
-                demoCursors.Concat(boundCursors.Select(cursor => cursor.EmbeddedCursor));
+                boundCursors.Select(cursor => cursor.EmbeddedCursor).Concat(demoCursors);
 
             _scopeGraphics.Readouts = new []
             {
