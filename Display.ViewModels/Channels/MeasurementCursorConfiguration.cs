@@ -24,17 +24,11 @@ namespace ScopeLib.Display.ViewModels
     /// </summary>
     public class MeasurementCursorConfiguration : ViewModelBase
     {
-        private readonly ChannelConfiguration _channelConfiguration;
-
         /// <summary>
         /// Initializes an instance of this class with default settings.
         /// </summary>
-        /// <param name="channelConfiguration">
-        /// The configuration of the channel this cursor belongs to.
-        /// </param>
-        internal MeasurementCursorConfiguration (ChannelConfiguration channelConfiguration)
+        internal MeasurementCursorConfiguration ()
         {
-            _channelConfiguration = channelConfiguration;
             Level = 0.0;
         }
 

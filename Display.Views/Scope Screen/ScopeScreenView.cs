@@ -221,14 +221,14 @@ namespace ScopeLib.Display.Views
             }
             else if (triggerConfiguration is LevelTriggerConfiguration)
             {
-                triggerCursors.Add(CursorFactory.CreateTriggerCriteriaCursor(
+                triggerCursors.Add(TriggerCursorFactory.CreateTriggerCriteriaCursor(
                     triggerConfiguration as LevelTriggerConfiguration, channelConfig,
                     () => _referenceLevel));
             }
             // Add more cases for other types of triggers here.
             // ...
 
-            triggerCursors.Add(CursorFactory.CreateTriggerPointCursor(triggerConfiguration));
+            triggerCursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(triggerConfiguration));
 
             return triggerCursors;
         }
@@ -246,15 +246,15 @@ namespace ScopeLib.Display.Views
             var channelCursors = new List<BoundCursor>();
 
             channelCursors.AddRange(channelConfigurations
-                .Select((channelConf, index) => CursorFactory.CreateChannelReferenceCursor(channelConf, index)));
+                .Select((channelConf, index) => ChannelCursorFactory.CreateChannelReferenceCursor(channelConf, index)));
 
             channelConfigurations.ForEach(channelConfig =>
             {
-                channelCursors.Add(CursorFactory.CreateMeasurementCursor(
+                channelCursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
                     channelConfig.MeasurementCursorA, channelConfig, true,
                     null, () => _referenceLevel));
 
-                channelCursors.Add(CursorFactory.CreateMeasurementCursor(
+                channelCursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
                     channelConfig.MeasurementCursorB, channelConfig, false,
                     () => channelConfig.MeasurementCursorA.Level, () => _referenceLevel));
             });

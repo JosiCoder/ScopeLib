@@ -67,8 +67,8 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         private void Initialize()
         {
-            MeasurementCursorA = new MeasurementCursorConfiguration(this);
-            MeasurementCursorB = new MeasurementCursorConfiguration(this);
+            MeasurementCursorA = new MeasurementCursorConfiguration();
+            MeasurementCursorB = new MeasurementCursorConfiguration();
         }
 
         private string _baseUnitString;
