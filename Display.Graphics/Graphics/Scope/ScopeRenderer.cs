@@ -38,7 +38,7 @@ namespace ScopeLib.Display.Graphics
         private const int _interAreaSpacing = 5;
         private readonly Distance _defaultReadoutsAlignmentDistance = new Distance (5, 10);
         private readonly Distance _defaultCaptionsAlignmentDistance = new Distance (3, 3);
-        private const string _standardFontFamily = "Noto Sans";
+        private const string _standardFontFamily = "DejaVu Sans";
         private const double _standardFontSize = 12;
 
         private const double _graticuleLineWidth = 0.5;
@@ -46,7 +46,7 @@ namespace ScopeLib.Display.Graphics
         private const double _graticuleAxesTicksLineWidth = 0.5;
         private const double _cursorLineWidth = 0.5;
         private readonly double[] _cursorLineLowWeightDashes = new []{ 1d, 3d };
-        private readonly double[] _cursorLineMediumWeightDashes = new []{ 1d, 1d };
+        private readonly double[] _cursorLineMediumWeightDashes = new []{ 5d, 2d };
         private const double _cursorHighlightLineWidth = 1.0;
         private const double _cursorTickLineWidth = 0.5;
         private const double _cursorMarkersLineWidth = 0.5;

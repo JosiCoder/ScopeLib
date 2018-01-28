@@ -21,6 +21,15 @@ using System.Collections.Generic;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
+    /// Specifies the modes available for a level-based scope trigger.
+    /// </summary>
+    public enum LevelTriggerMode : short
+    {
+        RisingEdge,
+        FallingEdge,
+    }
+
+    /// <summary>
     /// Provides the configuration of a level-based scope trigger.
     /// </summary>
     public class LevelTriggerConfiguration : TriggerConfigurationBase
@@ -32,6 +41,7 @@ namespace ScopeLib.Display.ViewModels
             : base()
         {
             BaseUnitString = "V";
+            Mode = LevelTriggerMode.RisingEdge;
             Level = 0.0;
         }
 
@@ -40,11 +50,14 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         /// <param name="baseUnitString">The string representing the base unit.</param>
         /// <param name="channel">The number of the scope channel the trigger is assigned to.</param>
+        /// <param name="mode">The trigger mode.</param>
         /// <param name="level">The trigger level.</param>
-        public LevelTriggerConfiguration (string baseUnitString, ushort channel, double level)
+        public LevelTriggerConfiguration (string baseUnitString, ushort channel,
+            LevelTriggerMode mode, double level)
             : base(channel)
         {
             BaseUnitString = baseUnitString;
+            Mode = mode;
             Level = level;
         }
 
@@ -61,6 +74,24 @@ namespace ScopeLib.Display.ViewModels
             set
             {
                 _baseUnitString = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
+        private LevelTriggerMode _mode;
+        /// <summary>
+        /// Gets or sets the trigger mode.
+        /// </summary>
+        public LevelTriggerMode Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                _mode = value;
                 RaisePropertyChanged();
             }
         }

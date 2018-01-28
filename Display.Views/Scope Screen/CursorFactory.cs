@@ -29,6 +29,13 @@ namespace ScopeLib.Display.Views
     /// </summary>
     internal static class CursorFactory
     {
+        private const char _deltaSymbol = '\u2206';
+        private const char _channelCaptionBaseSymbol = '\u278A';// one of '\u2460', '\u2776', '\u278A';
+
+        private const char _triggerSymbol = 'T';
+        private const char _triggerTypeRisingSymbol = '\u2191';
+        private const char _triggerTypeFallingSymbol = '\u2193';
+
         /// <summary>
         /// Creates a trigger criteria cursor for a level-based trigger.
         /// </summary>
@@ -37,7 +44,12 @@ namespace ScopeLib.Display.Views
             ChannelConfiguration triggerChannelConfiguration,
             Func<double> referenceLevel)
         {
-            const string triggerCaption = "T";
+            var triggerSymbol =
+                triggerConfiguration.Mode == LevelTriggerMode.RisingEdge ? _triggerTypeRisingSymbol
+                : triggerConfiguration.Mode == LevelTriggerMode.FallingEdge ? _triggerTypeFallingSymbol
+                : '?';                ;
+
+            var triggerCaption = string.Format("{0}{1}", _triggerSymbol, triggerSymbol);
             Func<String> levelTextProvider = () =>
                 UnitHelper.BuildValueText(triggerConfiguration.BaseUnitString, triggerConfiguration.Level);
 
@@ -96,7 +108,7 @@ namespace ScopeLib.Display.Views
         /// </summary>
         internal static BoundCursor CreateTriggerPointCursor(TriggerConfigurationBase triggerConfiguration)
         {
-            const string triggerCaption = "T";
+            var triggerCaption = _triggerSymbol.ToString();
             Func<String> positionTextProvider = () =>
                 string.Format("{0:F2}", triggerConfiguration.HorizontalPosition);
 
@@ -131,7 +143,7 @@ namespace ScopeLib.Display.Views
         internal static BoundCursor CreateChannelReferenceCursor(ChannelConfiguration channelConfiguration,
             int channelNumber)
         {
-            var channelCaption = (channelNumber+1).ToString();
+            var channelCaption = ((char)(_channelCaptionBaseSymbol+channelNumber)).ToString();
             var channelColor = CairoHelpers.ToCairoColor(channelConfiguration.Color);
 
             var cursor = new ScopeCursor
@@ -160,7 +172,7 @@ namespace ScopeLib.Display.Views
         /// Creates a measurement cursor.
         /// </summary>
         internal static BoundCursor CreateMeasurementCursor(
-            string caption, MeasurementCursorConfiguration cursorConfiguration,
+            MeasurementCursorConfiguration cursorConfiguration,
             ChannelConfiguration cursorChannelConfiguration,
             Func<double> referenceLevel, MeasurementCursorConfiguration referenceCursorConfiguration)
         {
@@ -187,7 +199,7 @@ namespace ScopeLib.Display.Views
                 valueAlignment = ScopeVerticalAlignment.Bottom;
 
                 levelTextProvider = () =>
-                    string.Format("{0} / d = {1}", mainTextProvider(),
+                    string.Format("{0} / {1} = {2}", mainTextProvider(), _deltaSymbol,
                         UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString,
                             cursorConfiguration.Level - referenceCursorConfiguration.Level));
             }
@@ -195,14 +207,12 @@ namespace ScopeLib.Display.Views
             var cursor = new ScopeCursor
             {
                 Lines = ScopeCursorLines.Y,
-                LineWeight = ScopeCursorLineWeight.Low,
+                LineWeight = ScopeCursorLineWeight.Medium,
                 SelectableLines = ScopeCursorLines.Y,
                 Markers = markers,
                 Color = cursorColor,
                 Captions = new []
                 {
-                    new ScopePositionCaption(() => caption, ScopeHorizontalAlignment.Left, captionAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
-                    new ScopePositionCaption(() => caption, ScopeHorizontalAlignment.Right, captionAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
                     new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, valueAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cursorColor),
                 },
             };

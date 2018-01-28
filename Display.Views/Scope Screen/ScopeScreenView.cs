@@ -248,13 +248,11 @@ namespace ScopeLib.Display.Views
             var channelCursors = new List<BoundCursor>();
             channelConfigurations.ForEach(channelConfig =>
             {
-                var referenceCursor = CursorFactory.CreateMeasurementCursor("A",
+                channelCursors.Add(CursorFactory.CreateMeasurementCursor(
                     channelConfig.MeasurementCursorA, channelConfig,
-                    () => _referenceLevel, null);
+                    () => _referenceLevel, null));
 
-                channelCursors.Add(referenceCursor);
-
-                channelCursors.Add(CursorFactory.CreateMeasurementCursor("B",
+                channelCursors.Add(CursorFactory.CreateMeasurementCursor(
                     channelConfig.MeasurementCursorB, channelConfig,
                     () => _referenceLevel, channelConfig.MeasurementCursorA));
             });
