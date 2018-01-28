@@ -174,34 +174,38 @@ namespace ScopeLib.Display.Views
         internal static BoundCursor CreateMeasurementCursor(
             MeasurementCursorConfiguration cursorConfiguration,
             ChannelConfiguration cursorChannelConfiguration,
-            Func<double> referenceLevel, MeasurementCursorConfiguration referenceCursorConfiguration)
+            bool isReferenceCursor, Func<double> deltaReferenceLevelProvider,
+            Func<double> referenceLevel)
         {
-            Func<String> mainTextProvider = () =>
+            Func<String> basicLevelTextProvider = () =>
                 UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString, cursorConfiguration.Level);
 
             var cursorColor = CairoHelpers.ToCairoColor(cursorChannelConfiguration.Color);
 
-            Func<String> levelTextProvider;
             ScopeCursorMarkers markers;
-            ScopeVerticalAlignment captionAlignment;
             ScopeVerticalAlignment valueAlignment;
-            if (referenceCursorConfiguration == null)
+            if (isReferenceCursor)
             {
                 markers = ScopeCursorMarkers.YLower;
-                captionAlignment = ScopeVerticalAlignment.Bottom;
                 valueAlignment = ScopeVerticalAlignment.Top;
-                levelTextProvider = mainTextProvider;
             }
             else
             {
                 markers = ScopeCursorMarkers.YUpper;
-                captionAlignment = ScopeVerticalAlignment.Top;
                 valueAlignment = ScopeVerticalAlignment.Bottom;
+            }
 
+            Func<String> levelTextProvider;
+            if (deltaReferenceLevelProvider == null)
+            {
+                levelTextProvider = basicLevelTextProvider;
+            }
+            else
+            {
                 levelTextProvider = () =>
-                    string.Format("{0} / {1} = {2}", mainTextProvider(), _deltaSymbol,
+                    string.Format("{0} / {1} = {2}", basicLevelTextProvider(), _deltaSymbol,
                         UnitHelper.BuildValueText(cursorChannelConfiguration.BaseUnitString,
-                            cursorConfiguration.Level - referenceCursorConfiguration.Level));
+                            cursorConfiguration.Level - deltaReferenceLevelProvider()));
             }
 
             var cursor = new ScopeCursor
