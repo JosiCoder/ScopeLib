@@ -40,10 +40,10 @@ namespace ScopeLib.Display.Demo
                 new ChannelConfiguration("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
                 new ChannelConfiguration("V", new Position(-Math.PI, -2), 1, 2.5, new Color(0, 1, 0)),
             };
-            channelConfigurations[0].MeasurementCursorA.Level = 2.0;
-            channelConfigurations[0].MeasurementCursorB.Level = 3.0;
-            channelConfigurations[1].MeasurementCursorA.Level = -0.5;
-            channelConfigurations[1].MeasurementCursorB.Level = 0.5;
+            channelConfigurations[0].MeasurementCursorA.Value = 2.0;
+            channelConfigurations[0].MeasurementCursorB.Value = 3.0;
+            channelConfigurations[1].MeasurementCursorA.Value = -0.5;
+            channelConfigurations[1].MeasurementCursorB.Value = 0.5;
             _scopeScreenVM.ChannelConfigurations = channelConfigurations;
 
             _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],

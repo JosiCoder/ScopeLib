@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using PB = Praeclarum.Bind;
 using ScopeLib.Utilities;
 using ScopeLib.Display.ViewModels;
@@ -41,16 +42,45 @@ namespace ScopeLib.Display.Views
             ChannelConfiguration triggerChannelConfiguration,
             Func<double> referenceLevel)
         {
-            var triggerSymbol =
+            var triggerModeSymbol =
                 triggerConfiguration.Mode == LevelTriggerMode.RisingEdge ? _triggerTypeRisingSymbol
                 : triggerConfiguration.Mode == LevelTriggerMode.FallingEdge ? _triggerTypeFallingSymbol
-                : '?';                ;
+                : '?';
 
-            var triggerCaption = string.Format("{0}{1}", _triggerSymbol, triggerSymbol);
+            var influencingObjects = new INotifyPropertyChanged[]
+            {
+                triggerChannelConfiguration,
+                triggerChannelConfiguration.ReferencePointPosition
+            };
+
+            return  CreateTriggerCriteriaCursor(triggerConfiguration,
+                triggerModeSymbol,
+                () => triggerChannelConfiguration.ValueScaleFactor,
+                () => triggerChannelConfiguration.ReferencePointPosition.Y,
+                referenceLevel,
+                triggerConfiguration.ChannelConfiguration.BaseUnitString,
+                triggerChannelConfiguration.Color,
+                influencingObjects);
+        }
+
+        /// <summary>
+        /// Creates a trigger criteria cursor for a level-based trigger.
+        /// </summary>
+        internal static BoundCursor CreateTriggerCriteriaCursor(
+            LevelTriggerConfiguration triggerConfiguration,
+            char triggerModeSymbol,
+            Func<double> valueScaleFactor,
+            Func<double> triggerReferenceValue,
+            Func<double> referenceLevel,
+            string baseUnitString,
+            Color levelColor,
+            IEnumerable<INotifyPropertyChanged> influencingObjects)
+        {
+            var triggerCaption = string.Format("{0}{1}", _triggerSymbol, triggerModeSymbol);
             Func<String> levelTextProvider = () =>
-                UnitHelper.BuildValueText(triggerConfiguration.ChannelConfiguration.BaseUnitString, triggerConfiguration.Level);
+                UnitHelper.BuildValueText(baseUnitString, triggerConfiguration.Level);
 
-            var levelColor = CairoHelpers.ToCairoColor(triggerChannelConfiguration.Color);
+            var cairoColor = CairoHelpers.ToCairoColor(levelColor);
 
             var cursor = new ScopeCursor
             {
@@ -58,26 +88,20 @@ namespace ScopeLib.Display.Views
                 LineWeight = ScopeCursorLineWeight.Low,
                 SelectableLines = ScopeCursorLines.Y,
                 Markers = ScopeCursorMarkers.YFull,
-                Color = levelColor,
+                Color = cairoColor,
                 Captions = new []
                 {
-                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
-                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
-                    new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, levelColor),
+                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cairoColor),
+                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cairoColor),
+                    new ScopePositionCaption(levelTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cairoColor),
                 },
             };
 
             // === Create value converters. ===
 
-            Func<double> valueScaleFactor = () =>
-                triggerChannelConfiguration.ValueScaleFactor;
-
-            Func<double> triggerLevelReferencePosition = () =>
-                triggerChannelConfiguration.ReferencePointPosition.Y;
-
             var triggerLevelConverter = new ValueConverter<double, double>(
-                val => (val - referenceLevel()) * valueScaleFactor() + triggerLevelReferencePosition(),
-                val => ((val - triggerLevelReferencePosition()) / valueScaleFactor()) + referenceLevel());
+                val => (val - referenceLevel()) * valueScaleFactor() + triggerReferenceValue(),
+                val => ((val - triggerReferenceValue()) / valueScaleFactor()) + referenceLevel());
 
             // === Create bindings. ===
 
@@ -86,16 +110,15 @@ namespace ScopeLib.Display.Views
                 cursor.Position.Y == triggerLevelConverter.DerivedValue &&
                 triggerLevelConverter.OriginalValue == triggerConfiguration.Level);
 
-            // The trigger cursor's Y position depends on some additional values (except the primary value
+            // The trigger cursor's position depends on some additional values (except the primary value
             // it is bound to). Update it if any of these values changes. ===
-            triggerChannelConfiguration.PropertyChanged += (sender, e) =>
+            influencingObjects.ForEach(influencingObject =>
             {
-                PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
-            };
-            triggerChannelConfiguration.ReferencePointPosition.PropertyChanged += (sender, e) =>
-            {
-                PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
-            };
+                influencingObject.PropertyChanged += (sender, e) =>
+                {
+                    PB.Binding.InvalidateMember(() => triggerLevelConverter.DerivedValue);
+                };
+            });
 
             return new BoundCursor(cursor, binding);
         }

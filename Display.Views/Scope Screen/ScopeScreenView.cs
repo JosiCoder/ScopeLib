@@ -256,7 +256,7 @@ namespace ScopeLib.Display.Views
 
                 channelCursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
                     channelConfig.MeasurementCursorB, channelConfig, false,
-                    () => channelConfig.MeasurementCursorA.Level, () => _referenceLevel));
+                    () => channelConfig.MeasurementCursorA.Value, () => _referenceLevel));
             });
 
             return channelCursors;

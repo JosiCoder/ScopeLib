@@ -29,22 +29,22 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         internal MeasurementCursorConfiguration ()
         {
-            Level = 0.0;
+            Value = 0.0;
         }
 
-        private double _level;
+        private double _value;
         /// <summary>
-        /// Gets or sets the cursor level.
+        /// Gets or sets the cursor value.
         /// </summary>
-        public double Level
+        public double Value
         {
             get
             {
-                return _level;
+                return _value;
             }
             set
             {
-                _level = value;
+                _value = value;
                 RaisePropertyChanged();
             }
         }
