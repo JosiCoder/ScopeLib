@@ -35,17 +35,19 @@ namespace ScopeLib.Display.ViewModels
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="level">The number of the scope channel the trigger is assigned to.</param>
-        protected TriggerConfigurationBase (ushort channel)
+        /// <param name="channelConfiguration">
+        /// The configuration of the scope channel the trigger is assigned to.
+        /// </param>
+        protected TriggerConfigurationBase (ChannelConfiguration channelConfiguration)
             : this()
         {
-            ChannelNumber = channel;
+            ChannelConfiguration = channelConfiguration;
         }
 
         /// <summary>
-        /// Gets or sets the number of the scope channel the trigger is assigned to.
+        /// Gets or sets the configuration of the scope channel the trigger is assigned to.
         /// </summary>
-        public ushort ChannelNumber
+        public ChannelConfiguration ChannelConfiguration
         { get; set; }
 
 

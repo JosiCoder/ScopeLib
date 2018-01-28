@@ -40,7 +40,6 @@ namespace ScopeLib.Display.ViewModels
         public LevelTriggerConfiguration ()
             : base()
         {
-            BaseUnitString = "V";
             Mode = LevelTriggerMode.RisingEdge;
             Level = 0.0;
         }
@@ -49,35 +48,18 @@ namespace ScopeLib.Display.ViewModels
         /// Initializes an instance of this class.
         /// </summary>
         /// <param name="baseUnitString">The string representing the base unit.</param>
-        /// <param name="channel">The number of the scope channel the trigger is assigned to.</param>
+        /// <param name="channelConfiguration">
+        /// The configuration of the scope channel the trigger is assigned to.
+        /// </param>
         /// <param name="mode">The trigger mode.</param>
         /// <param name="level">The trigger level.</param>
-        public LevelTriggerConfiguration (string baseUnitString, ushort channel,
+        public LevelTriggerConfiguration (ChannelConfiguration channelConfiguration,
             LevelTriggerMode mode, double level)
-            : base(channel)
+            : base(channelConfiguration)
         {
-            BaseUnitString = baseUnitString;
             Mode = mode;
             Level = level;
         }
-
-        private string _baseUnitString;
-        /// <summary>
-        /// Gets or sets the string representing the base unit.
-        /// </summary>
-        public string BaseUnitString
-        {
-            get
-            {
-                return _baseUnitString;
-            }
-            set
-            {
-                _baseUnitString = value;
-                RaisePropertyChanged();
-            }
-        }
-
 
         private LevelTriggerMode _mode;
         /// <summary>

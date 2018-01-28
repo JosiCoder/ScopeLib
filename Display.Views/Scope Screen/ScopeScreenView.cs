@@ -211,22 +211,20 @@ namespace ScopeLib.Display.Views
         {
             var triggerConfiguration = _viewModel.TriggerConfiguration;
 
-            var channelConfig = _viewModel.ChannelConfigurations
-                    .Skip(triggerConfiguration.ChannelNumber)
-                    .FirstOrDefault();
+            var channelConfig = triggerConfiguration.ChannelConfiguration;
 
             var triggerCursors = new List<BoundCursor>();
 
             if (channelConfig == null)
-                {
-                    ; // intentionally left blank
-                }
+            {
+                ; // intentionally left blank
+            }
             else if (triggerConfiguration is LevelTriggerConfiguration)
-                {
+            {
                 triggerCursors.Add(CursorFactory.CreateTriggerCriteriaCursor(
                     triggerConfiguration as LevelTriggerConfiguration, channelConfig,
                     () => _referenceLevel));
-                }
+            }
             // Add more cases for other types of triggers here.
             // ...
 

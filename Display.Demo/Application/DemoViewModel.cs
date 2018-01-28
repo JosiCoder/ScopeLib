@@ -35,9 +35,6 @@ namespace ScopeLib.Display.Demo
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                 (x, y) => y);
 
-            _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration("V", 0,
-                LevelTriggerMode.FallingEdge, 0.5);
-
             var channelConfigurations = new[]
             {
                 new ChannelConfiguration("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
@@ -48,6 +45,9 @@ namespace ScopeLib.Display.Demo
             channelConfigurations[1].MeasurementCursorA.Level = -0.5;
             channelConfigurations[1].MeasurementCursorB.Level = 0.5;
             _scopeScreenVM.ChannelConfigurations = channelConfigurations;
+
+            _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],
+                LevelTriggerMode.FallingEdge, 0.5);
 
             _scopeScreenVM.CurrentSignalFrames = new[]
             {

@@ -51,7 +51,7 @@ namespace ScopeLib.Display.Views
 
             var triggerCaption = string.Format("{0}{1}", _triggerSymbol, triggerSymbol);
             Func<String> levelTextProvider = () =>
-                UnitHelper.BuildValueText(triggerConfiguration.BaseUnitString, triggerConfiguration.Level);
+                UnitHelper.BuildValueText(triggerConfiguration.ChannelConfiguration.BaseUnitString, triggerConfiguration.Level);
 
             var levelColor = CairoHelpers.ToCairoColor(triggerChannelConfiguration.Color);
 
