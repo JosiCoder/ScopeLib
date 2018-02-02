@@ -30,24 +30,40 @@ namespace ScopeLib.Display.Demo
 
         public DemoViewModel ()
         {
-            var channel2TimeIncrement = 2 * Math.PI / 40;
-            var channel2values =
-                FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
-                (x, y) => y);
+            // === Channels configuration ===
 
             var channelConfigurations = new[]
             {
                 new ChannelConfiguration("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
-                new ChannelConfiguration("V", new Position(-Math.PI, -2), 1, 2.5, new Color(0, 1, 0)),
+                new ChannelConfiguration("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
             };
+            channelConfigurations[0].MeasurementCursorA.Visible = true;
+            channelConfigurations[0].MeasurementCursorB.Visible = true;
+            channelConfigurations[1].MeasurementCursorA.Visible = true;
+            channelConfigurations[1].MeasurementCursorB.Visible = true;
             channelConfigurations[0].MeasurementCursorA.Value = 2.0;
             channelConfigurations[0].MeasurementCursorB.Value = 3.0;
             channelConfigurations[1].MeasurementCursorA.Value = -0.5;
             channelConfigurations[1].MeasurementCursorB.Value = 0.5;
             _scopeScreenVM.ChannelConfigurations = channelConfigurations;
 
-            _scopeScreenVM.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],
+            // === Timebase configuration ===
+
+            var timebaseConfiguration = new TimebaseConfiguration ("s", 1, new Color(0.5, 0.8, 1.0));
+            timebaseConfiguration.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],
                 LevelTriggerMode.FallingEdge, 0.5);
+            timebaseConfiguration.MeasurementCursorA.Visible = true;
+            timebaseConfiguration.MeasurementCursorB.Visible = true;
+            timebaseConfiguration.MeasurementCursorA.Value = 2.0;
+            timebaseConfiguration.MeasurementCursorB.Value = 3.0;
+            _scopeScreenVM.TimebaseConfiguration = timebaseConfiguration;
+
+            // === Frames ===
+
+            var channel2TimeIncrement = 2 * Math.PI / 40;
+            var channel2values =
+                FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
+                    (x, y) => y);
 
             _scopeScreenVM.CurrentSignalFrames = new[]
             {

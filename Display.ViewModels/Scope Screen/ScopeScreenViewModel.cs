@@ -26,9 +26,9 @@ namespace ScopeLib.Display.ViewModels
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
         /// <summary>
-        /// Gets or sets the trigger configuration.
+        /// Gets or sets the timebase configuration.
         /// </summary>
-        public TriggerConfigurationBase TriggerConfiguration
+        public TimebaseConfiguration TimebaseConfiguration
         { get; set; }
 
         /// <summary>

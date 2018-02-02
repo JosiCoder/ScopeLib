@@ -35,6 +35,7 @@ namespace ScopeLib.Display.Views
     {
         private readonly IScopeScreenViewModel _viewModel;
 
+        private const double _referenceTime = 0.0;
         private const double _referenceLevel = 0.0;
         private const bool _captureContinuously = false;
         private const double _xMinimumGraticuleUnits = 10.0;
@@ -184,9 +185,11 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a scope graph from a channel configuration and a signal frame.
         /// </summary>
-        private static ScopeGraph CreateScopeGraph(double triggerPointPosition,
-            ChannelConfiguration channelConfiguration, SignalFrame signalFrame)
+        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration, SignalFrame signalFrame)
         {
+            var timebaseConfiguration = _viewModel.TimebaseConfiguration;
+            var triggerPointPosition = timebaseConfiguration.TriggerConfiguration.HorizontalPosition;
+
             return new ScopeGraph
             {
                 LineType = _graphLineType,
@@ -200,37 +203,58 @@ namespace ScopeLib.Display.Views
                 ReferencePoint =
                     new Cairo.PointD(signalFrame.ReferenceTime, _referenceLevel),
                 Vertices = signalFrame.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * signalFrame.TimeIncrement, value)),
+                    .Select((value, counter) => new Cairo.PointD (counter * signalFrame.TimeIncrement * timebaseConfiguration.TimeScaleFactor, value)),
             };
         }
 
         /// <summary>
-        /// Creates the trigger cursors.
+        /// Creates the timebase cursors.
         /// </summary>
-        private IEnumerable<BoundCursor> CreateTriggerCursors()
+        private IEnumerable<BoundCursor> CreateTimebaseCursors()
         {
-            var triggerConfiguration = _viewModel.TriggerConfiguration;
+            var timebaseConfig = _viewModel.TimebaseConfiguration;
+            var triggerConfig = timebaseConfig.TriggerConfiguration;
+            var channelConfig = triggerConfig.ChannelConfiguration;
 
-            var channelConfig = triggerConfiguration.ChannelConfiguration;
-
-            var triggerCursors = new List<BoundCursor>();
+            var cursors = new List<BoundCursor>();
 
             if (channelConfig == null)
             {
                 ; // intentionally left blank
             }
-            else if (triggerConfiguration is LevelTriggerConfiguration)
+            else if (triggerConfig is LevelTriggerConfiguration)
             {
-                triggerCursors.Add(TriggerCursorFactory.CreateTriggerCriteriaCursor(
-                    triggerConfiguration as LevelTriggerConfiguration, channelConfig,
+                cursors.Add(TriggerCursorFactory.CreateTriggerCriteriaCursor(
+                    triggerConfig as LevelTriggerConfiguration, channelConfig,
                     () => _referenceLevel));
             }
             // Add more cases for other types of triggers here.
             // ...
 
-            triggerCursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(triggerConfiguration));
+            cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseConfig));
 
-            return triggerCursors;
+            bool bothCursorsVisible =
+                channelConfig.MeasurementCursorA.Visible &&
+                channelConfig.MeasurementCursorB.Visible;
+
+            if (timebaseConfig.MeasurementCursorA.Visible)
+            {
+                cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
+                    timebaseConfig.MeasurementCursorA, timebaseConfig, bothCursorsVisible,
+                    null,
+                    () => _referenceTime));
+            }
+
+            if (timebaseConfig.MeasurementCursorB.Visible)
+            {
+                cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
+                    timebaseConfig.MeasurementCursorB, timebaseConfig, false,
+                    bothCursorsVisible ? () => timebaseConfig.MeasurementCursorA.Value : (Func<double>)null,
+                    () => _referenceTime));
+
+            }
+
+            return cursors;
         }
 
         /// <summary>
@@ -238,28 +262,40 @@ namespace ScopeLib.Display.Views
         /// </summary>
         private IEnumerable<BoundCursor> CreateChannelCursors()
         {
-            var channelConfigurations = _viewModel.ChannelConfigurations;
+            var channelConfig = _viewModel.ChannelConfigurations;
 
             // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
 
-            var channelCursors = new List<BoundCursor>();
+            var cursors = new List<BoundCursor>();
 
-            channelCursors.AddRange(channelConfigurations
+            cursors.AddRange(channelConfig
                 .Select((channelConf, index) => ChannelCursorFactory.CreateChannelReferenceCursor(channelConf, index)));
 
-            channelConfigurations.ForEach(channelConfig =>
-            {
-                channelCursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
-                    channelConfig.MeasurementCursorA, channelConfig, true,
-                    null, () => _referenceLevel));
+            channelConfig.ForEach(chConfig =>
+                {
+                    bool bothCursorsVisible =
+                        chConfig.MeasurementCursorA.Visible &&
+                        chConfig.MeasurementCursorB.Visible;
 
-                channelCursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
-                    channelConfig.MeasurementCursorB, channelConfig, false,
-                    () => channelConfig.MeasurementCursorA.Value, () => _referenceLevel));
-            });
+                    if (chConfig.MeasurementCursorA.Visible)
+                    {
+                        cursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
+                            chConfig.MeasurementCursorA, chConfig, bothCursorsVisible,
+                            null,
+                            () => _referenceLevel));
+                    }
 
-            return channelCursors;
+                    if (chConfig.MeasurementCursorB.Visible)
+                    {
+                        cursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
+                            chConfig.MeasurementCursorB, chConfig, false,
+                            bothCursorsVisible ? () => chConfig.MeasurementCursorA.Value : (Func<double>)null,
+                            () => _referenceLevel));
+                    }
+                });
+
+            return cursors;
         }
 
         /// <summary>
@@ -271,8 +307,7 @@ namespace ScopeLib.Display.Views
             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
 
             _scopeGraphics.Graphs = CollectionUtilities.Zip(
-                objects => CreateScopeGraph(_viewModel.TriggerConfiguration.HorizontalPosition,
-                    objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
+                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as SignalFrame),
                 _viewModel.ChannelConfigurations, _viewModel.CurrentSignalFrames);
 
             var demoCursors = new []
@@ -307,7 +342,7 @@ namespace ScopeLib.Display.Views
 
             // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
-            var boundCursors = CreateChannelCursors().Concat(CreateTriggerCursors());
+            var boundCursors = CreateChannelCursors().Concat(CreateTimebaseCursors());
             _scopeGraphics.Cursors =
                 boundCursors.Select(cursor => cursor.EmbeddedCursor).Concat(demoCursors);
 

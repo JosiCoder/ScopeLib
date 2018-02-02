@@ -21,27 +21,17 @@ using System.Collections.Generic;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides access to a viewmodel of a scope screen.
+    /// Provides the configuration of an unspecified trigger.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public class NullTriggerConfiguration : TriggerConfigurationBase
     {
         /// <summary>
-        /// Gets or sets the timebase configuration.
+        /// Initializes an instance of this class.
         /// </summary>
-        TimebaseConfiguration TimebaseConfiguration
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the channel configuration, one item per channel.
-        /// </summary>
-        IEnumerable<ChannelConfiguration> ChannelConfigurations
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current signal frames, one item per channel.
-        /// </summary>
-        IEnumerable<SignalFrame> CurrentSignalFrames
-        { get; set; }
+        public NullTriggerConfiguration ()
+            : base()
+        {
+        }
     }
 }
 

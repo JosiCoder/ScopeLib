@@ -32,18 +32,59 @@ namespace ScopeLib.Display.Views
     {
         private const char _deltaSymbol = '\u2206';
 
+        private enum MeasurementAxis : short
+        {
+            X,
+            Y
+        }
+
+        /// <summary>
+        /// Creates a cursor used for time measurements.
+        /// </summary>
+        internal static BoundCursor CreateTimeMeasurementCursor(
+            MeasurementCursorConfiguration cursorConfiguration,
+            TimebaseConfiguration timebaseConfiguration,
+            bool isReferenceCursor,
+            Func<double> deltaReferenceLevelProvider,
+            Func<double> referenceLevelProvider)
+        {
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> bindingProvider =
+                (cursor, valueConverter) => PB.Binding.Create (() =>
+                    cursor.Position.X == valueConverter.DerivedValue &&
+                    valueConverter.OriginalValue == cursorConfiguration.Value);
+
+            var influencingObjects = new INotifyPropertyChanged[]
+            {
+                timebaseConfiguration,
+                timebaseConfiguration.TriggerConfiguration,
+            };
+
+            return CreateMeasurementCursor(
+                MeasurementAxis.X,
+                isReferenceCursor,
+                () => cursorConfiguration.Value,
+                bindingProvider,
+                deltaReferenceLevelProvider,
+                () => timebaseConfiguration.TimeScaleFactor,
+                () => timebaseConfiguration.TriggerConfiguration.HorizontalPosition,
+                referenceLevelProvider,
+                timebaseConfiguration.BaseUnitString,
+                timebaseConfiguration.Color,
+                influencingObjects);
+        }
+
         /// <summary>
         /// Creates a cursor used for level measurements.
         /// </summary>
         internal static BoundCursor CreateLevelMeasurementCursor(
             MeasurementCursorConfiguration cursorConfiguration,
             ChannelConfiguration cursorChannelConfiguration,
-            bool isReferenceCursor, Func<double> deltaReferenceLevelProvider,
-            Func<double> referenceLevel)
+            bool isReferenceCursor,
+            Func<double> deltaReferenceLevelProvider,
+            Func<double> referenceLevelProvider)
         {
-            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding =
-                (cursor, valueConverter) =>
-                PB.Binding.Create (() =>
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> bindingProvider =
+                (cursor, valueConverter) => PB.Binding.Create (() =>
                     cursor.Position.Y == valueConverter.DerivedValue &&
                     valueConverter.OriginalValue == cursorConfiguration.Value);
             
@@ -54,13 +95,14 @@ namespace ScopeLib.Display.Views
             };
 
             return CreateMeasurementCursor(
-                () => cursorConfiguration.Value,
-                createBinding,
+                MeasurementAxis.Y,
                 isReferenceCursor,
+                () => cursorConfiguration.Value,
+                bindingProvider,
                 deltaReferenceLevelProvider,
                 () => cursorChannelConfiguration.ValueScaleFactor,
                 () => cursorChannelConfiguration.ReferencePointPosition.Y,
-                referenceLevel,
+                referenceLevelProvider,
                 cursorChannelConfiguration.BaseUnitString,
                 cursorChannelConfiguration.Color,
                 influencingObjects);
@@ -69,21 +111,107 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a measurement cursor.
         /// </summary>
-        internal static BoundCursor CreateMeasurementCursor(
-            Func<double> value,
-            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> createBinding,
+        private static BoundCursor CreateMeasurementCursor(
+            MeasurementAxis measurementAxis,
             bool isReferenceCursor,
-            Func<double> deltaReferenceValueProvider,
-            Func<double> valueScaleFactor,
-            Func<double> triggerReferenceValue,
-            Func<double> referenceValue,
+            Func<double> valueProvider,
+            Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> valueBindingProvider,
+            Func<double> deltaMeasurementReferenceValueProvider,
+            Func<double> valueScaleFactorProvider,
+            Func<double> referencePointPositionProvider,
+            Func<double> referenceValueProvider,
             string baseUnitString,
             Color cursorColor,
             IEnumerable<INotifyPropertyChanged> influencingObjects)
         {
             Func<String> basicValueTextProvider = () =>
-                UnitHelper.BuildValueText(baseUnitString, value());
+                UnitHelper.BuildValueText(baseUnitString, valueProvider());
 
+            Func<String> valueTextProvider;
+            if (deltaMeasurementReferenceValueProvider == null)
+            {
+                valueTextProvider = basicValueTextProvider;
+            }
+            else
+            {
+                valueTextProvider = () =>
+                    string.Format("{0} / {1} = {2}", basicValueTextProvider(), _deltaSymbol,
+                        UnitHelper.BuildValueText(baseUnitString,
+                            valueProvider() - deltaMeasurementReferenceValueProvider()));
+            }
+
+            var cursor =
+                measurementAxis == MeasurementAxis.Y
+                ? CreateYAxisMeasurementCursor (isReferenceCursor, valueTextProvider, cursorColor)
+                : CreateXAxisMeasurementCursor (isReferenceCursor, valueTextProvider, cursorColor);
+
+            // === Create value converters. ===
+
+            var valueConverter = new ValueConverter<double, double>(
+                val => (val - referenceValueProvider()) * valueScaleFactorProvider() + referencePointPositionProvider(),
+                val => ((val - referencePointPositionProvider()) / valueScaleFactorProvider()) + referenceValueProvider());
+
+            // === Create bindings. ===
+
+            // Bind the cursor's position.
+            var binding = valueBindingProvider(cursor, valueConverter);
+
+            // The measurement cursor's position depends on some additional values (except the primary value
+            // it is bound to). Update it if any of these values changes. ===
+            influencingObjects.ForEach(influencingObject =>
+            {
+                influencingObject.PropertyChanged += (sender, e) =>
+                {
+                    PB.Binding.InvalidateMember(() => valueConverter.DerivedValue);
+                };
+            });
+
+            return new BoundCursor(cursor, new [] {binding});
+        }
+
+        /// <summary>
+        /// Creates a vertical (X axis) measurement cursor.
+        /// </summary>
+        private static ScopeCursor CreateXAxisMeasurementCursor(bool isReferenceCursor,
+            Func<String> valueTextProvider, Color cursorColor
+        )
+        {
+            var cairoColor = CairoHelpers.ToCairoColor(cursorColor);
+
+            ScopeCursorMarkers markers;
+            ScopeHorizontalAlignment valueAlignment;
+            if (isReferenceCursor)
+            {
+                markers = ScopeCursorMarkers.XLeft;
+                valueAlignment = ScopeHorizontalAlignment.Right;
+            }
+            else
+            {
+                markers = ScopeCursorMarkers.XRight;
+                valueAlignment = ScopeHorizontalAlignment.Left;
+            }
+
+            return new ScopeCursor
+            {
+                Lines = ScopeCursorLines.X,
+                LineWeight = ScopeCursorLineWeight.Medium,
+                SelectableLines = ScopeCursorLines.X,
+                Markers = markers,
+                Color = cairoColor,
+                Captions = new []
+                {
+                    new ScopePositionCaption(valueTextProvider, valueAlignment, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, cairoColor),
+                },
+            };
+        }
+
+        /// <summary>
+        /// Creates a horizontal (Y axis) measurement cursor.
+        /// </summary>
+        private static ScopeCursor CreateYAxisMeasurementCursor(bool isReferenceCursor,
+            Func<String> valueTextProvider, Color cursorColor
+        )
+        {
             var cairoColor = CairoHelpers.ToCairoColor(cursorColor);
 
             ScopeCursorMarkers markers;
@@ -99,20 +227,7 @@ namespace ScopeLib.Display.Views
                 valueAlignment = ScopeVerticalAlignment.Bottom;
             }
 
-            Func<String> valueTextProvider;
-            if (deltaReferenceValueProvider == null)
-            {
-                valueTextProvider = basicValueTextProvider;
-            }
-            else
-            {
-                valueTextProvider = () =>
-                    string.Format("{0} / {1} = {2}", basicValueTextProvider(), _deltaSymbol,
-                        UnitHelper.BuildValueText(baseUnitString,
-                            value() - deltaReferenceValueProvider()));
-            }
-
-            var cursor = new ScopeCursor
+            return new ScopeCursor
             {
                 Lines = ScopeCursorLines.Y,
                 LineWeight = ScopeCursorLineWeight.Medium,
@@ -124,29 +239,6 @@ namespace ScopeLib.Display.Views
                     new ScopePositionCaption(valueTextProvider, ScopeHorizontalAlignment.Right, valueAlignment, ScopeAlignmentReference.YPositionAndHorizontalRangeEdge, true, cairoColor),
                 },
             };
-
-            // === Create value converters. ===
-
-            var valueConverter = new ValueConverter<double, double>(
-                val => (val - referenceValue()) * valueScaleFactor() + triggerReferenceValue(),
-                val => ((val - triggerReferenceValue()) / valueScaleFactor()) + referenceValue());
-
-            // === Create bindings. ===
-
-            // Bind the cursor's position.
-            var binding = createBinding(cursor, valueConverter);
-
-            // The measurement cursor's position depends on some additional values (except the primary value
-            // it is bound to). Update it if any of these values changes. ===
-            influencingObjects.ForEach(influencingObject =>
-            {
-                influencingObject.PropertyChanged += (sender, e) =>
-                {
-                    PB.Binding.InvalidateMember(() => valueConverter.DerivedValue);
-                };
-            });
-
-            return new BoundCursor(cursor, new [] {binding});
         }
     }
 }

@@ -30,6 +30,24 @@ namespace ScopeLib.Display.ViewModels
         internal MeasurementCursorConfiguration ()
         {
             Value = 0.0;
+            Visible = false;
+        }
+
+        private bool _visible;
+        /// <summary>
+        /// Gets or sets a value indicating whether the cursor is visible.
+        /// </summary>
+        public bool Visible
+        {
+            get
+            {
+                return _visible;
+            }
+            set
+            {
+                _visible = value;
+                RaisePropertyChanged();
+            }
         }
 
         private double _value;
