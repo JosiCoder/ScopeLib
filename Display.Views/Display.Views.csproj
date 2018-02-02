@@ -78,6 +78,10 @@
       <Project>{4CBA5E80-45E7-4796-A43E-28ADC8B6C6CB}</Project>
       <Name>Display.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sampling\Sampling.csproj">
+      <Project>{405EE72A-2DAC-42C2-B13B-191516FEF51D}</Project>
+      <Name>Sampling</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scope Screen\" />

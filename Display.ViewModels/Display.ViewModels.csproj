@@ -35,7 +35,6 @@
     <Compile Include="Scope Screen\IScopeScreenViewModel.cs" />
     <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
     <Compile Include="MVVM\ViewModelBase.cs" />
-    <Compile Include="Scope Screen\SignalFrame.cs" />
     <Compile Include="Timebase\TriggerConfigurationBase.cs" />
     <Compile Include="Timebase\LevelTriggerConfiguration.cs" />
     <Compile Include="Miscellaneous\CommonTypes.cs" />
@@ -50,6 +49,10 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{1DC0553F-3D45-46F6-9418-E49717BA5E95}</Project>
       <Name>Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sampling\Sampling.csproj">
+      <Project>{405EE72A-2DAC-42C2-B13B-191516FEF51D}</Project>
+      <Name>Sampling</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

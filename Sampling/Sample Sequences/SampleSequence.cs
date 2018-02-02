@@ -18,28 +18,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace ScopeLib.Display.ViewModels
+namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a signal frame, i.e. a bunch of values captured from a signal including some
-    /// meta information.
+    /// Provides a sample sequence, i.e. a bunch of values sampled from a signal,
+    /// and some related meta information.
     /// </summary>
-    public class SignalFrame
+    public class SampleSequence
     {
         /// <summary>
         /// Initializes an instance of this class with default settings.
         /// </summary>
-        public SignalFrame ()
+        public SampleSequence ()
         {
         }
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="timeIncrement">The time increment between two successive measurements.</param>
+        /// <param name="timeIncrement">The time increment between two successive sampled.</param>
         /// <param name="referenceTime">The time value of the reference point (e.g. the trigger position).</param>
-        /// <param name="values">The measurement values.</param>
-        public SignalFrame (double timeIncrement, double referenceTime, IEnumerable<double> values)
+        /// <param name="values">The sample values.</param>
+        public SampleSequence (double timeIncrement, double referenceTime, IEnumerable<double> values)
         {
             TimeIncrement = timeIncrement;
             ReferenceTime = referenceTime;
@@ -59,7 +59,7 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the measurement values.
+        /// Gets or sets the sample values.
         /// </summary>
         public IEnumerable<double> Values
         { get; set; }

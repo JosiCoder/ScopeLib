@@ -83,6 +83,10 @@
       <Project>{E18A3F24-1950-4172-8089-9CEC4ADD76D0}</Project>
       <Name>Display.Views</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sampling\Sampling.csproj">
+      <Project>{405EE72A-2DAC-42C2-B13B-191516FEF51D}</Project>
+      <Name>Sampling</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Application\DemoWindowView.glade">

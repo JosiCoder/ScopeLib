@@ -17,6 +17,7 @@
 
 using System;
 using ScopeLib.Utilities;
+using ScopeLib.Sampling;
 using ScopeLib.Display.ViewModels;
 
 namespace ScopeLib.Display.Demo
@@ -65,10 +66,10 @@ namespace ScopeLib.Display.Demo
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                     (x, y) => y);
 
-            _scopeScreenVM.CurrentSignalFrames = new[]
+            _scopeScreenVM.CurrentSignalSampleSequences = new[]
             {
-                new SignalFrame(1, 2, new []{-1d, 0d, 2d, 3d}),
-                new SignalFrame(channel2TimeIncrement, 0,  channel2values),
+                new SampleSequence(1, 2, new []{-1d, 0d, 2d, 3d}),
+                new SampleSequence(channel2TimeIncrement, 0,  channel2values),
             };
         }
 

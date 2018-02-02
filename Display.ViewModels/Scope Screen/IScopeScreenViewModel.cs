@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
 {
@@ -38,9 +39,9 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the current signal frames, one item per channel.
+        /// Gets or sets the current signal sample sequences, one sequence per channel.
         /// </summary>
-        IEnumerable<SignalFrame> CurrentSignalFrames
+        IEnumerable<SampleSequence> CurrentSignalSampleSequences
         { get; set; }
     }
 }
