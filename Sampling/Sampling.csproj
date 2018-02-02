@@ -37,6 +37,7 @@
     <Compile Include="Trigger\TriggerBase.cs" />
     <Compile Include="Trigger\LevelTrigger.cs" />
     <Compile Include="Trigger\NullTrigger.cs" />
+    <Compile Include="Sampler\SamplerBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

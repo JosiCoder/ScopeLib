@@ -21,46 +21,41 @@ using System.Collections.Generic;
 namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a sample sequence, i.e. a bunch of values sampled from a signal,
-    /// and some related meta information.
+    /// Provides a base implementation for samplers, i.e. classes that returns sample sequence providers
+    /// based on certain sample sources. A sample sequence provider is a function that provides a sequence
+    /// of values sampled from a signal.
     /// </summary>
-    public class SampleSequence
+    public abstract class SamplerBase
     {
-        /// <summary>
-        /// Initializes an instance of this class with default settings.
-        /// </summary>
-        public SampleSequence ()
-        {
-        }
-
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="timeIncrement">The time increment between two successive sampled.</param>
-        /// <param name="values">The sample values.</param>
-        public SampleSequence (double timeIncrement, IEnumerable<double> values)
+        /// <param name="trigger">The trigger to use.</param>
+        /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
+        public SamplerBase (TriggerBase trigger, int triggerChannelIndex)
         {
-            TimeIncrement = timeIncrement;
-            Values = values;
+            Trigger = trigger;
+            TriggerChannelIndex = triggerChannelIndex;
         }
 
         /// <summary>
-        /// Gets or sets the time increment between two successive measurements.
+        /// Gets the functions that provide the signal sample sequences,
+        /// one function per channel.
         /// </summary>
-        public double TimeIncrement
-        { get; set; }
+        public abstract IEnumerable<Func<SampleSequence>> SampleSequenceProviders
+        { get; }
 
         /// <summary>
-        /// Gets or sets the time value of the reference point (e.g. the trigger position).
+        /// Gets the trigger to use.
         /// </summary>
-        public double ReferenceTime
-        { get; set; }
+        public TriggerBase Trigger
+        { get; private set; }
 
         /// <summary>
-        /// Gets or sets the sample values.
+        /// Gets the index of the channel to apply the trigger on.
         /// </summary>
-        public IEnumerable<double> Values
-        { get; set; }
+        public int TriggerChannelIndex
+        { get; private set; }
     }
 }
 

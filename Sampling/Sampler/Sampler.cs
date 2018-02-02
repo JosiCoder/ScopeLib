@@ -16,51 +16,71 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace ScopeLib.Sampling
-{//TODO: Comments
+{
     /// <summary>
-    /// Provides a sample sequence, i.e. a bunch of values sampled from a signal,
-    /// and some related meta information.
+    /// Provides a sampler that passes the raw signal samples through after tiggering and time increment adjustments.
     /// </summary>
-    public class Sampler
+    public class Sampler : SamplerBase
     {
-//        /// <summary>
-//        /// Initializes an instance of this class with default settings.
-//        /// </summary>
-//        public Sampler ()
-//        {
-//        }
+        private readonly IEnumerable<Func<SampleSequence>> _wrappedSequenceProviders;
+        private readonly TriggerBase _trigger;
+        private double triggerReferenceTime;
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="timeIncrement">The time increment between two successive sampled.</param>
-        /// <param name="referenceTime">The time value of the reference point (e.g. the trigger time).</param>
-        /// <param name="values">The sample values.</param>
-        public Sampler (IEnumerable<Func<SampleSequence>> sampleSequenceProviders)
+        /// <param name="embeddedSequenceProviders">
+        /// The functions that provide the raw signal sample sequences, one function per channel.
+        /// </param>
+        /// <param name="trigger">The trigger to use.</param>
+        /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
+        public Sampler (IEnumerable<Func<SampleSequence>> embeddedSequenceProviders, TriggerBase trigger,
+            int triggerChannelIndex)
+            : base(trigger, triggerChannelIndex)
         {
-            SampleSequenceProviders = sampleSequenceProviders;
+            _trigger = trigger;
+            _wrappedSequenceProviders = WrapSequenceProviders(embeddedSequenceProviders);
         }
 
         /// <summary>
-        /// Gets or sets the time increment between two successive measurements.
+        /// Gets the functions that provide the signal sample sequences,
+        /// one function per channel.
         /// </summary>
-        public IEnumerable<Func<SampleSequence>> SampleSequenceProviders
-        { get; private set; }
-//
-//        /// <summary>
-//        /// Gets or sets the time value of the reference point (e.g. the trigger position).
-//        /// </summary>
-//        public double ReferenceTime
-//        { get; set; }
-//
-//        /// <summary>
-//        /// Gets or sets the sample values.
-//        /// </summary>
-//        public IEnumerable<double> Values
-//        { get; set; }
+        public override IEnumerable<Func<SampleSequence>> SampleSequenceProviders
+        {
+            get
+            {
+                return _wrappedSequenceProviders;
+            }
+        }
+
+        private IEnumerable<Func<SampleSequence>> WrapSequenceProviders(
+            IEnumerable<Func<SampleSequence>> embeddedSequenceProviders)
+        {
+            return embeddedSequenceProviders.Select((provider, index) =>
+            {
+                return new Func<SampleSequence>(() =>
+                {
+                    var sampleSequence = provider();
+
+                    if (index == TriggerChannelIndex)
+                    {
+                        // We are currently providing the sample sequence of the trigger channel, determine
+                        // the reference time.
+                        triggerReferenceTime = 0;//TODO
+                    }
+
+                    // Set the channel's reference time to that of the trigger.
+                    sampleSequence.ReferenceTime = triggerReferenceTime;
+
+                    return sampleSequence;
+                });
+            });
+        }
     }
 }
 
