@@ -39,9 +39,10 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the current signal sample sequences, one sequence per channel.
+        /// Gets or sets the functions that provide the signal sample sequences,
+        /// one function per channel.
         /// </summary>
-        IEnumerable<SampleSequence> CurrentSignalSampleSequences
+        IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         { get; set; }
     }
 }

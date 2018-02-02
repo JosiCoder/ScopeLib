@@ -186,10 +186,12 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a scope graph from a channel configuration and a signal frame.
         /// </summary>
-        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration, SampleSequence sampleSequences)
+        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration, Func<SampleSequence> sampleSequenceProvider)
         {
             var timebaseConfiguration = _viewModel.TimebaseConfiguration;
             var triggerPointPosition = timebaseConfiguration.TriggerConfiguration.HorizontalPosition;
+
+            var sampleSequence = sampleSequenceProvider();
 
             return new ScopeGraph
             {
@@ -202,9 +204,9 @@ namespace ScopeLib.Display.Views
                 XScaleFactor = channelConfiguration.TimeScaleFactor,
                 YScaleFactor = channelConfiguration.ValueScaleFactor,
                 ReferencePoint =
-                    new Cairo.PointD(sampleSequences.ReferenceTime, _referenceLevel),
-                Vertices = sampleSequences.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequences.TimeIncrement * timebaseConfiguration.TimeScaleFactor, value)),
+                    new Cairo.PointD(sampleSequence.ReferenceTime, _referenceLevel),
+                Vertices = sampleSequence.Values
+                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.TimeIncrement * timebaseConfiguration.TimeScaleFactor, value)),
             };
         }
 
@@ -308,8 +310,8 @@ namespace ScopeLib.Display.Views
             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
 
             _scopeGraphics.Graphs = CollectionUtilities.Zip(
-                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as SampleSequence),
-                _viewModel.ChannelConfigurations, _viewModel.CurrentSignalSampleSequences);
+                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as Func<SampleSequence>),
+                _viewModel.ChannelConfigurations, _viewModel.SampleSequenceProviders);
 
             var demoCursors = new []
             {

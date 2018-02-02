@@ -25,8 +25,8 @@ namespace ScopeLib.Display.Demo
         public static void Main (string[] args)
         {
             Application.Init ();
-            var mainWindowView = DemoWindowView.Create (new DemoViewModel());
-            mainWindowView.Show ();
+            var demoWindowView = DemoWindowView.Create (new DemoViewModel());
+            demoWindowView.Show ();
             Application.Run ();
         }
     }

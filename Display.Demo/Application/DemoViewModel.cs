@@ -52,7 +52,7 @@ namespace ScopeLib.Display.Demo
 
             var timebaseConfiguration = new TimebaseConfiguration ("s", 1, new Color(0.5, 0.8, 1.0));
             timebaseConfiguration.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],
-                LevelTriggerMode.FallingEdge, 0.5);
+                LevelTriggerMode.RisingEdge, 0.5);
             timebaseConfiguration.MeasurementCursorA.Visible = true;
             timebaseConfiguration.MeasurementCursorB.Visible = true;
             timebaseConfiguration.MeasurementCursorA.Value = 2.0;
@@ -66,10 +66,10 @@ namespace ScopeLib.Display.Demo
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                     (x, y) => y);
 
-            _scopeScreenVM.CurrentSignalSampleSequences = new[]
+            _scopeScreenVM.SampleSequenceProviders = new Func<SampleSequence>[]
             {
-                new SampleSequence(1, 2, new []{-1d, 0d, 2d, 3d}),
-                new SampleSequence(channel2TimeIncrement, 0,  channel2values),
+                () => new SampleSequence(1, 2, new []{-1d, 0d, 2d, 3d}),
+                () => new SampleSequence(channel2TimeIncrement, 0,  channel2values),
             };
         }
 
