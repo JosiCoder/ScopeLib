@@ -33,9 +33,15 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sample Sequences\SampleSequence.cs" />
+    <Compile Include="Sampler\Sampler.cs" />
+    <Compile Include="Trigger\TriggerBase.cs" />
+    <Compile Include="Trigger\LevelTrigger.cs" />
+    <Compile Include="Trigger\NullTrigger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Sample Sequences\" />
+    <Folder Include="Sampler\" />
+    <Folder Include="Trigger\" />
   </ItemGroup>
 </Project>

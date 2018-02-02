@@ -17,32 +17,19 @@
 
 using System;
 using System.Collections.Generic;
-using ScopeLib.Sampling;
 
-namespace ScopeLib.Display.ViewModels
+namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides the configuration of an unspecified trigger.
+    /// Provides a non-fuctional dummy scope trigger.
     /// </summary>
-    public class NullTriggerConfiguration : TriggerConfigurationBase<NullTrigger>
+    public class NullTrigger : TriggerBase
     {
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        public NullTriggerConfiguration ()
-            : this(new NullTrigger(), new ChannelConfiguration())
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of this class.
-        /// </summary>
-        /// <param name="trigger">The trigger to use.</param>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
-        /// </param>
-        public NullTriggerConfiguration (NullTrigger trigger, ChannelConfiguration channelConfiguration)
-            : base(trigger, channelConfiguration)
+        public NullTrigger ()
+            : base()
         {
         }
     }

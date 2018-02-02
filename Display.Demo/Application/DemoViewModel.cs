@@ -16,6 +16,8 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using ScopeLib.Utilities;
 using ScopeLib.Sampling;
 using ScopeLib.Display.ViewModels;
@@ -36,6 +38,7 @@ namespace ScopeLib.Display.Demo
             var channelConfigurations = new[]
             {
                 new ChannelConfiguration("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
+//                new ChannelConfiguration("V", new Position(0.0, 1.0), 1, 1, new Color(1, 1, 0)),
                 new ChannelConfiguration("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
             };
             channelConfigurations[0].MeasurementCursorA.Visible = true;
@@ -50,27 +53,44 @@ namespace ScopeLib.Display.Demo
 
             // === Timebase configuration ===
 
+            var triggerChannelIndex = 0;
+
             var timebaseConfiguration = new TimebaseConfiguration ("s", 1, new Color(0.5, 0.8, 1.0));
-            timebaseConfiguration.TriggerConfiguration = new LevelTriggerConfiguration(channelConfigurations[0],
-                LevelTriggerMode.RisingEdge, 0.5);
+            timebaseConfiguration.TriggerConfiguration =
+                new LevelTriggerConfiguration(
+                    new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5),
+                    channelConfigurations[triggerChannelIndex]);
             timebaseConfiguration.MeasurementCursorA.Visible = true;
             timebaseConfiguration.MeasurementCursorB.Visible = true;
             timebaseConfiguration.MeasurementCursorA.Value = 2.0;
             timebaseConfiguration.MeasurementCursorB.Value = 3.0;
             _scopeScreenVM.TimebaseConfiguration = timebaseConfiguration;
 
-            // === Frames ===
+            // === Sample Sequences ===
 
             var channel2TimeIncrement = 2 * Math.PI / 40;
             var channel2values =
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                     (x, y) => y);
 
-            _scopeScreenVM.SampleSequenceProviders = new Func<SampleSequence>[]
+            var sampleSequenceProviders = new Func<SampleSequence>[]
             {
-                () => new SampleSequence(1, 2, new []{-1d, 0d, 2d, 3d}),
-                () => new SampleSequence(channel2TimeIncrement, 0,  channel2values),
+                () => GetSampleSequence(1, 2, new []{ -1d, 0d, 2d, 3d }),
+                () => GetSampleSequence(channel2TimeIncrement, 0, channel2values),
             };
+            var xxx = sampleSequenceProviders
+                .Select((provider, index) => new
+                {
+                    SequenceProvider = provider,
+                    IsTriggerChannel = index == triggerChannelIndex,
+                });
+
+            _scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+        }
+
+        private SampleSequence GetSampleSequence(double timeIncrement, double referenceTime, IEnumerable<double> values)
+        {
+            return new SampleSequence(timeIncrement, referenceTime, values);
         }
 
         /// <summary>

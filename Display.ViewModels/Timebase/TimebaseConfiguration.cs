@@ -116,11 +116,11 @@ namespace ScopeLib.Display.ViewModels
         public MeasurementCursorConfiguration MeasurementCursorB
         { get; private set; }
 
-        private TriggerConfigurationBase _triggerConfiguration;
+        private ITriggerViewModel _triggerConfiguration;
         /// <summary>
         /// Gets or sets the trigger configuration.
         /// </summary>
-        public TriggerConfigurationBase TriggerConfiguration
+        public ITriggerViewModel TriggerConfiguration
         {
             get
             {

@@ -17,51 +17,38 @@
 
 using System;
 using System.Collections.Generic;
+using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Specifies the modes available for a level-based scope trigger.
-    /// </summary>
-    public enum LevelTriggerMode : short
-    {
-        RisingEdge,
-        FallingEdge,
-    }
-
-    /// <summary>
     /// Provides the configuration of a level-based scope trigger.
     /// </summary>
-    public class LevelTriggerConfiguration : TriggerConfigurationBase
+    public class LevelTriggerConfiguration : TriggerConfigurationBase<LevelTrigger>
     {
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
-        public LevelTriggerConfiguration ()
-            : base()
+        /// <param name="channelConfiguration">
+        /// The configuration of the scope channel the trigger is assigned to.
+        /// </param>
+        public LevelTriggerConfiguration (ChannelConfiguration channelConfiguration)
+            : this(new LevelTrigger(), channelConfiguration)
         {
-            Mode = LevelTriggerMode.RisingEdge;
-            Level = 0.0;
         }
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="baseUnitString">The string representing the base unit.</param>
+        /// <param name="trigger">The trigger to use.</param>
         /// <param name="channelConfiguration">
         /// The configuration of the scope channel the trigger is assigned to.
         /// </param>
-        /// <param name="mode">The trigger mode.</param>
-        /// <param name="level">The trigger level.</param>
-        public LevelTriggerConfiguration (ChannelConfiguration channelConfiguration,
-            LevelTriggerMode mode, double level)
-            : base(channelConfiguration)
+        public LevelTriggerConfiguration (LevelTrigger trigger, ChannelConfiguration channelConfiguration)
+            : base(trigger, channelConfiguration)
         {
-            Mode = mode;
-            Level = level;
         }
 
-        private LevelTriggerMode _mode;
         /// <summary>
         /// Gets or sets the trigger mode.
         /// </summary>
@@ -69,16 +56,15 @@ namespace ScopeLib.Display.ViewModels
         {
             get
             {
-                return _mode;
+                return Trigger.Mode;
             }
             set
             {
-                _mode = value;
+                Trigger.Mode = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _level;
         /// <summary>
         /// Gets or sets the trigger level.
         /// </summary>
@@ -86,11 +72,11 @@ namespace ScopeLib.Display.ViewModels
         {
             get
             {
-                return _level;
+                return Trigger.Level;
             }
             set
             {
-                _level = value;
+                Trigger.Level = value;
                 RaisePropertyChanged();
             }
         }

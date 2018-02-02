@@ -17,30 +17,45 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
 {
+    public interface ITriggerViewModel : INotifyPropertyChanged
+    {
+        /// <summary>
+        /// Gets or sets the configuration of the scope channel the trigger is assigned to.
+        /// </summary>
+        ChannelConfiguration ChannelConfiguration
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the horizontal position of the trigger point.
+        /// </summary>
+        double HorizontalPosition
+        { get; set; }
+    }
+
     /// <summary>
     /// Provides the base implementation for trigger configurations.
     /// </summary>
-    public abstract class TriggerConfigurationBase : ViewModelBase
+    /// <typeparam name="TTrigger">The type of the trigger.</typeparam>
+    public abstract class TriggerConfigurationBase<TTrigger> : ViewModelBase, ITriggerViewModel
+        where TTrigger : TriggerBase
     {
+        protected readonly TTrigger Trigger;
+
         /// <summary>
         /// Initializes an instance of this class with default settings.
         /// </summary>
-        protected TriggerConfigurationBase ()
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of this class.
-        /// </summary>
+        /// <param name="trigger">The trigger to use.</param>
         /// <param name="channelConfiguration">
         /// The configuration of the scope channel the trigger is assigned to.
         /// </param>
-        protected TriggerConfigurationBase (ChannelConfiguration channelConfiguration)
-            : this()
+        protected TriggerConfigurationBase (TTrigger trigger, ChannelConfiguration channelConfiguration)
         {
+            Trigger = trigger;
             ChannelConfiguration = channelConfiguration;
         }
 
@@ -49,7 +64,6 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public ChannelConfiguration ChannelConfiguration
         { get; set; }
-
 
         private double _horizontalPosition;
         /// <summary>

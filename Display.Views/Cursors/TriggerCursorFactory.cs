@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using PB = Praeclarum.Bind;
 using ScopeLib.Utilities;
+using ScopeLib.Sampling;
 using ScopeLib.Display.ViewModels;
 using ScopeLib.Display.Graphics;
 

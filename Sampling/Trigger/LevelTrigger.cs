@@ -17,34 +17,56 @@
 
 using System;
 using System.Collections.Generic;
-using ScopeLib.Sampling;
 
-namespace ScopeLib.Display.ViewModels
+namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides the configuration of an unspecified trigger.
+    /// Specifies the modes available for a level-based scope trigger.
     /// </summary>
-    public class NullTriggerConfiguration : TriggerConfigurationBase<NullTrigger>
+    public enum LevelTriggerMode : short
+    {
+        RisingEdge,
+        FallingEdge,
+    }
+
+    /// <summary>
+    /// Provides a level-based scope trigger.
+    /// </summary>
+    public class LevelTrigger : TriggerBase
     {
         /// <summary>
-        /// Initializes an instance of this class.
+        /// Initializes an instance of this class with default settings.
         /// </summary>
-        public NullTriggerConfiguration ()
-            : this(new NullTrigger(), new ChannelConfiguration())
+        public LevelTrigger ()
+            : base()
         {
+            Mode = LevelTriggerMode.RisingEdge;
+            Level = 0.0;
         }
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="trigger">The trigger to use.</param>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
-        /// </param>
-        public NullTriggerConfiguration (NullTrigger trigger, ChannelConfiguration channelConfiguration)
-            : base(trigger, channelConfiguration)
+        /// <param name="mode">The trigger mode.</param>
+        /// <param name="level">The trigger level.</param>
+        public LevelTrigger (LevelTriggerMode mode, double level)
+            : base()
         {
+            Mode = mode;
+            Level = level;
         }
+
+        /// <summary>
+        /// Gets or sets the trigger mode.
+        /// </summary>
+        public LevelTriggerMode Mode
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the trigger level.
+        /// </summary>
+        public double Level
+        { get; set; }
     }
 }
 

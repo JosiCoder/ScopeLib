@@ -19,19 +19,19 @@ using System;
 using System.Collections.Generic;
 
 namespace ScopeLib.Sampling
-{
+{//TODO: Comments
     /// <summary>
     /// Provides a sample sequence, i.e. a bunch of values sampled from a signal,
     /// and some related meta information.
     /// </summary>
-    public class SampleSequence
+    public class Sampler
     {
-        /// <summary>
-        /// Initializes an instance of this class with default settings.
-        /// </summary>
-        public SampleSequence ()
-        {
-        }
+//        /// <summary>
+//        /// Initializes an instance of this class with default settings.
+//        /// </summary>
+//        public Sampler ()
+//        {
+//        }
 
         /// <summary>
         /// Initializes an instance of this class.
@@ -39,30 +39,28 @@ namespace ScopeLib.Sampling
         /// <param name="timeIncrement">The time increment between two successive sampled.</param>
         /// <param name="referenceTime">The time value of the reference point (e.g. the trigger time).</param>
         /// <param name="values">The sample values.</param>
-        public SampleSequence (double timeIncrement, double referenceTime, IEnumerable<double> values)
+        public Sampler (IEnumerable<Func<SampleSequence>> sampleSequenceProviders)
         {
-            TimeIncrement = timeIncrement;
-            ReferenceTime = referenceTime;
-            Values = values;
+            SampleSequenceProviders = sampleSequenceProviders;
         }
 
         /// <summary>
         /// Gets or sets the time increment between two successive measurements.
         /// </summary>
-        public double TimeIncrement
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the time value of the reference point (e.g. the trigger position).
-        /// </summary>
-        public double ReferenceTime
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sample values.
-        /// </summary>
-        public IEnumerable<double> Values
-        { get; set; }
+        public IEnumerable<Func<SampleSequence>> SampleSequenceProviders
+        { get; private set; }
+//
+//        /// <summary>
+//        /// Gets or sets the time value of the reference point (e.g. the trigger position).
+//        /// </summary>
+//        public double ReferenceTime
+//        { get; set; }
+//
+//        /// <summary>
+//        /// Gets or sets the sample values.
+//        /// </summary>
+//        public IEnumerable<double> Values
+//        { get; set; }
     }
 }
 
