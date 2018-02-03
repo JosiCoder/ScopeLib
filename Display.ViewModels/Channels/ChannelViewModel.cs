@@ -22,19 +22,21 @@ using ScopeLib.Utilities;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides the configuration of the scope timebase.
+    /// Provides the viewmodel of a scope channel.
     /// </summary>
-    public class TimebaseConfiguration : NotifyingBase
+    public class ChannelViewModel : NotifyingBase
     {
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
-        public TimebaseConfiguration ()
+        public ChannelViewModel ()
         {
-            BaseUnitString = "s";
+            BaseUnitString = "V";
+            ReferencePointPosition = new Position ();
             TimeScaleFactor = 1.0;
+            ValueScaleFactor = 1.0;
             Color = _defaultColor;
             Initialize();
         }
@@ -43,13 +45,19 @@ namespace ScopeLib.Display.ViewModels
         /// Initializes an instance of this class.
         /// </summary>
         /// <param name="baseUnitString">The string representing the base unit.</param>
+        /// <param name="referencePointPosition">
+        /// The the position of the reference point on the scope display.
+        /// </param>
         /// <param name="xScaleFactor">The scaling factor for the time axis.</param>
         /// <param name="yScaleFactor">The scaling factor for the value axis.</param>
         /// <param name="color">The graph color.</param>
-        public TimebaseConfiguration (string baseUnitString, double timeScaleFactor, Color color)
+        public ChannelViewModel (string baseUnitString, Position referencePointPosition,
+            double timeScaleFactor, double valueScaleFactor, Color color)
         {
             BaseUnitString = baseUnitString;
+            ReferencePointPosition = referencePointPosition;
             TimeScaleFactor = timeScaleFactor;
+            ValueScaleFactor = valueScaleFactor;
             Color = color;
             Initialize();
         }
@@ -59,9 +67,8 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         private void Initialize()
         {
-            MeasurementCursorA = new MeasurementCursorConfiguration();
-            MeasurementCursorB = new MeasurementCursorConfiguration();
-            TriggerConfiguration = new NullTriggerConfiguration ();
+            MeasurementCursorA = new MeasurementCursorViewModel();
+            MeasurementCursorB = new MeasurementCursorViewModel();
         }
 
         private string _baseUnitString;
@@ -81,6 +88,16 @@ namespace ScopeLib.Display.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets or sets the position of the reference point on the scope display.
+        /// The X value specifies the horizontal distance of the reference point from
+        /// trigger point position.
+        /// The Y value specifies the vertical distance of the reference point from
+        /// the horizontal center line.
+        /// </summary>
+        public Position ReferencePointPosition
+        { get; set; }
+
         private double _timeScaleFactor;
         /// <summary>
         /// Gets or sets the scaling factor for the time axis.
@@ -98,6 +115,23 @@ namespace ScopeLib.Display.ViewModels
             }
         }
 
+        private double _valueScaleFactor;
+        /// <summary>
+        /// Gets or sets the scaling factor for the value axis.
+        /// </summary>
+        public double ValueScaleFactor
+        {
+            get
+            {
+                return _valueScaleFactor;
+            }
+            set
+            {
+                _valueScaleFactor = value;
+                RaisePropertyChanged();
+            }
+        }
+
         /// <summary>
         /// Gets or sets the graph color.
         /// </summary>
@@ -105,37 +139,16 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the first measurement cursor.
+        /// Gets the viewmodel of the first measurement cursor.
         /// </summary>
-        public MeasurementCursorConfiguration MeasurementCursorA
+        public MeasurementCursorViewModel MeasurementCursorA
         { get; private set; }
 
         /// <summary>
-        /// Gets or sets the second measurement cursor.
+        /// Gets the viewmodel of the second measurement cursor.
         /// </summary>
-        public MeasurementCursorConfiguration MeasurementCursorB
+        public MeasurementCursorViewModel MeasurementCursorB
         { get; private set; }
-
-        private ITriggerViewModel _triggerConfiguration;
-        /// <summary>
-        /// Gets or sets the trigger configuration.
-        /// </summary>
-        public ITriggerViewModel TriggerConfiguration
-        {
-            get
-            {
-                return _triggerConfiguration;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentException ("null trigger not allowed");
-                }
-                _triggerConfiguration = value;
-                RaisePropertyChanged();
-            }
-        }
     }
 }
 

@@ -27,7 +27,7 @@ namespace ScopeLib.Sampling
     public class SampleSequence
     {
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
         public SampleSequence ()
         {

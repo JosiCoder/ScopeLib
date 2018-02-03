@@ -42,8 +42,8 @@ namespace ScopeLib.Display.Views
         /// Creates a cursor used for time measurements.
         /// </summary>
         internal static BoundCursor CreateTimeMeasurementCursor(
-            MeasurementCursorConfiguration cursorConfiguration,
-            TimebaseConfiguration timebaseConfiguration,
+            MeasurementCursorViewModel cursorVM,
+            TimebaseViewModel timebaseVM,
             bool isReferenceCursor,
             Func<double> deltaReferenceLevelProvider,
             Func<double> referenceLevelProvider)
@@ -51,25 +51,25 @@ namespace ScopeLib.Display.Views
             Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> bindingProvider =
                 (cursor, valueConverter) => PB.Binding.Create (() =>
                     cursor.Position.X == valueConverter.DerivedValue &&
-                    valueConverter.OriginalValue == cursorConfiguration.Value);
+                    valueConverter.OriginalValue == cursorVM.Value);
 
             var influencingObjects = new INotifyPropertyChanged[]
             {
-                timebaseConfiguration,
-                timebaseConfiguration.TriggerConfiguration,
+                timebaseVM,
+                timebaseVM.TriggerVM,
             };
 
             return CreateMeasurementCursor(
                 MeasurementAxis.X,
                 isReferenceCursor,
-                () => cursorConfiguration.Value,
+                () => cursorVM.Value,
                 bindingProvider,
                 deltaReferenceLevelProvider,
-                () => timebaseConfiguration.TimeScaleFactor,
-                () => timebaseConfiguration.TriggerConfiguration.HorizontalPosition,
+                () => timebaseVM.TimeScaleFactor,
+                () => timebaseVM.TriggerVM.HorizontalPosition,
                 referenceLevelProvider,
-                timebaseConfiguration.BaseUnitString,
-                timebaseConfiguration.Color,
+                timebaseVM.BaseUnitString,
+                timebaseVM.Color,
                 influencingObjects);
         }
 
@@ -77,8 +77,8 @@ namespace ScopeLib.Display.Views
         /// Creates a cursor used for level measurements.
         /// </summary>
         internal static BoundCursor CreateLevelMeasurementCursor(
-            MeasurementCursorConfiguration cursorConfiguration,
-            ChannelConfiguration cursorChannelConfiguration,
+            MeasurementCursorViewModel cursorVM,
+            ChannelViewModel cursorChannelConfiguration,
             bool isReferenceCursor,
             Func<double> deltaReferenceLevelProvider,
             Func<double> referenceLevelProvider)
@@ -86,7 +86,7 @@ namespace ScopeLib.Display.Views
             Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> bindingProvider =
                 (cursor, valueConverter) => PB.Binding.Create (() =>
                     cursor.Position.Y == valueConverter.DerivedValue &&
-                    valueConverter.OriginalValue == cursorConfiguration.Value);
+                    valueConverter.OriginalValue == cursorVM.Value);
             
             var influencingObjects = new INotifyPropertyChanged[]
             {
@@ -97,7 +97,7 @@ namespace ScopeLib.Display.Views
             return CreateMeasurementCursor(
                 MeasurementAxis.Y,
                 isReferenceCursor,
-                () => cursorConfiguration.Value,
+                () => cursorVM.Value,
                 bindingProvider,
                 deltaReferenceLevelProvider,
                 () => cursorChannelConfiguration.ValueScaleFactor,

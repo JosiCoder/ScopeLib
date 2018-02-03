@@ -22,15 +22,15 @@ using ScopeLib.Sampling;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides the configuration of an unspecified trigger.
+    /// Provides the viewmodel of an unspecified trigger.
     /// </summary>
-    public class NullTriggerConfiguration : TriggerConfigurationBase<NullTrigger>
+    public class NullTriggerViewModel : TriggerViewModelBase<NullTrigger>
     {
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        public NullTriggerConfiguration ()
-            : this(new NullTrigger(), new ChannelConfiguration())
+        public NullTriggerViewModel ()
+            : this(new NullTrigger(), new ChannelViewModel())
         {
         }
 
@@ -38,11 +38,11 @@ namespace ScopeLib.Display.ViewModels
         /// Initializes an instance of this class.
         /// </summary>
         /// <param name="trigger">The trigger to use.</param>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
+        /// <param name="channelVM">
+        /// The viewmodel of the scope channel the trigger is assigned to.
         /// </param>
-        public NullTriggerConfiguration (NullTrigger trigger, ChannelConfiguration channelConfiguration)
-            : base(trigger, channelConfiguration)
+        public NullTriggerViewModel (NullTrigger trigger, ChannelViewModel channelVM)
+            : base(trigger, channelVM)
         {
         }
     }

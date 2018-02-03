@@ -29,7 +29,7 @@ namespace ScopeLib.Display.Graphics
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
         public ScopePositionCaption ()
         {

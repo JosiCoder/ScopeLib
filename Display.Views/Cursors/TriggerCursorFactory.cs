@@ -39,19 +39,19 @@ namespace ScopeLib.Display.Views
         /// Creates a trigger criteria cursor for a level-based trigger.
         /// </summary>
         internal static BoundCursor CreateTriggerCriteriaCursor(
-            LevelTriggerConfiguration triggerConfiguration,
-            ChannelConfiguration triggerChannelConfiguration,
+            LevelTriggerViewModel triggerVM,
+            ChannelViewModel triggerChannelConfiguration,
             Func<double> referenceLevelProvider)
         {
             var triggerModeSymbol =
-                triggerConfiguration.Mode == LevelTriggerMode.RisingEdge ? _triggerTypeRisingSymbol
-                : triggerConfiguration.Mode == LevelTriggerMode.FallingEdge ? _triggerTypeFallingSymbol
+                triggerVM.Mode == LevelTriggerMode.RisingEdge ? _triggerTypeRisingSymbol
+                : triggerVM.Mode == LevelTriggerMode.FallingEdge ? _triggerTypeFallingSymbol
                 : '?';
 
             Func<ScopeCursor, ValueConverter<double, double>, PB.Binding> bindingProvider =
                 (cursor, valueConverter) => PB.Binding.Create (() =>
                     cursor.Position.Y == valueConverter.DerivedValue &&
-                    valueConverter.OriginalValue == triggerConfiguration.Level);
+                    valueConverter.OriginalValue == triggerVM.Level);
 
             var influencingObjects = new INotifyPropertyChanged[]
             {
@@ -61,12 +61,12 @@ namespace ScopeLib.Display.Views
 
             return  CreateTriggerCriteriaCursor(
                 triggerModeSymbol,
-                () => triggerConfiguration.Level,
+                () => triggerVM.Level,
                 bindingProvider,
                 () => triggerChannelConfiguration.ValueScaleFactor,
                 () => triggerChannelConfiguration.ReferencePointPosition.Y,
                 referenceLevelProvider,
-                triggerConfiguration.ChannelConfiguration.BaseUnitString,
+                triggerVM.ChannelVM.BaseUnitString,
                 triggerChannelConfiguration.Color,
                 influencingObjects);
         }
@@ -133,17 +133,17 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a trigger point cursor.
         /// </summary>
-        internal static BoundCursor CreateTriggerPointCursor(TimebaseConfiguration timebaseConfiguration)
+        internal static BoundCursor CreateTriggerPointCursor(TimebaseViewModel timebaseVM)
         {
-            var triggerConfiguration = timebaseConfiguration.TriggerConfiguration;
+            var triggerVM = timebaseVM.TriggerVM;
 
             var triggerCaption = _triggerSymbol.ToString();
 
             Func<String> positionTextProvider = () =>
-                UnitHelper.BuildValueText(timebaseConfiguration.BaseUnitString,
-                    triggerConfiguration.HorizontalPosition / timebaseConfiguration.TimeScaleFactor);
+                UnitHelper.BuildValueText(timebaseVM.BaseUnitString,
+                    triggerVM.HorizontalPosition / timebaseVM.TimeScaleFactor);
 
-            var markerColor = CairoHelpers.ToCairoColor(timebaseConfiguration.Color);
+            var markerColor = CairoHelpers.ToCairoColor(timebaseVM.Color);
 
             var cursor = new ScopeCursor
             {
@@ -163,7 +163,7 @@ namespace ScopeLib.Display.Views
             // === Create bindings. ===
 
             // Bind the cursor's position.
-            var binding = PB.Binding.Create (() => cursor.Position.X == triggerConfiguration.HorizontalPosition);
+            var binding = PB.Binding.Create (() => cursor.Position.X == triggerVM.HorizontalPosition);
 
             return new BoundCursor(cursor, new [] {binding});
         }

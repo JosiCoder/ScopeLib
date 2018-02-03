@@ -35,7 +35,7 @@ namespace ScopeLib.Sampling
     public class LevelTrigger : TriggerBase
     {
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
         public LevelTrigger ()
             : base()

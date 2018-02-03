@@ -25,7 +25,7 @@ namespace ScopeLib.Display.Views
     public static class CairoHelpers
     {
         /// <summary>
-        /// Converts a view model point to a Cairo point.
+        /// Converts a native point to a Cairo point.
         /// </summary>
         public static Cairo.PointD ToCairoPointD(ScopeLib.Display.ViewModels.Point point)
         {
@@ -33,7 +33,7 @@ namespace ScopeLib.Display.Views
         }
 
         /// <summary>
-        /// Converts a view model color to a Cairo color.
+        /// Converts a native color to a Cairo color.
         /// </summary>
         public static Cairo.Color ToCairoColor(ScopeLib.Display.ViewModels.Color color)
         {

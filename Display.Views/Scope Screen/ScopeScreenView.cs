@@ -186,10 +186,10 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a scope graph from a channel configuration and a signal frame.
         /// </summary>
-        private ScopeGraph CreateScopeGraph(ChannelConfiguration channelConfiguration, Func<SampleSequence> sampleSequenceProvider)
+        private ScopeGraph CreateScopeGraph(ChannelViewModel channelVM, Func<SampleSequence> sampleSequenceProvider)
         {
-            var timebaseConfiguration = _viewModel.TimebaseConfiguration;
-            var triggerPointPosition = timebaseConfiguration.TriggerConfiguration.HorizontalPosition;
+            var timebaseVM = _viewModel.TimebaseVM;
+            var triggerPointPosition = timebaseVM.TriggerVM.HorizontalPosition;
 
             var sampleSequence = sampleSequenceProvider();
 
@@ -198,15 +198,15 @@ namespace ScopeLib.Display.Views
                 LineType = _graphLineType,
                 ReferencePointPosition =
                     new Cairo.PointD(
-                        channelConfiguration.ReferencePointPosition.X + triggerPointPosition,
-                        channelConfiguration.ReferencePointPosition.Y),
-                Color = CairoHelpers.ToCairoColor(channelConfiguration.Color),
-                XScaleFactor = channelConfiguration.TimeScaleFactor,
-                YScaleFactor = channelConfiguration.ValueScaleFactor,
+                        channelVM.ReferencePointPosition.X + triggerPointPosition,
+                        channelVM.ReferencePointPosition.Y),
+                Color = CairoHelpers.ToCairoColor(channelVM.Color),
+                XScaleFactor = channelVM.TimeScaleFactor,
+                YScaleFactor = channelVM.ValueScaleFactor,
                 ReferencePoint =
                     new Cairo.PointD(sampleSequence.ReferenceTime, _referenceLevel),
                 Vertices = sampleSequence.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.TimeIncrement * timebaseConfiguration.TimeScaleFactor, value)),
+                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.TimeIncrement * timebaseVM.TimeScaleFactor, value)),
             };
         }
 
@@ -215,44 +215,44 @@ namespace ScopeLib.Display.Views
         /// </summary>
         private IEnumerable<BoundCursor> CreateTimebaseCursors()
         {
-            var timebaseConfig = _viewModel.TimebaseConfiguration;
-            var triggerConfig = timebaseConfig.TriggerConfiguration;
-            var channelConfig = triggerConfig.ChannelConfiguration;
+            var timebaseVM = _viewModel.TimebaseVM;
+            var triggerVM = timebaseVM.TriggerVM;
+            var channelVM = triggerVM.ChannelVM;
 
             var cursors = new List<BoundCursor>();
 
-            if (channelConfig == null)
+            if (channelVM == null)
             {
                 ; // intentionally left blank
             }
-            else if (triggerConfig is LevelTriggerConfiguration)
+            else if (triggerVM is LevelTriggerViewModel)
             {
                 cursors.Add(TriggerCursorFactory.CreateTriggerCriteriaCursor(
-                    triggerConfig as LevelTriggerConfiguration, channelConfig,
+                    triggerVM as LevelTriggerViewModel, channelVM,
                     () => _referenceLevel));
             }
             // Add more cases for other types of triggers here.
             // ...
 
-            cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseConfig));
+            cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseVM));
 
             bool bothCursorsVisible =
-                channelConfig.MeasurementCursorA.Visible &&
-                channelConfig.MeasurementCursorB.Visible;
+                channelVM.MeasurementCursorA.Visible &&
+                channelVM.MeasurementCursorB.Visible;
 
-            if (timebaseConfig.MeasurementCursorA.Visible)
+            if (timebaseVM.MeasurementCursorA.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseConfig.MeasurementCursorA, timebaseConfig, bothCursorsVisible,
+                    timebaseVM.MeasurementCursorA, timebaseVM, bothCursorsVisible,
                     null,
                     () => _referenceTime));
             }
 
-            if (timebaseConfig.MeasurementCursorB.Visible)
+            if (timebaseVM.MeasurementCursorB.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseConfig.MeasurementCursorB, timebaseConfig, false,
-                    bothCursorsVisible ? () => timebaseConfig.MeasurementCursorA.Value : (Func<double>)null,
+                    timebaseVM.MeasurementCursorB, timebaseVM, false,
+                    bothCursorsVisible ? () => timebaseVM.MeasurementCursorA.Value : (Func<double>)null,
                     () => _referenceTime));
 
             }
@@ -265,7 +265,7 @@ namespace ScopeLib.Display.Views
         /// </summary>
         private IEnumerable<BoundCursor> CreateChannelCursors()
         {
-            var channelConfig = _viewModel.ChannelConfigurations;
+            var channelConfig = _viewModel.ChannelVMs;
 
             // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
@@ -310,8 +310,8 @@ namespace ScopeLib.Display.Views
             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
 
             _scopeGraphics.Graphs = CollectionUtilities.Zip(
-                objects => CreateScopeGraph(objects[0] as ChannelConfiguration, objects[1] as Func<SampleSequence>),
-                _viewModel.ChannelConfigurations, _viewModel.SampleSequenceProviders);
+                objects => CreateScopeGraph(objects[0] as ChannelViewModel, objects[1] as Func<SampleSequence>),
+                _viewModel.ChannelVMs, _viewModel.SampleSequenceProviders);
 
             var demoCursors = new []
             {

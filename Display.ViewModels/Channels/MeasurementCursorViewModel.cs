@@ -16,67 +16,53 @@
 //--------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides the configuration of a level-based scope trigger.
+    /// Provides the viewmodel of a measurement cursor.
     /// </summary>
-    public class LevelTriggerConfiguration : TriggerConfigurationBase<LevelTrigger>
+    public class MeasurementCursorViewModel : ViewModelBase
     {
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
-        /// </param>
-        public LevelTriggerConfiguration (ChannelConfiguration channelConfiguration)
-            : this(new LevelTrigger(), channelConfiguration)
+        internal MeasurementCursorViewModel ()
         {
+            Value = 0.0;
+            Visible = false;
         }
 
+        private bool _visible;
         /// <summary>
-        /// Initializes an instance of this class.
+        /// Gets or sets a value indicating whether the cursor is visible.
         /// </summary>
-        /// <param name="trigger">The trigger to use.</param>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
-        /// </param>
-        public LevelTriggerConfiguration (LevelTrigger trigger, ChannelConfiguration channelConfiguration)
-            : base(trigger, channelConfiguration)
-        {
-        }
-
-        /// <summary>
-        /// Gets or sets the trigger mode.
-        /// </summary>
-        public LevelTriggerMode Mode
+        public bool Visible
         {
             get
             {
-                return Trigger.Mode;
+                return _visible;
             }
             set
             {
-                Trigger.Mode = value;
+                _visible = value;
                 RaisePropertyChanged();
             }
         }
 
+        private double _value;
         /// <summary>
-        /// Gets or sets the trigger level.
+        /// Gets or sets the cursor value.
         /// </summary>
-        public double Level
+        public double Value
         {
             get
             {
-                return Trigger.Level;
+                return _value;
             }
             set
             {
-                Trigger.Level = value;
+                _value = value;
                 RaisePropertyChanged();
             }
         }

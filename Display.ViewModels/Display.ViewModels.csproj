@@ -35,14 +35,14 @@
     <Compile Include="Scope Screen\IScopeScreenViewModel.cs" />
     <Compile Include="Scope Screen\ScopeScreenViewModel.cs" />
     <Compile Include="MVVM\ViewModelBase.cs" />
-    <Compile Include="Timebase\TriggerConfigurationBase.cs" />
-    <Compile Include="Timebase\LevelTriggerConfiguration.cs" />
     <Compile Include="Miscellaneous\CommonTypes.cs" />
     <Compile Include="Miscellaneous\UnitHelper.cs" />
-    <Compile Include="Channels\ChannelConfiguration.cs" />
-    <Compile Include="Channels\MeasurementCursorConfiguration.cs" />
-    <Compile Include="Timebase\TimebaseConfiguration.cs" />
-    <Compile Include="Timebase\NullTriggerConfiguration.cs" />
+    <Compile Include="Timebase\LevelTriggerViewModel.cs" />
+    <Compile Include="Timebase\NullTriggerViewModel.cs" />
+    <Compile Include="Timebase\TimebaseViewModel.cs" />
+    <Compile Include="Timebase\TriggerViewModelBase.cs" />
+    <Compile Include="Channels\ChannelViewModel.cs" />
+    <Compile Include="Channels\MeasurementCursorViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -27,15 +27,15 @@ namespace ScopeLib.Display.ViewModels
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
         /// <summary>
-        /// Gets or sets the timebase configuration.
+        /// Gets or sets the timebase viewmodel.
         /// </summary>
-        public TimebaseConfiguration TimebaseConfiguration
+        public TimebaseViewModel TimebaseVM
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the channel configuration, one item per channel.
+        /// Gets or sets the channel viewmodels, one item per channel.
         /// </summary>
-        public IEnumerable<ChannelConfiguration> ChannelConfigurations
+        public IEnumerable<ChannelViewModel> ChannelVMs
         { get; set; }
 
         /// <summary>

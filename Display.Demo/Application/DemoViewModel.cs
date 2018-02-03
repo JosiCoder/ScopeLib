@@ -37,10 +37,10 @@ namespace ScopeLib.Display.Demo
 
             var channelVMs = new[]
             {
-//                new ChannelConfiguration("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
-                new ChannelConfiguration("V", new Position(0.0, 1.0), 1, 1, new Color(1, 1, 0)),
-//                new ChannelConfiguration("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
-                new ChannelConfiguration("V", new Position(0, -2), 1, 2, new Color(0, 1, 0)),
+//                new ChannelViewModel("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
+                new ChannelViewModel("V", new Position(0.0, 1.0), 1, 1, new Color(1, 1, 0)),
+//                new ChannelViewModel("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
+                new ChannelViewModel("V", new Position(0, -2), 1, 2, new Color(0, 1, 0)),
             };
             channelVMs[0].MeasurementCursorA.Visible = true;
             channelVMs[0].MeasurementCursorB.Visible = true;
@@ -50,22 +50,22 @@ namespace ScopeLib.Display.Demo
             channelVMs[0].MeasurementCursorB.Value = 3.0;
             channelVMs[1].MeasurementCursorA.Value = -0.5;
             channelVMs[1].MeasurementCursorB.Value = 0.5;
-            _scopeScreenVM.ChannelConfigurations = channelVMs;
+            _scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Timebase configuration ===
 
-            var timebaseVM = new TimebaseConfiguration ("s", 1, new Color(0.5, 0.8, 1.0));
+            var timebaseVM = new TimebaseViewModel ("s", 1, new Color(0.5, 0.8, 1.0));
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
             var triggerChannelIndex = 0;
 
-            timebaseVM.TriggerConfiguration =
-                new LevelTriggerConfiguration(trigger, channelVMs[triggerChannelIndex]);
+            timebaseVM.TriggerVM =
+                new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
             timebaseVM.MeasurementCursorA.Visible = true;
             timebaseVM.MeasurementCursorB.Visible = true;
             timebaseVM.MeasurementCursorA.Value = 2.0;
             timebaseVM.MeasurementCursorB.Value = 3.0;
-            _scopeScreenVM.TimebaseConfiguration = timebaseVM;
+            _scopeScreenVM.TimebaseVM = timebaseVM;
 
             // === Sample Sequences ===
 

@@ -34,11 +34,11 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a reference line cursor for a single channel.
         /// </summary>
-        internal static BoundCursor CreateChannelReferenceCursor(ChannelConfiguration channelConfiguration,
+        internal static BoundCursor CreateChannelReferenceCursor(ChannelViewModel channelVM,
             int channelNumber)
         {
             var channelCaption = ((char)(_channelCaptionBaseSymbol+channelNumber)).ToString();
-            var channelColor = CairoHelpers.ToCairoColor(channelConfiguration.Color);
+            var channelColor = CairoHelpers.ToCairoColor(channelVM.Color);
 
             var cursor = new ScopeCursor
             {
@@ -57,7 +57,7 @@ namespace ScopeLib.Display.Views
             // === Create bindings. ===
 
             // Bind the cursor's position.
-            var binding = PB.Binding.Create (() => cursor.Position.Y == channelConfiguration.ReferencePointPosition.Y);
+            var binding = PB.Binding.Create (() => cursor.Position.Y == channelVM.ReferencePointPosition.Y);
 
             return new BoundCursor(cursor, new [] {binding});
         }

@@ -22,12 +22,15 @@ using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
 {
+    /// <summary>
+    /// Provides access to a viewmodel of a trigger.
+    /// </summary>
     public interface ITriggerViewModel : INotifyPropertyChanged
     {
         /// <summary>
-        /// Gets or sets the configuration of the scope channel the trigger is assigned to.
+        /// Gets or sets the viewmodel of the scope channel the trigger is assigned to.
         /// </summary>
-        ChannelConfiguration ChannelConfiguration
+        ChannelViewModel ChannelVM
         { get; set; }
 
         /// <summary>
@@ -38,31 +41,31 @@ namespace ScopeLib.Display.ViewModels
     }
 
     /// <summary>
-    /// Provides the base implementation for trigger configurations.
+    /// Provides the base implementation for trigger viewmodels.
     /// </summary>
     /// <typeparam name="TTrigger">The type of the trigger.</typeparam>
-    public abstract class TriggerConfigurationBase<TTrigger> : ViewModelBase, ITriggerViewModel
+    public abstract class TriggerViewModelBase<TTrigger> : ViewModelBase, ITriggerViewModel
         where TTrigger : TriggerBase
     {
         protected readonly TTrigger Trigger;
 
         /// <summary>
-        /// Initializes an instance of this class with default settings.
+        /// Initializes an instance of this class.
         /// </summary>
         /// <param name="trigger">The trigger to use.</param>
-        /// <param name="channelConfiguration">
-        /// The configuration of the scope channel the trigger is assigned to.
+        /// <param name="channelVM">
+        /// The viewmodel of the scope channel the trigger is assigned to.
         /// </param>
-        protected TriggerConfigurationBase (TTrigger trigger, ChannelConfiguration channelConfiguration)
+        protected TriggerViewModelBase (TTrigger trigger, ChannelViewModel channelVM)
         {
             Trigger = trigger;
-            ChannelConfiguration = channelConfiguration;
+            ChannelVM = channelVM;
         }
 
         /// <summary>
-        /// Gets or sets the configuration of the scope channel the trigger is assigned to.
+        /// Gets or sets the viewmodel of the scope channel the trigger is assigned to.
         /// </summary>
-        public ChannelConfiguration ChannelConfiguration
+        public ChannelViewModel ChannelVM
         { get; set; }
 
         private double _horizontalPosition;
