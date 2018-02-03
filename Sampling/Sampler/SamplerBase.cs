@@ -21,7 +21,7 @@ using System.Collections.Generic;
 namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a base implementation for samplers, i.e. classes that returns sample sequence providers
+    /// Provides a base implementation for samplers, i.e. classes that return sample sequence providers
     /// based on certain sample sources. A sample sequence provider is a function that provides a sequence
     /// of values sampled from a signal.
     /// </summary>
@@ -39,8 +39,7 @@ namespace ScopeLib.Sampling
         }
 
         /// <summary>
-        /// Gets the functions that provide the signal sample sequences,
-        /// one function per channel.
+        /// Gets the functions that provide the sample sequences, one function per channel.
         /// </summary>
         public abstract IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         { get; }

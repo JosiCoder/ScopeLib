@@ -59,8 +59,8 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         private void Initialize()
         {
-            MeasurementCursorA = new MeasurementCursorViewModel();
-            MeasurementCursorB = new MeasurementCursorViewModel();
+            MeasurementCursor1VM = new MeasurementCursorViewModel();
+            MeasurementCursor2VM = new MeasurementCursorViewModel();
             TriggerVM = new NullTriggerViewModel ();
         }
 
@@ -107,13 +107,13 @@ namespace ScopeLib.Display.ViewModels
         /// <summary>
         /// Gets the viewmodel of the first measurement cursor.
         /// </summary>
-        public MeasurementCursorViewModel MeasurementCursorA
+        public MeasurementCursorViewModel MeasurementCursor1VM
         { get; private set; }
 
         /// <summary>
         /// Gets or sets the viewmodel of the second measurement cursor.
         /// </summary>
-        public MeasurementCursorViewModel MeasurementCursorB
+        public MeasurementCursorViewModel MeasurementCursor2VM
         { get; private set; }
 
         private ITriggerViewModel _triggerVM;

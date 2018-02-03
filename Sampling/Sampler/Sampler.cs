@@ -22,46 +22,48 @@ using System.Collections.Generic;
 namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a sampler that passes the raw signal samples through after tiggering and time increment adjustments.
+    /// Provides a sampler that uses raw samples provided by external sample sequence provider functions.
     /// </summary>
     public class Sampler : SamplerBase
     {
-        private readonly IEnumerable<Func<SampleSequence>> _wrappedSequenceProviders;
+        private readonly IEnumerable<Func<SampleSequence>> _wrappedSampleSequenceProviders;
         private readonly TriggerBase _trigger;
         private double triggerReferenceTime;
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="embeddedSequenceProviders">
-        /// The functions that provide the raw signal sample sequences, one function per channel.
+        /// <param name="externalSampleSequenceProviders">
+        /// The functions that provide the external signal sample sequences, one function per channel.
         /// </param>
         /// <param name="trigger">The trigger to use.</param>
         /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
-        public Sampler (IEnumerable<Func<SampleSequence>> embeddedSequenceProviders, TriggerBase trigger,
+        public Sampler (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders, TriggerBase trigger,
             int triggerChannelIndex)
             : base(trigger, triggerChannelIndex)
         {
             _trigger = trigger;
-            _wrappedSequenceProviders = WrapSequenceProviders(embeddedSequenceProviders);
+            _wrappedSampleSequenceProviders = WrapSequenceProviders(externalSampleSequenceProviders);
         }
 
         /// <summary>
-        /// Gets the functions that provide the signal sample sequences,
-        /// one function per channel.
+        /// Gets the functions that provide the sample sequences, one function per channel.
         /// </summary>
         public override IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         {
             get
             {
-                return _wrappedSequenceProviders;
+                return _wrappedSampleSequenceProviders;
             }
         }
 
+        /// <summary>
+        /// Wraps the external sample sequence providers.
+        /// </summary>
         private IEnumerable<Func<SampleSequence>> WrapSequenceProviders(
-            IEnumerable<Func<SampleSequence>> embeddedSequenceProviders)
+            IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
         {
-            return embeddedSequenceProviders.Select((provider, index) =>
+            return externalSampleSequenceProviders.Select((provider, index) =>
             {
                 return new Func<SampleSequence>(() =>
                 {

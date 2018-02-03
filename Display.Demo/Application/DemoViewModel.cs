@@ -42,14 +42,14 @@ namespace ScopeLib.Display.Demo
 //                new ChannelViewModel("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
                 new ChannelViewModel("V", new Position(0, -2), 1, 2, new Color(0, 1, 0)),
             };
-            channelVMs[0].MeasurementCursorA.Visible = true;
-            channelVMs[0].MeasurementCursorB.Visible = true;
-            channelVMs[1].MeasurementCursorA.Visible = true;
-            channelVMs[1].MeasurementCursorB.Visible = true;
-            channelVMs[0].MeasurementCursorA.Value = 2.0;
-            channelVMs[0].MeasurementCursorB.Value = 3.0;
-            channelVMs[1].MeasurementCursorA.Value = -0.5;
-            channelVMs[1].MeasurementCursorB.Value = 0.5;
+            channelVMs[0].MeasurementCursor1VM.Visible = true;
+            channelVMs[0].MeasurementCursor2VM.Visible = true;
+            channelVMs[1].MeasurementCursor1VM.Visible = true;
+            channelVMs[1].MeasurementCursor2VM.Visible = true;
+            channelVMs[0].MeasurementCursor1VM.Value = 2.0;
+            channelVMs[0].MeasurementCursor2VM.Value = 3.0;
+            channelVMs[1].MeasurementCursor1VM.Value = -0.5;
+            channelVMs[1].MeasurementCursor2VM.Value = 0.5;
             _scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Timebase configuration ===
@@ -61,10 +61,10 @@ namespace ScopeLib.Display.Demo
 
             timebaseVM.TriggerVM =
                 new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
-            timebaseVM.MeasurementCursorA.Visible = true;
-            timebaseVM.MeasurementCursorB.Visible = true;
-            timebaseVM.MeasurementCursorA.Value = 2.0;
-            timebaseVM.MeasurementCursorB.Value = 3.0;
+            timebaseVM.MeasurementCursor1VM.Visible = true;
+            timebaseVM.MeasurementCursor2VM.Visible = true;
+            timebaseVM.MeasurementCursor1VM.Value = 2.0;
+            timebaseVM.MeasurementCursor2VM.Value = 3.0;
             _scopeScreenVM.TimebaseVM = timebaseVM;
 
             // === Sample Sequences ===

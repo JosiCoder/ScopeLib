@@ -237,22 +237,22 @@ namespace ScopeLib.Display.Views
             cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseVM));
 
             bool bothCursorsVisible =
-                channelVM.MeasurementCursorA.Visible &&
-                channelVM.MeasurementCursorB.Visible;
+                channelVM.MeasurementCursor1VM.Visible &&
+                channelVM.MeasurementCursor2VM.Visible;
 
-            if (timebaseVM.MeasurementCursorA.Visible)
+            if (timebaseVM.MeasurementCursor1VM.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseVM.MeasurementCursorA, timebaseVM, bothCursorsVisible,
+                    timebaseVM.MeasurementCursor1VM, timebaseVM, bothCursorsVisible,
                     null,
                     () => _referenceTime));
             }
 
-            if (timebaseVM.MeasurementCursorB.Visible)
+            if (timebaseVM.MeasurementCursor2VM.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseVM.MeasurementCursorB, timebaseVM, false,
-                    bothCursorsVisible ? () => timebaseVM.MeasurementCursorA.Value : (Func<double>)null,
+                    timebaseVM.MeasurementCursor2VM, timebaseVM, false,
+                    bothCursorsVisible ? () => timebaseVM.MeasurementCursor1VM.Value : (Func<double>)null,
                     () => _referenceTime));
 
             }
@@ -278,22 +278,22 @@ namespace ScopeLib.Display.Views
             channelConfig.ForEach(chConfig =>
                 {
                     bool bothCursorsVisible =
-                        chConfig.MeasurementCursorA.Visible &&
-                        chConfig.MeasurementCursorB.Visible;
+                        chConfig.MeasurementCursor1VM.Visible &&
+                        chConfig.MeasurementCursor2VM.Visible;
 
-                    if (chConfig.MeasurementCursorA.Visible)
+                    if (chConfig.MeasurementCursor1VM.Visible)
                     {
                         cursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
-                            chConfig.MeasurementCursorA, chConfig, bothCursorsVisible,
+                            chConfig.MeasurementCursor1VM, chConfig, bothCursorsVisible,
                             null,
                             () => _referenceLevel));
                     }
 
-                    if (chConfig.MeasurementCursorB.Visible)
+                    if (chConfig.MeasurementCursor2VM.Visible)
                     {
                         cursors.Add(MeasurementCursorFactory.CreateLevelMeasurementCursor(
-                            chConfig.MeasurementCursorB, chConfig, false,
-                            bothCursorsVisible ? () => chConfig.MeasurementCursorA.Value : (Func<double>)null,
+                            chConfig.MeasurementCursor2VM, chConfig, false,
+                            bothCursorsVisible ? () => chConfig.MeasurementCursor1VM.Value : (Func<double>)null,
                             () => _referenceLevel));
                     }
                 });
