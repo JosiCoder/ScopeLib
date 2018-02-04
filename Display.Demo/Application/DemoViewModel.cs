@@ -57,7 +57,7 @@ namespace ScopeLib.Display.Demo
             var timebaseVM = new TimebaseViewModel ("s", 1, new Color(0.5, 0.8, 1.0));
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
-            var triggerChannelIndex = 0;
+            var triggerChannelIndex = 1;
 
             timebaseVM.TriggerVM =
                 new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
@@ -69,20 +69,35 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
+            var channel1TimeIncrement = 1;
+            var channel1values =  new []{ -1d, 0d, 2d, 3d };
+
             var channel2TimeIncrement = 2 * Math.PI / 40;
             var channel2values =
                 FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
                     (x, y) => y);
 
+            // UseDeferred shows us some details about how the values are accessed (see there).
             var sampleSequenceProviders = new Func<SampleSequence>[]
             {
-                () => new SampleSequence(1, new []{ -1d, 0d, 2d, 3d }),
+//                () => new SampleSequence(channel1TimeIncrement, channel1values),
+                () => new SampleSequence(channel1TimeIncrement, UseDeferred(channel1values)),
                 () => new SampleSequence(channel2TimeIncrement, channel2values),
+//                () => new SampleSequence(channel2TimeIncrement, UseDeferred(channel2values)),
             };
 
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
 
             _scopeScreenVM.SampleSequenceProviders = sampler.SampleSequenceProviders;
+        }
+
+        /// <summary>
+        /// Defer access to the values in the specified enumerable and log each access. This
+        /// shows us which values are accessed as well as when and how often they are accessed.
+        /// </summary>
+        private IEnumerable<T> UseDeferred<T>(IEnumerable<T> values)
+        {
+            return values.ForEachDoDeferred(element => Console.WriteLine(element));
         }
 
         /// <summary>

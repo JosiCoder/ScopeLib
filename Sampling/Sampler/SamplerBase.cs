@@ -84,16 +84,16 @@ namespace ScopeLib.Sampling
                         // We are currently providing the sample sequence of the trigger channel, 
                         // determine the trigger reference time.
                     {
-                        var values = sampleSequence.Values;
-
                         Trigger.Arm();
                         IEnumerable<double> remaining;
-                        var taken = values.TakeWhile(element => !Trigger.Check(element), out remaining);
+                        var taken = sampleSequence.Values.TakeWhile(element => !Trigger.Check(element), out remaining);
                         sampleSequence.Values = taken.Concat(remaining);
                         var numberOfValuesTakenBeforeTrigger = taken.Count();
 
+                        // TODO: Interpolate considering values before and after trigger. 
                         triggerReferenceTime =
-                            Trigger.State == TriggerState.Triggered ?      numberOfValuesTakenBeforeTrigger * sampleSequence.TimeIncrement
+                            Trigger.State == TriggerState.Triggered ?
+                            numberOfValuesTakenBeforeTrigger * sampleSequence.TimeIncrement
                             : 0;
                     }
 
