@@ -30,9 +30,36 @@ namespace ScopeLib.Sampling
     }
 
     /// <summary>
+    /// Provides access to a scope trigger.
+    /// </summary>
+    public interface ITrigger
+    {
+        /// <summary>
+        /// Gets the trigger state.
+        /// </summary>
+        TriggerState State
+        { get; }
+
+        /// <summary>
+        /// Arm the trigger, i.e. prepares it to wait for the trigger condition.
+        /// </summary>
+        void Arm ();
+
+        /// <summary>
+        /// Checks the trigger using the current value.
+        /// </summary>
+        /// <param name="value">The value used to check the trigger.</param>
+        /// <returns>
+        /// A value indicating whether the trigger has been triggered by the current value or
+        /// was already triggered before.
+        /// </returns>
+        bool Check (double value);
+    }
+
+    /// <summary>
     /// Provides the base implementation for scope triggers.
     /// </summary>
-    public abstract class TriggerBase
+    public abstract class TriggerBase : ITrigger
     {
         /// <summary>
         /// Initializes an instance of this class.

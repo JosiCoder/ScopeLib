@@ -36,7 +36,7 @@ namespace ScopeLib.Sampling
         /// </param>
         /// <param name="trigger">The trigger to use.</param>
         /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
-        public Sampler (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders, TriggerBase trigger,
+        public Sampler (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders, ITrigger trigger,
             int triggerChannelIndex)
             : base(trigger, triggerChannelIndex)
         {

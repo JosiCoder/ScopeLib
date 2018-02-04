@@ -34,7 +34,7 @@ namespace ScopeLib.Sampling
         /// </summary>
         /// <param name="trigger">The trigger to use.</param>
         /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
-        public SamplerBase (TriggerBase trigger, int triggerChannelIndex)
+        public SamplerBase (ITrigger trigger, int triggerChannelIndex)
         {
             Trigger = trigger;
             TriggerChannelIndex = triggerChannelIndex;
@@ -49,7 +49,7 @@ namespace ScopeLib.Sampling
         /// <summary>
         /// Gets the trigger to use.
         /// </summary>
-        public TriggerBase Trigger
+        public ITrigger Trigger
         { get; private set; }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace ScopeLib.Sampling
 
                     // Buffer the values to ensure that the enumerable provided by the external sample
                     // sequence provider is enumerated just once.
-                    // TODO: Skip all values that aren't used.
+                    // TODO: Skip all values that aren't necessary (requires information from ouside).
                     sampleSequence.Values = sampleSequence.Values.ToList();
 
                     return sampleSequence;
