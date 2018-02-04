@@ -51,15 +51,15 @@ namespace ScopeLib.Sampling
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the time value of the reference point (e.g. the trigger position).
-        /// </summary>
-        public double ReferenceTime
-        { get; set; }
-
-        /// <summary>
         /// Gets or sets the sample values.
         /// </summary>
         public IEnumerable<double> Values
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time value of the reference point (e.g. the trigger position).
+        /// </summary>
+        public double ReferenceTime
         { get; set; }
     }
 }

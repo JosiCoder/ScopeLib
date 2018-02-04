@@ -32,6 +32,15 @@ namespace ScopeLib.Sampling
             : base()
         {
         }
+
+        /// <summary>
+        /// Checks the trigger using the current value.
+        /// </summary>
+        protected override void DoCheck(double value)
+        {
+            // The dummy trigger triggers immediately on the first value.
+            State = TriggerState.Triggered;
+        }
     }
 }
 

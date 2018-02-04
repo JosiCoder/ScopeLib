@@ -45,4 +45,10 @@
     <Folder Include="Sampler\" />
     <Folder Include="Trigger\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{1DC0553F-3D45-46F6-9418-E49717BA5E95}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

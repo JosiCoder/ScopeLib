@@ -27,8 +27,6 @@ namespace ScopeLib.Sampling
     public class Sampler : SamplerBase
     {
         private readonly IEnumerable<Func<SampleSequence>> _wrappedSampleSequenceProviders;
-        private readonly TriggerBase _trigger;
-        private double triggerReferenceTime;
 
         /// <summary>
         /// Initializes an instance of this class.
@@ -42,8 +40,7 @@ namespace ScopeLib.Sampling
             int triggerChannelIndex)
             : base(trigger, triggerChannelIndex)
         {
-            _trigger = trigger;
-            _wrappedSampleSequenceProviders = WrapSequenceProviders(externalSampleSequenceProviders);
+            _wrappedSampleSequenceProviders = ApplyTriggerAndAlignSampleSequences(externalSampleSequenceProviders);
         }
 
         /// <summary>
@@ -55,33 +52,6 @@ namespace ScopeLib.Sampling
             {
                 return _wrappedSampleSequenceProviders;
             }
-        }
-
-        /// <summary>
-        /// Wraps the external sample sequence providers.
-        /// </summary>
-        private IEnumerable<Func<SampleSequence>> WrapSequenceProviders(
-            IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
-        {
-            return externalSampleSequenceProviders.Select((provider, index) =>
-            {
-                return new Func<SampleSequence>(() =>
-                {
-                    var sampleSequence = provider();
-
-                    if (index == TriggerChannelIndex)
-                    {
-                        // We are currently providing the sample sequence of the trigger channel, determine
-                        // the reference time.
-                        triggerReferenceTime = 0;//TODO
-                    }
-
-                    // Set the channel's reference time to that of the trigger.
-                    sampleSequence.ReferenceTime = triggerReferenceTime;
-
-                    return sampleSequence;
-                });
-            });
         }
     }
 }

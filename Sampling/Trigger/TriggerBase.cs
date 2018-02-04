@@ -21,6 +21,15 @@ using System.Collections.Generic;
 namespace ScopeLib.Sampling
 {
     /// <summary>
+    /// Specifies the states available for a scope trigger.
+    /// </summary>
+    public enum TriggerState : short
+    {
+        Armed,
+        Triggered,
+    }
+
+    /// <summary>
     /// Provides the base implementation for scope triggers.
     /// </summary>
     public abstract class TriggerBase
@@ -31,6 +40,45 @@ namespace ScopeLib.Sampling
         protected TriggerBase ()
         {
         }
+
+        /// <summary>
+        /// Gets or sets the trigger state.
+        /// </summary>
+        public TriggerState State
+        { get; set; }
+
+        /// <summary>
+        /// Arm the trigger, i.e. prepares it to wait for the trigger condition.
+        /// </summary>
+        public virtual void Arm()
+        {
+            State = TriggerState.Armed;
+        }
+
+        /// <summary>
+        /// Checks the trigger using the current value.
+        /// </summary>
+        /// <param name="value">The value used to check the trigger.</param>
+        /// <returns>
+        /// A value indicating whether the trigger has been triggered by the current value or
+        /// was already triggered before.
+        /// </returns>
+        public bool Check(double value)
+        {
+            if (State == TriggerState.Triggered)
+            {
+                return true;
+            }
+
+            DoCheck(value);
+
+            return State == TriggerState.Triggered;
+        }
+
+        /// <summary>
+        /// Checks the trigger using the current value.
+        /// </summary>
+        protected abstract void DoCheck(double value);
     }
 }
 

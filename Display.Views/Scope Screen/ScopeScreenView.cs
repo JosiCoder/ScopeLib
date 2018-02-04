@@ -275,7 +275,7 @@ namespace ScopeLib.Display.Views
             cursors.AddRange(channelConfig
                 .Select((channelConf, index) => ChannelCursorFactory.CreateChannelReferenceCursor(channelConf, index)));
 
-            channelConfig.ForEach(chConfig =>
+            channelConfig.ForEachDo(chConfig =>
                 {
                     bool bothCursorsVisible =
                         chConfig.MeasurementCursor1VM.Visible &&

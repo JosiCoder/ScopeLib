@@ -34,6 +34,8 @@ namespace ScopeLib.Sampling
     /// </summary>
     public class LevelTrigger : TriggerBase
     {
+        private double previousValue;
+
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
@@ -67,6 +69,34 @@ namespace ScopeLib.Sampling
         /// </summary>
         public double Level
         { get; set; }
+
+        /// <summary>
+        /// Arm the trigger, i.e. prepares it to wait for the trigger condition.
+        /// </summary>
+        public override void Arm()
+        {
+            base.Arm();
+
+            previousValue = 
+                Mode == LevelTriggerMode.RisingEdge ? double.MaxValue
+                : Mode == LevelTriggerMode.FallingEdge ? double.MinValue
+                : double.NaN;
+        }
+
+        /// <summary>
+        /// Checks the trigger using the current value.
+        /// </summary>
+        protected override void DoCheck(double value)
+        {
+            if (Mode == LevelTriggerMode.RisingEdge && value > Level && Level > previousValue
+                ||
+                Mode == LevelTriggerMode.FallingEdge && value < Level && Level < previousValue)
+            {
+                State = TriggerState.Triggered;
+            }
+
+            previousValue = value;
+        }
     }
 }
 

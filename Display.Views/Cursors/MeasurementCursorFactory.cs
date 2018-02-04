@@ -158,7 +158,7 @@ namespace ScopeLib.Display.Views
 
             // The measurement cursor's position depends on some additional values (except the primary value
             // it is bound to). Update it if any of these values changes. ===
-            influencingObjects.ForEach(influencingObject =>
+            influencingObjects.ForEachDo(influencingObject =>
             {
                 influencingObject.PropertyChanged += (sender, e) =>
                 {

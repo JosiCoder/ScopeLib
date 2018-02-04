@@ -16,7 +16,9 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Sampling
 {
@@ -55,6 +57,58 @@ namespace ScopeLib.Sampling
         /// </summary>
         public int TriggerChannelIndex
         { get; private set; }
+
+
+        /// <summary>
+        /// Applies the current trigger and aligns all sample sequences accordingly.
+        /// </summary>
+        /// <param name="externalSampleSequenceProviders">
+        /// The functions that provide the raw signal sample sequences, one function per channel.
+        /// </param>
+        /// <returns>
+        /// Functions that provide the signal sample sequences after the trigger has been applied,
+        /// one function per channel.
+        /// </returns>
+        protected IEnumerable<Func<SampleSequence>> ApplyTriggerAndAlignSampleSequences(
+            IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
+        {
+            double triggerReferenceTime = 0;
+
+            return externalSampleSequenceProviders.Select((provider, index) =>
+            {
+                return new Func<SampleSequence>(() =>
+                {
+                    var sampleSequence = provider();
+
+                    if (index == TriggerChannelIndex)
+                        // We are currently providing the sample sequence of the trigger channel, 
+                        // determine the trigger reference time.
+                    {
+                        var values = sampleSequence.Values;
+
+                        Trigger.Arm();
+                        IEnumerable<double> remaining;
+                        var taken = values.TakeWhile(element => !Trigger.Check(element), out remaining);
+                        sampleSequence.Values = taken.Concat(remaining);
+                        var numberOfValuesTakenBeforeTrigger = taken.Count();
+
+                        triggerReferenceTime =
+                            Trigger.State == TriggerState.Triggered ?      numberOfValuesTakenBeforeTrigger * sampleSequence.TimeIncrement
+                            : 0;
+                    }
+
+                    // Set the channel's reference time to that of the trigger.
+                    sampleSequence.ReferenceTime = triggerReferenceTime;
+
+                    // Buffer the values to ensure that the enumerable provided by the external sample
+                    // sequence provider is enumerated just once.
+                    // TODO: Skip all values that aren't used.
+                    sampleSequence.Values = sampleSequence.Values.ToList();
+
+                    return sampleSequence;
+                });
+            });
+        }
     }
 }
 
