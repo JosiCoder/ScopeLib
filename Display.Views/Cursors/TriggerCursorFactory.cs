@@ -34,6 +34,8 @@ namespace ScopeLib.Display.Views
         private const char _triggerSymbol = 'T';
         private const char _triggerTypeRisingSymbol = '\u2191';
         private const char _triggerTypeFallingSymbol = '\u2193';
+        private const string _armedCaption = "A'd";
+        private const string _triggeredCaption = "T'd";
 
         /// <summary>
         /// Creates a trigger criteria cursor for a level-based trigger.
@@ -137,7 +139,10 @@ namespace ScopeLib.Display.Views
         {
             var triggerVM = timebaseVM.TriggerVM;
 
-            var triggerCaption = _triggerSymbol.ToString();
+            Func<String> triggerStateCaptionProvider = () =>
+                triggerVM.State == TriggerState.Armed ? _armedCaption
+                : triggerVM.State == TriggerState.Triggered ? _triggeredCaption
+                : "";
 
             Func<String> positionTextProvider = () =>
                 UnitHelper.BuildValueText(timebaseVM.BaseUnitString,
@@ -154,8 +159,8 @@ namespace ScopeLib.Display.Views
                 Color = markerColor,
                 Captions = new []
                 {
-                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
-                    new ScopePositionCaption(() => triggerCaption, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                    new ScopePositionCaption(triggerStateCaptionProvider, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
+                    new ScopePositionCaption(triggerStateCaptionProvider, ScopeHorizontalAlignment.Left, ScopeVerticalAlignment.Bottom, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
                     new ScopePositionCaption(positionTextProvider, ScopeHorizontalAlignment.Right, ScopeVerticalAlignment.Top, ScopeAlignmentReference.XPositionAndVerticalRangeEdge, true, markerColor),
                 },
             };

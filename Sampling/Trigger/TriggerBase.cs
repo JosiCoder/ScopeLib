@@ -42,10 +42,10 @@ namespace ScopeLib.Sampling
         }
 
         /// <summary>
-        /// Gets or sets the trigger state.
+        /// Gets the trigger state.
         /// </summary>
         public TriggerState State
-        { get; set; }
+        { get; protected set; }
 
         /// <summary>
         /// Arm the trigger, i.e. prepares it to wait for the trigger condition.

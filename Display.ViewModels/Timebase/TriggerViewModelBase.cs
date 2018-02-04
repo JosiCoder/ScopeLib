@@ -28,6 +28,12 @@ namespace ScopeLib.Display.ViewModels
     public interface ITriggerViewModel : INotifyPropertyChanged
     {
         /// <summary>
+        /// Gets the trigger state.
+        /// </summary>
+        TriggerState State
+        { get; }
+
+        /// <summary>
         /// Gets or sets the viewmodel of the scope channel the trigger is assigned to.
         /// </summary>
         ChannelViewModel ChannelVM
@@ -60,6 +66,17 @@ namespace ScopeLib.Display.ViewModels
         {
             Trigger = trigger;
             ChannelVM = channelVM;
+        }
+
+        /// <summary>
+        /// Gets the trigger state.
+        /// </summary>
+        public TriggerState State
+        {
+            get
+            {
+                return Trigger.State;
+            }
         }
 
         /// <summary>
