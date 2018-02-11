@@ -34,8 +34,8 @@ namespace ScopeLib.Sampling.Specs
         protected const int _triggerChannelIndex = 0;
         protected Mock<ITrigger> _triggerMock;
         protected IEnumerable<Func<SampleSequence>> _sampleSequenceProviders;
-        protected readonly double[] _channel1values = new []{0d, 1d, 2d, 3d, 4d, 5d, 6d};
-        protected readonly double[] _channel2values = new []{10d, 11d, 12d, 13d};
+        protected readonly double[] _channel0values = new []{0d, 1d, 2d, 3d, 4d, 5d, 6d};
+        protected readonly double[] _channel1values = new []{10d, 11d, 12d, 13d};
         protected readonly List<double> _accessedValues = new List<double>();
 
         protected override void InitializeClassUnderTest ()
@@ -44,8 +44,8 @@ namespace ScopeLib.Sampling.Specs
 
             _sampleSequenceProviders = new Func<SampleSequence>[]
             {
-                () => new SampleSequence(10, UseDeferred(_channel1values)),
-                () => new SampleSequence(20, UseDeferred(_channel2values)),
+                () => new SampleSequence(10, UseDeferred(_channel0values)),
+                () => new SampleSequence(20, UseDeferred(_channel1values)),
             };
 
             SUT = new Sampler(_sampleSequenceProviders, _triggerMock.Object, _triggerChannelIndex);
@@ -95,9 +95,9 @@ namespace ScopeLib.Sampling.Specs
             [Test]
             public void then_the_SUT_should_access_all_sample_values_of_the_trigger_channel_but_none_else ()
             {
-                _channel1values.ForEachDo(value => _accessedValues.ShouldContain(value));
+                _channel0values.ForEachDo(value => _accessedValues.ShouldContain(value));
 
-                _accessedValues.Count.ShouldEqual(_channel1values.Count());
+                _accessedValues.Count.ShouldEqual(_channel0values.Count());
             }
 
             [Test]
@@ -126,10 +126,10 @@ namespace ScopeLib.Sampling.Specs
             [Test]
             public void then_the_SUT_should_access_all_sample_values_exactly_once ()
             {
-                _channel1values.Concat(_channel2values)
+                _channel0values.Concat(_channel1values)
                     .ForEachDo(value => _accessedValues.ShouldContain(value));
                 
-                _accessedValues.Count.ShouldEqual(_channel1values.Count() + _channel2values.Count());
+                _accessedValues.Count.ShouldEqual(_channel0values.Count() + _channel1values.Count());
             }
         }
     }
@@ -176,7 +176,7 @@ namespace ScopeLib.Sampling.Specs
             [Test]
             public void then_the_SUT_should_access_all_pre_trigger_sample_values_but_none_else ()
             {
-                _channel1values
+                _channel0values
                     .Take(_indexOfTriggeringItem + 1)
                     .ForEachDo(value => _accessedValues.ShouldContain(value));
 
