@@ -184,7 +184,7 @@ namespace ScopeLib.Display.Views
         }
 
         /// <summary>
-        /// Creates a scope graph from a channel configuration and a signal frame.
+        /// Creates a scope graph from a channel configuration and a sample sequence provider.
         /// </summary>
         private ScopeGraph CreateScopeGraph(ChannelViewModel channelVM, Func<SampleSequence> sampleSequenceProvider)
         {
@@ -309,9 +309,22 @@ namespace ScopeLib.Display.Views
             var textColor = new Cairo.Color (1, 1, 0);
             var cursor1Color = new Cairo.Color (1, 0.5, 0.5);
 
+            // Reorder the channel information and sample sequence providers so that the trigger channel comes first.
+            var channelDataWithTriggerChannelFirst = CollectionUtilities.Zip(objects =>
+                new
+                {
+                    ChannelVM = objects[0] as ChannelViewModel,
+                    SampleSequence = objects[1] as Func<SampleSequence>
+                },
+                _viewModel.ChannelVMs, _viewModel.SampleSequenceProviders)
+                .OrderByDescending(item => item.ChannelVM == _viewModel.TimebaseVM.TriggerVM.ChannelVM);
+
+            // Create the scope graphs (essentially consisting of channel information and sample sequence providers).
+            // Note that the trigger channel comes first.
             _scopeGraphics.Graphs = CollectionUtilities.Zip(
                 objects => CreateScopeGraph(objects[0] as ChannelViewModel, objects[1] as Func<SampleSequence>),
-                _viewModel.ChannelVMs, _viewModel.SampleSequenceProviders);
+                channelDataWithTriggerChannelFirst.Select(a => a.ChannelVM),
+                channelDataWithTriggerChannelFirst.Select(a => a.SampleSequence));
 
             var demoCursors = new []
             {
