@@ -38,6 +38,7 @@
     <Compile Include="Notification\NotifyingBase.cs" />
     <Compile Include="Notification\ValueConverter.cs" />
     <Compile Include="Notification\ValueConverterBuilder.cs" />
+    <Compile Include="Miscellaneous\CachedEnumerable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

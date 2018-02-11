@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using ScopeLib.Utilities;
 
 namespace ScopeLib.Sampling
 {
@@ -37,11 +38,13 @@ namespace ScopeLib.Sampling
         /// Initializes an instance of this class.
         /// </summary>
         /// <param name="timeIncrement">The time increment between two successive sampled.</param>
-        /// <param name="values">The sample values.</param>
+        /// <param name="values">
+        /// The sample values. They are cached to ensure that they aren't accessed multiple times.
+        /// </param>
         public SampleSequence (double timeIncrement, IEnumerable<double> values)
         {
             TimeIncrement = timeIncrement;
-            Values = values;
+            Values = values.ToCachedEnumerable();
         }
 
         /// <summary>

@@ -44,8 +44,8 @@ namespace ScopeLib.Sampling.Specs
 
             _sampleSequenceProviders = new Func<SampleSequence>[]
             {
-                () => new SampleSequence(1, UseDeferred(_channel1values)),
-                () => new SampleSequence(2, UseDeferred(_channel2values)),
+                () => new SampleSequence(10, UseDeferred(_channel1values)),
+                () => new SampleSequence(20, UseDeferred(_channel2values)),
             };
 
             SUT = new Sampler(_sampleSequenceProviders, _triggerMock.Object, _triggerChannelIndex);
@@ -61,78 +61,133 @@ namespace ScopeLib.Sampling.Specs
     }
 
 
-    public abstract class NonTriggeredSamplerSpecs
-        : SamplerSpecs
+    public class Given_the_trigger_does_not_trigger_and_no_timerange_is_given
     {
-        protected override void Given()
+        public abstract class NonTriggeredSamplerSpecs
+            : SamplerSpecs
         {
-            base.Given();
-
-            _triggerMock
-                .Setup (tr => tr.Check(It.IsAny<double>()))
-                .Returns (false);
-        }
-    }
-
-
-    public abstract class TriggeredSamplerSpecs
-        : SamplerSpecs
-    {
-        protected override void Given()
-        {
-            base.Given();
-
-            var count = 0;
-
-            // Triggers after 5th value.
-            _triggerMock
-                .SetupSequence (tr => tr.Check(It.IsAny<double>()))
-                .Returns (false)
-                .Returns (false)
-                .Returns (false)
-                .Returns (false)
-                .Returns(true);
-        }
-    }
-
-
-    public class Given_the_trigger_does_not_trigger_and_no_timerange_is_given_when_fetching_the_sample_sequences_for_all_channels
-        : NonTriggeredSamplerSpecs
-    {
-        protected override void When()
-        {
-            var providers = SUT.SampleSequenceProviders.ToArray();
-            providers[0]();
-            providers[1]();
-        }
-
-        [Test]
-        public void then_the_SUT_should_access_all_sample_values ()
-        {
-            foreach (var value  in _channel1values.Concat(_channel2values))
+            protected override void Given()
             {
-                _accessedValues.ShouldContain(value);
+                base.Given();
+
+                _triggerMock
+                    .Setup (tr => tr.Check(It.IsAny<double>()))
+                    .Returns (false);
+
+                _triggerMock
+                    .SetupGet(tr => tr.State)
+                    .Returns(TriggerState.Armed);
+            }
+        }
+
+
+        public class when_fetching_the_sample_sequences_for_all_channels
+            : NonTriggeredSamplerSpecs
+        {
+            private SampleSequence[] _sequences;
+
+            protected override void When()
+            {
+                var providers = SUT.SampleSequenceProviders.ToArray();
+                _sequences = providers.Select(provider => provider()).ToArray();
+            }
+
+            [Test]
+            public void then_the_SUT_should_access_all_sample_values_of_the_trigger_channel_but_none_else ()
+            {
+                _channel1values.ForEachDo(value => _accessedValues.ShouldContain(value));
+
+                _accessedValues.Count.ShouldEqual(_channel1values.Count());
+            }
+
+            [Test]
+            public void then_each_sample_sequence_should_have_a_reference_time_of_zero ()
+            {
+                _sequences.ForEachDo(sequence => sequence.ReferenceTime.ShouldEqual(0));
+            }
+        }
+
+
+        public class when_fetching_the_sample_values_of_all_channels_multiple_times
+            : NonTriggeredSamplerSpecs
+        {
+            private SampleSequence[] _sequences;
+
+            protected override void When()
+            {
+                var providers = SUT.SampleSequenceProviders.ToArray();
+                _sequences = providers.Select(provider => provider()).ToArray();
+
+                // Fetching values twice.
+                _sequences.ForEachDo(sequence => sequence.Values.ToList());
+                _sequences.ForEachDo(sequence => sequence.Values.ToList());
+            }
+
+            [Test]
+            public void then_the_SUT_should_access_all_sample_values_exactly_once ()
+            {
+                _channel1values.Concat(_channel2values)
+                    .ForEachDo(value => _accessedValues.ShouldContain(value));
+                
+                _accessedValues.Count.ShouldEqual(_channel1values.Count() + _channel2values.Count());
             }
         }
     }
 
 
-    public class Given_the_trigger_triggers_after_some_items_and_no_timerange_is_given_when_fetching_the_sample_sequences_for_all_channels
-        : TriggeredSamplerSpecs
+    public class Given_the_trigger_triggers_after_some_items_and_no_timerange_is_given
     {
-        protected override void When()
+        public abstract class TriggeredSamplerSpecs
+            : SamplerSpecs
         {
-            var providers = SUT.SampleSequenceProviders.ToArray();
-            providers[0]();
-            providers[1]();
+            protected override void Given()
+            {
+                base.Given();
+
+                // Triggers after 5th value.
+                _triggerMock
+                    .SetupSequence (tr => tr.Check(It.IsAny<double>()))
+                    .Returns (false)
+                    .Returns (false)
+                    .Returns (false)
+                    .Returns (false)
+                    .Returns(true);
+
+                _triggerMock
+                    .SetupGet(tr => tr.State)
+                    .Returns(TriggerState.Triggered);
+            }
         }
 
-        [Test]
-        public void then_the_SUT_should_access_all_sample_values ()
+
+        public class when_fetching_the_sample_sequences_for_all_channels
+            : TriggeredSamplerSpecs
         {
-            foreach (var value  in _channel1values.Concat(_channel2values))
+            private const int _indexOfTriggeringItem = 4;
+
+            private SampleSequence[] _sequences;
+
+            protected override void When()
             {
-                _accessedValues.ShouldContain(value);
+                var providers = SUT.SampleSequenceProviders.ToArray();
+                _sequences = providers.Select(provider => provider()).ToArray();
+            }
+
+            [Test]
+            public void then_the_SUT_should_access_all_pre_trigger_sample_values_but_none_else ()
+            {
+                _channel1values
+                    .Take(_indexOfTriggeringItem + 1)
+                    .ForEachDo(value => _accessedValues.ShouldContain(value));
+
+                _accessedValues.Count.ShouldEqual(_indexOfTriggeringItem + 1);
+            }
+
+            [Test]
+            public void then_each_sample_sequence_should_have_a_reference_time_corresponding_to_the_trigger_reference_time ()
+            {
+                var triggerReferenceTime = _indexOfTriggeringItem * _sequences[_triggerChannelIndex].TimeIncrement;
+                _sequences.ForEachDo(sequence => sequence.ReferenceTime.ShouldEqual(triggerReferenceTime));
             }
         }
     }

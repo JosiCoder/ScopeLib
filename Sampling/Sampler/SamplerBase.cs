@@ -85,9 +85,7 @@ namespace ScopeLib.Sampling
                         // determine the trigger reference time.
                     {
                         Trigger.Arm();
-                        IEnumerable<double> remaining;
-                        var taken = sampleSequence.Values.TakeWhile(element => !Trigger.Check(element), out remaining);
-                        sampleSequence.Values = taken.Concat(remaining);
+                        var taken = sampleSequence.Values.TakeWhile(element => !Trigger.Check(element));
                         var numberOfValuesTakenBeforeTrigger = taken.Count();
 
                         // TODO: Interpolate considering values before and after trigger. 
@@ -99,11 +97,6 @@ namespace ScopeLib.Sampling
 
                     // Set the channel's reference time to that of the trigger.
                     sampleSequence.ReferenceTime = triggerReferenceTime;
-
-                    // Buffer the values to ensure that the enumerable provided by the external sample
-                    // sequence provider is enumerated just once.
-                    // TODO: Skip all values that aren't necessary (requires information from ouside).
-                    sampleSequence.Values = sampleSequence.Values.ToList();
 
                     return sampleSequence;
                 });
