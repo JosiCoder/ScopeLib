@@ -22,9 +22,10 @@ using System.Collections.Generic;
 namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a sampler that uses raw samples provided by external sample sequence provider functions.
+    /// Provides sample sequence providers for all channels. A sample sequence provider is a
+    /// function that provides a sequence of values sampled from a signal.
     /// </summary>
-    public class Sampler : SamplerBase
+    public class Sampler
     {
         private readonly IEnumerable<Func<SampleSequence>> _wrappedSampleSequenceProviders;
 
@@ -38,21 +39,78 @@ namespace ScopeLib.Sampling
         /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
         public Sampler (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders, ITrigger trigger,
             int triggerChannelIndex)
-            : base(trigger, triggerChannelIndex)
         {
+            Trigger = trigger;
+            TriggerChannelIndex = triggerChannelIndex;
+
             _wrappedSampleSequenceProviders = ApplyTriggerAndAlignSampleSequences(externalSampleSequenceProviders);
         }
 
         /// <summary>
+        /// Gets the trigger to use.
+        /// </summary>
+        public ITrigger Trigger
+        { get; private set; }
+
+        /// <summary>
+        /// Gets the index of the channel to apply the trigger on.
+        /// </summary>
+        public int TriggerChannelIndex
+        { get; private set; }
+
+        /// <summary>
         /// Gets the functions that provide the sample sequences, one function per channel.
         /// </summary>
-        public override IEnumerable<Func<SampleSequence>> SampleSequenceProviders
+        public IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         {
             get
             {
                 return _wrappedSampleSequenceProviders;
             }
         }
+
+        /// <summary>
+        /// Applies the current trigger and aligns all sample sequences accordingly.
+        /// </summary>
+        /// <param name="externalSampleSequenceProviders">
+        /// The functions that provide the raw signal sample sequences, one function per channel.
+        /// </param>
+        /// <returns>
+        /// Functions that provide the signal sample sequences after the trigger has been applied,
+        /// one function per channel.
+        /// </returns>
+        protected IEnumerable<Func<SampleSequence>> ApplyTriggerAndAlignSampleSequences(
+            IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
+        {
+            double triggerReferenceTime = 0;
+
+            return externalSampleSequenceProviders.Select((provider, index) =>
+            {
+                return new Func<SampleSequence>(() =>
+                {
+                    var sampleSequence = provider();
+
+                    if (index == TriggerChannelIndex)
+                        // We are currently providing the sample sequence of the trigger channel, 
+                        // determine the trigger reference time.
+                    {
+                        Trigger.Arm();
+                        var taken = sampleSequence.Values.TakeWhile(element => !Trigger.Check(element));
+                        var numberOfValuesTakenBeforeTrigger = taken.Count();
+
+                        // TODO: Interpolate considering values before and after trigger. 
+                        triggerReferenceTime =
+                            Trigger.State == TriggerState.Triggered ?
+                            numberOfValuesTakenBeforeTrigger * sampleSequence.TimeIncrement
+                            : 0;
+                    }
+
+                    // Set the channel's reference time to that of the trigger.
+                    sampleSequence.ReferenceTime = triggerReferenceTime;
+
+                    return sampleSequence;
+                });
+            });
+        }
     }
 }
-
