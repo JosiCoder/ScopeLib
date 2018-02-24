@@ -201,12 +201,12 @@ namespace ScopeLib.Display.Views
                         channelVM.ReferencePointPosition.X + triggerPointPosition,
                         channelVM.ReferencePointPosition.Y),
                 Color = CairoHelpers.ToCairoColor(channelVM.Color),
-                XScaleFactor = channelVM.TimeScaleFactor,
-                YScaleFactor = channelVM.ValueScaleFactor,
+                XScaleFactor = channelVM.XScaleFactor,
+                YScaleFactor = channelVM.YScaleFactor,
                 ReferencePoint =
-                    new Cairo.PointD(sampleSequence.ReferenceTime, _referenceLevel),
+                    new Cairo.PointD(sampleSequence.ReferenceX, _referenceLevel),
                 Vertices = sampleSequence.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.TimeIncrement * timebaseVM.TimeScaleFactor, value)),
+                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.XInterval * timebaseVM.TimeScaleFactor, value)),
             };
         }
 

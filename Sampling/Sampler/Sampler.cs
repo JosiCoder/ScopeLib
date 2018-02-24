@@ -82,7 +82,7 @@ namespace ScopeLib.Sampling
         protected IEnumerable<Func<SampleSequence>> ApplyTriggerAndAlignSampleSequences(
             IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
         {
-            double triggerReferenceTime = 0;
+            double triggerX = 0;
 
             return externalSampleSequenceProviders.Select((provider, index) =>
             {
@@ -99,14 +99,14 @@ namespace ScopeLib.Sampling
                         var numberOfValuesTakenBeforeTrigger = taken.Count();
 
                         // TODO: Interpolate considering values before and after trigger. 
-                        triggerReferenceTime =
+                        triggerX =
                             Trigger.State == TriggerState.Triggered ?
-                            numberOfValuesTakenBeforeTrigger * sampleSequence.TimeIncrement
+                            numberOfValuesTakenBeforeTrigger * sampleSequence.XInterval
                             : 0;
                     }
 
-                    // Set the channel's reference time to that of the trigger.
-                    sampleSequence.ReferenceTime = triggerReferenceTime;
+                    // Set the channel's reference point according to where triggering has happened.
+                    sampleSequence.ReferenceX = triggerX;
 
                     return sampleSequence;
                 });

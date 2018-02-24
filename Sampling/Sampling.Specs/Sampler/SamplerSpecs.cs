@@ -101,9 +101,9 @@ namespace ScopeLib.Sampling.Specs
             }
 
             [Test]
-            public void then_each_sample_sequence_should_have_a_reference_time_of_zero ()
+            public void then_each_sample_sequence_should_have_a_reference_x_of_zero ()
             {
-                _sequences.ForEachDo(sequence => sequence.ReferenceTime.ShouldEqual(0));
+                _sequences.ForEachDo(sequence => sequence.ReferenceX.ShouldEqual(0));
             }
         }
 
@@ -184,12 +184,11 @@ namespace ScopeLib.Sampling.Specs
             }
 
             [Test]
-            public void then_each_sample_sequence_should_have_a_reference_time_corresponding_to_the_trigger_reference_time ()
+            public void then_each_sample_sequence_should_have_a_reference_x_corresponding_to_the_trigger_reference_time ()
             {
-                var triggerReferenceTime = _indexOfTriggeringItem * _sequences[_triggerChannelIndex].TimeIncrement;
-                _sequences.ForEachDo(sequence => sequence.ReferenceTime.ShouldEqual(triggerReferenceTime));
+                var triggerReferenceTime = _indexOfTriggeringItem * _sequences[_triggerChannelIndex].XInterval;
+                _sequences.ForEachDo(sequence => sequence.ReferenceX.ShouldEqual(triggerReferenceTime));
             }
         }
     }
 }
-

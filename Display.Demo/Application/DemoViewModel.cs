@@ -35,12 +35,11 @@ namespace ScopeLib.Display.Demo
         {
             // === Channels configuration ===
 
+            var timeScaleFactor = 1;
             var channelVMs = new[]
             {
-//                new ChannelViewModel("V", new Position(1.0, 1.0), 0.5, 0.333, new Color(1, 1, 0)),
-                new ChannelViewModel("V", new Position(0.0, 1.0), 1, 1, new Color(1, 1, 0)),
-//                new ChannelViewModel("V", new Position(-Math.PI, -2), 1, 2, new Color(0, 1, 0)),
-                new ChannelViewModel("V", new Position(0, -2), 1, 2, new Color(0, 1, 0)),
+                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 2, new Color(1, 1, 0)),
+                new ChannelViewModel("V", new Position(0, -2), timeScaleFactor, 1, new Color(0, 1, 0)),
             };
             channelVMs[0].MeasurementCursor1VM.Visible = true;
             channelVMs[0].MeasurementCursor2VM.Visible = true;
@@ -57,7 +56,7 @@ namespace ScopeLib.Display.Demo
             var timebaseVM = new TimebaseViewModel ("s", 1, new Color(0.5, 0.8, 1.0));
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
-            var triggerChannelIndex = 1;
+            var triggerChannelIndex = 0;
 
             timebaseVM.TriggerVM =
                 new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
@@ -69,21 +68,23 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var channel1TimeIncrement = 1;
-            var channel1values =  new []{ -1d, 0d, 2d, 3d };
-
-            var channel2TimeIncrement = 2 * Math.PI / 40;
-            var channel2values =
-                FunctionValueGenerator.GenerateSineValuesForAngles(0.0, 2 * Math.PI, channel2TimeIncrement,
+            var channel1SampleFrequency = 10;
+            var channel1XInterval = 1/(double)channel1SampleFrequency;
+            var channel1values =
+                FunctionValueGenerator.GenerateSineValuesForFrequency(1, channel1SampleFrequency, 4,
                     (x, y) => y);
+
+            var channel2SampleFrequency = 1;
+            var channel2XInterval = 1/(double)channel2SampleFrequency;
+            var channel2values =  new []{ -1d, 0d, 2d, 3d };
 
             // UseDeferred shows us some details about how the values are accessed (see there).
             var sampleSequenceProviders = new Func<SampleSequence>[]
             {
-//                () => new SampleSequence(channel1TimeIncrement, channel1values),
-                () => new SampleSequence(channel1TimeIncrement, UseDeferred(channel1values)),
-                () => new SampleSequence(channel2TimeIncrement, channel2values),
-//                () => new SampleSequence(channel2TimeIncrement, UseDeferred(channel2values)),
+//                () => new SampleSequence(channel1SampleInterval, channel1values),
+                () => new SampleSequence(channel1XInterval, LogDeferredAccess(channel1values)),
+                () => new SampleSequence(channel2XInterval, channel2values),
+//                () => new SampleSequence(channel2SampleInterval, UseDeferred(channel2values)),
             };
 
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
@@ -92,10 +93,10 @@ namespace ScopeLib.Display.Demo
         }
 
         /// <summary>
-        /// Defer access to the values in the specified enumerable and log each access. This
-        /// shows us which values are accessed as well as when and how often they are accessed.
+        /// Log the (deferred) access to the values in the specified enumerable. This shows
+        /// us which values are accessed as well as when and how often they are accessed.
         /// </summary>
-        private IEnumerable<T> UseDeferred<T>(IEnumerable<T> values)
+        private IEnumerable<T> LogDeferredAccess<T>(IEnumerable<T> values)
         {
             return values.ForEachDoDeferred(element => Console.WriteLine(element));
         }

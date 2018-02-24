@@ -22,8 +22,8 @@ using ScopeLib.Utilities;
 namespace ScopeLib.Sampling
 {
     /// <summary>
-    /// Provides a sample sequence, i.e. a bunch of values sampled from a signal,
-    /// and some related meta information.
+    /// Provides a bunch of values belonging to equally spaced reference values,
+    /// The values can belong to any domain (e.g. time or frequency).
     /// </summary>
     public class SampleSequence
     {
@@ -37,20 +37,20 @@ namespace ScopeLib.Sampling
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="timeIncrement">The time increment between two successive sampled.</param>
+        /// <param name="xInterval">The increment along the X axis between two successive samples.</param>
         /// <param name="values">
         /// The sample values. They are cached to ensure that they aren't accessed multiple times.
         /// </param>
-        public SampleSequence (double timeIncrement, IEnumerable<double> values)
+        public SampleSequence (double xInterval, IEnumerable<double> values)
         {
-            TimeIncrement = timeIncrement;
+            XInterval = xInterval;
             Values = values.ToCachedEnumerable();
         }
 
         /// <summary>
-        /// Gets or sets the time increment between two successive measurements.
+        /// Gets or sets the increment along the X axis between two successive samples.
         /// </summary>
-        public double TimeIncrement
+        public double XInterval
         { get; set; }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace ScopeLib.Sampling
         { get; set; }
 
         /// <summary>
-        /// Gets or sets the time value of the reference point (e.g. the trigger position).
+        /// Gets or sets the reference X value (e.g. the trigger position for time domain samples).
         /// </summary>
-        public double ReferenceTime
+        public double ReferenceX
         { get; set; }
     }
 }

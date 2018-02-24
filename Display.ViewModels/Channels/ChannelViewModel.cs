@@ -35,8 +35,8 @@ namespace ScopeLib.Display.ViewModels
         {
             BaseUnitString = "V";
             ReferencePointPosition = new Position ();
-            TimeScaleFactor = 1.0;
-            ValueScaleFactor = 1.0;
+            XScaleFactor = 1.0;
+            YScaleFactor = 1.0;
             Color = _defaultColor;
             Initialize();
         }
@@ -48,16 +48,16 @@ namespace ScopeLib.Display.ViewModels
         /// <param name="referencePointPosition">
         /// The the position of the reference point on the scope display.
         /// </param>
-        /// <param name="xScaleFactor">The scaling factor for the time axis.</param>
-        /// <param name="yScaleFactor">The scaling factor for the value axis.</param>
+        /// <param name="xScaleFactor">The scaling factor in the horizontal direction.</param>
+        /// <param name="yScaleFactor">The scaling factor in the vertical direction.</param>
         /// <param name="color">The graph color.</param>
         public ChannelViewModel (string baseUnitString, Position referencePointPosition,
-            double timeScaleFactor, double valueScaleFactor, Color color)
+            double xScaleFactor, double yScaleFactor, Color color)
         {
             BaseUnitString = baseUnitString;
             ReferencePointPosition = referencePointPosition;
-            TimeScaleFactor = timeScaleFactor;
-            ValueScaleFactor = valueScaleFactor;
+            XScaleFactor = xScaleFactor;
+            YScaleFactor = yScaleFactor;
             Color = color;
             Initialize();
         }
@@ -98,36 +98,36 @@ namespace ScopeLib.Display.ViewModels
         public Position ReferencePointPosition
         { get; set; }
 
-        private double _timeScaleFactor;
+        private double _xScaleFactor;
         /// <summary>
-        /// Gets or sets the scaling factor for the time axis.
+        /// Gets or sets the scaling factor in the horizontal direction.
         /// </summary>
-        public double TimeScaleFactor
+        public double XScaleFactor
         {
             get
             {
-                return _timeScaleFactor;
+                return _xScaleFactor;
             }
             set
             {
-                _timeScaleFactor = value;
+                _xScaleFactor = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _valueScaleFactor;
+        private double _yScaleFactor;
         /// <summary>
-        /// Gets or sets the scaling factor for the value axis.
+        /// Gets or sets the scaling factor in the vertical direction.
         /// </summary>
-        public double ValueScaleFactor
+        public double YScaleFactor
         {
             get
             {
-                return _valueScaleFactor;
+                return _yScaleFactor;
             }
             set
             {
-                _valueScaleFactor = value;
+                _yScaleFactor = value;
                 RaisePropertyChanged();
             }
         }

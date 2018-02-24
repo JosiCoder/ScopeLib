@@ -65,7 +65,7 @@ namespace ScopeLib.Display.Views
                 triggerModeSymbol,
                 () => triggerVM.Level,
                 bindingProvider,
-                () => triggerChannelConfiguration.ValueScaleFactor,
+                () => triggerChannelConfiguration.YScaleFactor,
                 () => triggerChannelConfiguration.ReferencePointPosition.Y,
                 referenceLevelProvider,
                 triggerVM.ChannelVM.BaseUnitString,

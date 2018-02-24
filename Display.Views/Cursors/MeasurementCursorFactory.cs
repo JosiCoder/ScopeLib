@@ -100,7 +100,7 @@ namespace ScopeLib.Display.Views
                 () => cursorVM.Value,
                 bindingProvider,
                 deltaReferenceLevelProvider,
-                () => cursorChannelConfiguration.ValueScaleFactor,
+                () => cursorChannelConfiguration.YScaleFactor,
                 () => cursorChannelConfiguration.ReferencePointPosition.Y,
                 referenceLevelProvider,
                 cursorChannelConfiguration.BaseUnitString,
