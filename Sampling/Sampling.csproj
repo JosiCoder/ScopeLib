@@ -37,11 +37,14 @@
     <Compile Include="Trigger\LevelTrigger.cs" />
     <Compile Include="Trigger\NullTrigger.cs" />
     <Compile Include="Sampler\SampleSequence.cs" />
+    <Compile Include="FFT\LomontFFT.cs" />
+    <Compile Include="FFT\Fourier.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Sampler\" />
     <Folder Include="Trigger\" />
+    <Folder Include="FFT\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

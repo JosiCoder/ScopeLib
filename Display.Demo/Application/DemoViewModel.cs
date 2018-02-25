@@ -38,15 +38,17 @@ namespace ScopeLib.Display.Demo
             var timeScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 2, new Color(1, 1, 0)),
+                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 1, new Color(1, 1, 0)),
                 new ChannelViewModel("V", new Position(0, -2), timeScaleFactor, 1, new Color(0, 1, 0)),
             };
+
             channelVMs[0].MeasurementCursor1VM.Visible = true;
             channelVMs[0].MeasurementCursor2VM.Visible = true;
-            channelVMs[1].MeasurementCursor1VM.Visible = true;
-            channelVMs[1].MeasurementCursor2VM.Visible = true;
             channelVMs[0].MeasurementCursor1VM.Value = 2.0;
             channelVMs[0].MeasurementCursor2VM.Value = 3.0;
+
+            channelVMs[1].MeasurementCursor1VM.Visible = true;
+            channelVMs[1].MeasurementCursor2VM.Visible = true;
             channelVMs[1].MeasurementCursor1VM.Value = -0.5;
             channelVMs[1].MeasurementCursor2VM.Value = 0.5;
             _scopeScreenVM.ChannelVMs = channelVMs;
@@ -68,23 +70,30 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var channel1SampleFrequency = 10;
+            var channel1SampleFrequency = 64;
             var channel1XInterval = 1/(double)channel1SampleFrequency;
             var channel1values =
                 FunctionValueGenerator.GenerateSineValuesForFrequency(1, channel1SampleFrequency, 4,
-                    (x, y) => y);
+                    (x, y) => y).Take(256); //TODO: must be a power of 2 for FFT
 
             var channel2SampleFrequency = 1;
             var channel2XInterval = 1/(double)channel2SampleFrequency;
             var channel2values =  new []{ -1d, 0d, 2d, 3d };
 
+//            var channel1SampleSequence = new SampleSequence(channel1XInterval, channel1values);
+            var channel1SampleSequence = new SampleSequence(channel1XInterval, LogDeferredAccess(channel1values));
+            var channel2SampleSequence = new SampleSequence(channel2XInterval, channel2values);
+//            var channel2SampleSequence = new SampleSequence(channel2XInterval, LogDeferredAccess(channel2values));
+
+            var channel1FourierSamples =
+                new Fourier().TransformForward(channel1SampleSequence);
+
             // UseDeferred shows us some details about how the values are accessed (see there).
             var sampleSequenceProviders = new Func<SampleSequence>[]
             {
-//                () => new SampleSequence(channel1SampleInterval, channel1values),
-                () => new SampleSequence(channel1XInterval, LogDeferredAccess(channel1values)),
-                () => new SampleSequence(channel2XInterval, channel2values),
-//                () => new SampleSequence(channel2SampleInterval, UseDeferred(channel2values)),
+                () => channel1SampleSequence,
+//                () => channel2SampleSequence,
+                () => channel1FourierSamples,
             };
 
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);

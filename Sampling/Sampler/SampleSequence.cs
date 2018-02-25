@@ -30,13 +30,6 @@ namespace ScopeLib.Sampling
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        public SampleSequence ()
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of this class.
-        /// </summary>
         /// <param name="xInterval">The increment along the X axis between two successive samples.</param>
         /// <param name="values">
         /// The sample values. They are cached to ensure that they aren't accessed multiple times.
