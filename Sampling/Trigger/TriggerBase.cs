@@ -25,6 +25,7 @@ namespace ScopeLib.Sampling
     /// </summary>
     public enum TriggerState : short
     {
+        Inactive,
         Armed,
         Triggered,
     }

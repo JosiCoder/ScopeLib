@@ -76,6 +76,10 @@ namespace ScopeLib.Display.Views
             _viewModel = viewModel;
             builder.Autoconnect(this);
 
+            //TODO
+            scopeDrawingArea.HeightRequest = 50;
+
+
             // === Create sub-views. ===
 
             // === Register event handlers. ===

@@ -49,14 +49,14 @@ namespace ScopeLib.Sampling
         /// <summary>
         /// Gets the trigger to use.
         /// </summary>
-        public ITrigger Trigger
-        { get; private set; }
+        private ITrigger Trigger
+        { get; set; }
 
         /// <summary>
         /// Gets the index of the channel to apply the trigger on.
         /// </summary>
-        public int TriggerChannelIndex
-        { get; private set; }
+        private int TriggerChannelIndex
+        { get; set; }
 
         /// <summary>
         /// Gets the functions that provide the sample sequences, one function per channel.

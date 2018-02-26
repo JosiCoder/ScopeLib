@@ -37,7 +37,9 @@ namespace ScopeLib.Display.Demo
     public partial class DemoWindowView: Gtk.Window
     {
         private readonly DemoViewModel _viewModel;
-        [UI] Gtk.Container graphicsContainer;
+        [UI] Gtk.Paned graphicsContainerPane;
+        [UI] Gtk.Container masterGraphicsContainer;
+        [UI] Gtk.Container slaveGraphicsContainer;
 
         /// <summary>
         /// Creates a new instance of this class.
@@ -62,8 +64,11 @@ namespace ScopeLib.Display.Demo
 
             //  === Create sub-views. ===
 
-            var scopeScreenView = ScopeScreenView.Create(_viewModel.ScopeScreenVM);
-            graphicsContainer.Add(scopeScreenView);
+            var masterScopeScreenView = ScopeScreenView.Create(_viewModel.MasterScopeScreenVM);
+            masterGraphicsContainer.Add(masterScopeScreenView);
+
+            var slaveScopeScreenView = ScopeScreenView.Create(_viewModel.SlaveScopeScreenVM);
+            slaveGraphicsContainer.Add(slaveScopeScreenView);
 
             // === Register event handlers. ===
 

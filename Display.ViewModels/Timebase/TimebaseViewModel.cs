@@ -130,7 +130,7 @@ namespace ScopeLib.Display.ViewModels
             {
                 if (value == null)
                 {
-                    throw new ArgumentException ("null trigger not allowed");
+                    throw new ArgumentException ("null not allowed for trigger");
                 }
                 _triggerVM = value;
                 RaisePropertyChanged();
