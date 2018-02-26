@@ -29,6 +29,15 @@ namespace ScopeLib.Display.Demo
     /// </summary>
     public class DemoViewModel
     {
+        private const char _channelCaptionBaseSymbol = '\u278A';// one of '\u2460', '\u2776', '\u278A';
+
+        private readonly Color _baseColor = new Color(0.5, 0.8, 1.0);
+        private readonly Color[] _channelColors = new Color[]
+        {
+            new Color(1, 1, 0),
+            new Color(0, 1, 0),
+        };
+
         private readonly IScopeScreenViewModel _masterScopeScreenVM = new ScopeScreenViewModel();
         private readonly IScopeScreenViewModel _slaveScopeScreenVM = new ScopeScreenViewModel();
 
@@ -68,8 +77,10 @@ namespace ScopeLib.Display.Demo
             var timeScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 1, new Color(1, 1, 0)),
-                new ChannelViewModel("V", new Position(0, -2), timeScaleFactor, 1, new Color(0, 1, 0)),
+                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 1,
+                    BuildChannelCaptionFromIndex(0), _channelColors[0]),
+                new ChannelViewModel("V", new Position(0, -2), timeScaleFactor, 1,
+                    BuildChannelCaptionFromIndex(1), _channelColors[1]),
             };
 
             var index = 0;
@@ -86,7 +97,7 @@ namespace ScopeLib.Display.Demo
 
             // === Timebase configuration ===
 
-            var timebaseVM = new TimebaseViewModel ("s", 1, new Color(0.5, 0.8, 1.0));
+            var timebaseVM = new TimebaseViewModel ("s", 1, _baseColor);
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
             var triggerChannelIndex = 0;
@@ -113,10 +124,11 @@ namespace ScopeLib.Display.Demo
         {
             // === Channels configuration ===
 
-            var timeScaleFactor = 1;
+            var frequencyScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("dB?", new Position(0, -2), timeScaleFactor, 0.5, new Color(0, 1, 0)),//TODO Unit
+                new ChannelViewModel("dB?", new Position(0, -2), frequencyScaleFactor, 0.5,
+                    BuildChannelCaptionFromIndex(0), _channelColors[0]),//TODO Unit
             };
 
             var index = 0;
@@ -128,7 +140,7 @@ namespace ScopeLib.Display.Demo
 
             // === Timebase configuration ===
 
-            var timebaseVM = new TimebaseViewModel ("Hz", 0.2, new Color(0.5, 0.8, 1.0));
+            var timebaseVM = new TimebaseViewModel ("Hz", 0.2, _baseColor);
 
             timebaseVM.MeasurementCursor1VM.Visible = true;
             timebaseVM.MeasurementCursor2VM.Visible = true;
@@ -147,6 +159,14 @@ namespace ScopeLib.Display.Demo
             };
 
             scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+        }
+
+        /// <summary>
+        /// Creates a channel caption for the specified channel index.
+        /// </summary>
+        private string BuildChannelCaptionFromIndex(int channelIndex)
+        {
+            return ((char)(_channelCaptionBaseSymbol + channelIndex)).ToString();
         }
 
         /// <summary>

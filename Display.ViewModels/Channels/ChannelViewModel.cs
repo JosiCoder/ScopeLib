@@ -26,6 +26,7 @@ namespace ScopeLib.Display.ViewModels
     /// </summary>
     public class ChannelViewModel : NotifyingBase
     {
+        private const string _defaultCaption = "???";
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace ScopeLib.Display.ViewModels
             ReferencePointPosition = new Position ();
             XScaleFactor = 1.0;
             YScaleFactor = 1.0;
+            Caption = _defaultCaption;
             Color = _defaultColor;
             Initialize();
         }
@@ -50,14 +52,16 @@ namespace ScopeLib.Display.ViewModels
         /// </param>
         /// <param name="xScaleFactor">The scaling factor in the horizontal direction.</param>
         /// <param name="yScaleFactor">The scaling factor in the vertical direction.</param>
-        /// <param name="color">The graph color.</param>
+        /// <param name="caption">The channel caption.</param>
+        /// <param name="color">The channel color.</param>
         public ChannelViewModel (string baseUnitString, Position referencePointPosition,
-            double xScaleFactor, double yScaleFactor, Color color)
+            double xScaleFactor, double yScaleFactor, string caption, Color color)
         {
             BaseUnitString = baseUnitString;
             ReferencePointPosition = referencePointPosition;
             XScaleFactor = xScaleFactor;
             YScaleFactor = yScaleFactor;
+            Caption = caption;
             Color = color;
             Initialize();
         }
@@ -133,7 +137,13 @@ namespace ScopeLib.Display.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the graph color.
+        /// Gets or sets the channel caption.
+        /// </summary>
+        public string Caption
+        { get; set; }
+
+        /// <summary>
+        /// Gets or sets the channel color.
         /// </summary>
         public Color Color
         { get; set; }

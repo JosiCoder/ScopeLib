@@ -277,7 +277,7 @@ namespace ScopeLib.Display.Views
             var cursors = new List<BoundCursor>();
 
             cursors.AddRange(channelConfig
-                .Select((channelConf, index) => ChannelCursorFactory.CreateChannelReferenceCursor(channelConf, index)));
+                .Select(channelConf => ChannelCursorFactory.CreateChannelReferenceCursor(channelConf)));
 
             channelConfig.ForEachDo(chConfig =>
                 {

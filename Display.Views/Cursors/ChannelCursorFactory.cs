@@ -29,15 +29,12 @@ namespace ScopeLib.Display.Views
     /// </summary>
     internal static class ChannelCursorFactory
     {
-        private const char _channelCaptionBaseSymbol = '\u278A';// one of '\u2460', '\u2776', '\u278A';
-
         /// <summary>
         /// Creates a reference line cursor for a single channel.
         /// </summary>
-        internal static BoundCursor CreateChannelReferenceCursor(ChannelViewModel channelVM,
-            int channelNumber)
+        internal static BoundCursor CreateChannelReferenceCursor(ChannelViewModel channelVM)
         {
-            var channelCaption = ((char)(_channelCaptionBaseSymbol+channelNumber)).ToString();
+            var channelCaption = channelVM.Caption;
             var channelColor = CairoHelpers.ToCairoColor(channelVM.Color);
 
             var cursor = new ScopeCursor
