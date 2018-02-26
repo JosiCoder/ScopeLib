@@ -77,14 +77,6 @@ namespace ScopeLib.Display.Demo
             // === Do some additional stuff. ===
 
             graphicsContainerPane.Orientation = Orientation.Vertical;
-            graphicsContainerPane.DragMotion += GraphicsContainerPane_DragMotionEventHandler;
-        }
-
-        /// <summary>
-        /// Performs actions whenever the scope drawing area has been drawn.
-        /// </summary>
-        private void GraphicsContainerPane_DragMotionEventHandler (object o, DragMotionArgs args)
-        {
         }
 
         /// <summary>

@@ -77,13 +77,11 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Visible = true;
             channelVMs[index].MeasurementCursor1VM.Value = 2.0;
             channelVMs[index].MeasurementCursor2VM.Value = 3.0;
-
             index++;
             channelVMs[index].MeasurementCursor1VM.Visible = true;
             channelVMs[index].MeasurementCursor2VM.Visible = true;
             channelVMs[index].MeasurementCursor1VM.Value = -0.5;
             channelVMs[index].MeasurementCursor2VM.Value = 0.5;
-
             scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Timebase configuration ===
@@ -118,7 +116,7 @@ namespace ScopeLib.Display.Demo
             var timeScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("dB?", new Position(0, -2), timeScaleFactor, 1, new Color(0, 1, 0)),//TODO Unit
+                new ChannelViewModel("dB?", new Position(0, -2), timeScaleFactor, 0.5, new Color(0, 1, 0)),//TODO Unit
             };
 
             var index = 0;
@@ -126,12 +124,11 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Visible = true;
             channelVMs[index].MeasurementCursor1VM.Value = -0.5;
             channelVMs[index].MeasurementCursor2VM.Value = 0.5;
-
             scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Timebase configuration ===
 
-            var timebaseVM = new TimebaseViewModel ("Hz", 1, new Color(0.5, 0.8, 1.0));
+            var timebaseVM = new TimebaseViewModel ("Hz", 0.2, new Color(0.5, 0.8, 1.0));
 
             timebaseVM.MeasurementCursor1VM.Visible = true;
             timebaseVM.MeasurementCursor2VM.Visible = true;

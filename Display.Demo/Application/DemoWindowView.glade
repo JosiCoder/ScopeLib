@@ -63,7 +63,7 @@ Copyright (C) 2017 Josi Coder
             </child>
           </object>
           <packing>
-            <property name="resize">False</property>
+            <property name="resize">True</property>
             <property name="shrink">True</property>
           </packing>
         </child>
@@ -100,7 +100,7 @@ Copyright (C) 2017 Josi Coder
             </child>
           </object>
           <packing>
-            <property name="resize">False</property>
+            <property name="resize">True</property>
             <property name="shrink">True</property>
           </packing>
         </child>
