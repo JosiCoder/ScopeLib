@@ -76,10 +76,6 @@ namespace ScopeLib.Display.Views
             _viewModel = viewModel;
             builder.Autoconnect(this);
 
-            //TODO
-            scopeDrawingArea.HeightRequest = 50;
-
-
             // === Create sub-views. ===
 
             // === Register event handlers. ===
@@ -97,10 +93,14 @@ namespace ScopeLib.Display.Views
 
             // === Create bindings. ===
 
-            // === Do any additional stuff. ===
+            // === Do some additional stuff. ===
 
             _scopeGraphics = new ScopeGraphics (ScopeStretchMode.Stretch,
                 _xMinimumGraticuleUnits, _yMinimumGraticuleUnits);
+
+            // Allow shrinking the drawing area completely.
+            scopeDrawingArea.HeightRequest = 0;
+            scopeDrawingArea.WidthRequest = 0;
 
             InitializeGraphics();
             RefreshData();
@@ -241,8 +241,8 @@ namespace ScopeLib.Display.Views
             cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseVM));
 
             bool bothCursorsVisible =
-                channelVM.MeasurementCursor1VM.Visible &&
-                channelVM.MeasurementCursor2VM.Visible;
+                timebaseVM.MeasurementCursor1VM.Visible &&
+                timebaseVM.MeasurementCursor2VM.Visible;
 
             if (timebaseVM.MeasurementCursor1VM.Visible)
             {

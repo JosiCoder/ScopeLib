@@ -232,13 +232,11 @@ namespace ScopeLib.Display.Graphics
                             _xMinimumGraticuleUnits, _yMinimumGraticuleUnits, _userOriginOffset)
                         : null;
 
-                    if (userRange == null)
-                    {
-                        return;
-                    }
-
                     renderer.DrawMainBackground (window.Width, window.Height);
-                    renderer.DrawScopeGraphics (userRange, Cursors, Graphs);
+                    if (userRange != null)
+                    {
+                        renderer.DrawScopeGraphics (userRange, Cursors, Graphs);
+                    }
                     renderer.DrawReadouts (currentReadoutsDeviceExtents, Readouts);
 
                     // There's a bug related to internal reference counting (already fixed on GitHub)

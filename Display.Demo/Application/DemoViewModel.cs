@@ -133,8 +133,6 @@ namespace ScopeLib.Display.Demo
 
             var timebaseVM = new TimebaseViewModel ("Hz", 1, new Color(0.5, 0.8, 1.0));
 
-            // TODO timebaseVM.TriggerVM is default, this deactivates the delta cursor. Investigate and fix.
-            // see CreateTimebaseCursors
             timebaseVM.MeasurementCursor1VM.Visible = true;
             timebaseVM.MeasurementCursor2VM.Visible = true;
             timebaseVM.MeasurementCursor1VM.Value = 2.0;
