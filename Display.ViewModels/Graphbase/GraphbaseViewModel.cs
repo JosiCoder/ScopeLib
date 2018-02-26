@@ -22,19 +22,19 @@ using ScopeLib.Utilities;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides the viewmodel of the scope timebase.
+    /// Provides the viewmodel of a scope graphbase (e.g. timebase).
     /// </summary>
-    public class TimebaseViewModel : ViewModelBase
+    public class GraphbaseViewModel : ViewModelBase
     {
         private readonly Color _defaultColor = new Color (1, 1, 1);
 
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        public TimebaseViewModel ()
+        public GraphbaseViewModel ()
         {
             BaseUnitString = "s";
-            TimeScaleFactor = 1.0;
+            ScaleFactor = 1.0;
             Color = _defaultColor;
             Initialize();
         }
@@ -43,13 +43,12 @@ namespace ScopeLib.Display.ViewModels
         /// Initializes an instance of this class.
         /// </summary>
         /// <param name="baseUnitString">The string representing the base unit.</param>
-        /// <param name="xScaleFactor">The scaling factor for the time axis.</param>
-        /// <param name="yScaleFactor">The scaling factor for the value axis.</param>
+        /// <param name="scaleFactor">The scaling factor for the base axis.</param>
         /// <param name="color">The graph color.</param>
-        public TimebaseViewModel (string baseUnitString, double timeScaleFactor, Color color)
+        public GraphbaseViewModel (string baseUnitString, double scaleFactor, Color color)
         {
             BaseUnitString = baseUnitString;
-            TimeScaleFactor = timeScaleFactor;
+            ScaleFactor = scaleFactor;
             Color = color;
             Initialize();
         }
@@ -81,19 +80,19 @@ namespace ScopeLib.Display.ViewModels
             }
         }
 
-        private double _timeScaleFactor;
+        private double _scaleFactor;
         /// <summary>
-        /// Gets or sets the scaling factor for the time axis.
+        /// Gets or sets the scaling factor for the base axis.
         /// </summary>
-        public double TimeScaleFactor
+        public double ScaleFactor
         {
             get
             {
-                return _timeScaleFactor;
+                return _scaleFactor;
             }
             set
             {
-                _timeScaleFactor = value;
+                _scaleFactor = value;
                 RaisePropertyChanged();
             }
         }

@@ -27,9 +27,9 @@ namespace ScopeLib.Display.ViewModels
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
         /// <summary>
-        /// Gets or sets the timebase viewmodel.
+        /// Gets or sets the graphbase viewmodel.
         /// </summary>
-        public TimebaseViewModel TimebaseVM
+        public GraphbaseViewModel GraphbaseVM
         { get; set; }
 
         /// <summary>

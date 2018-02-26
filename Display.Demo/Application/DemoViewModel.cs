@@ -95,20 +95,20 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Value = 0.5;
             scopeScreenVM.ChannelVMs = channelVMs;
 
-            // === Timebase configuration ===
+            // === Graphbase configuration ===
 
-            var timebaseVM = new TimebaseViewModel ("s", 1, _baseColor);
+            var graphbaseVM = new GraphbaseViewModel ("s", 1, _baseColor);
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
             var triggerChannelIndex = 0;
 
-            timebaseVM.TriggerVM =
+            graphbaseVM.TriggerVM =
                 new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
-            timebaseVM.MeasurementCursor1VM.Visible = true;
-            timebaseVM.MeasurementCursor2VM.Visible = true;
-            timebaseVM.MeasurementCursor1VM.Value = 2.0;
-            timebaseVM.MeasurementCursor2VM.Value = 3.0;
-            scopeScreenVM.TimebaseVM = timebaseVM;
+            graphbaseVM.MeasurementCursor1VM.Visible = true;
+            graphbaseVM.MeasurementCursor2VM.Visible = true;
+            graphbaseVM.MeasurementCursor1VM.Value = 2.0;
+            graphbaseVM.MeasurementCursor2VM.Value = 3.0;
+            scopeScreenVM.GraphbaseVM = graphbaseVM;
 
             // === Sample Sequences ===
 
@@ -138,15 +138,15 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Value = 0.5;
             scopeScreenVM.ChannelVMs = channelVMs;
 
-            // === Timebase configuration ===
+            // === Graphbase configuration ===
 
-            var timebaseVM = new TimebaseViewModel ("Hz", 0.2, _baseColor);
+            var graphbaseVM = new GraphbaseViewModel ("Hz", 0.2, _baseColor);
 
-            timebaseVM.MeasurementCursor1VM.Visible = true;
-            timebaseVM.MeasurementCursor2VM.Visible = true;
-            timebaseVM.MeasurementCursor1VM.Value = 2.0;
-            timebaseVM.MeasurementCursor2VM.Value = 3.0;
-            scopeScreenVM.TimebaseVM = timebaseVM;
+            graphbaseVM.MeasurementCursor1VM.Visible = true;
+            graphbaseVM.MeasurementCursor2VM.Visible = true;
+            graphbaseVM.MeasurementCursor1VM.Value = 2.0;
+            graphbaseVM.MeasurementCursor2VM.Value = 3.0;
+            scopeScreenVM.GraphbaseVM = graphbaseVM;
 
             // === Sample Sequences ===
 

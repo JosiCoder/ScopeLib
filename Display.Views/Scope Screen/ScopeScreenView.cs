@@ -192,8 +192,8 @@ namespace ScopeLib.Display.Views
         /// </summary>
         private ScopeGraph CreateScopeGraph(ChannelViewModel channelVM, Func<SampleSequence> sampleSequenceProvider)
         {
-            var timebaseVM = _viewModel.TimebaseVM;
-            var triggerPointPosition = timebaseVM.TriggerVM.HorizontalPosition;
+            var graphbaseVM = _viewModel.GraphbaseVM;
+            var triggerPointPosition = graphbaseVM.TriggerVM.HorizontalPosition;
 
             var sampleSequence = sampleSequenceProvider();
 
@@ -210,17 +210,17 @@ namespace ScopeLib.Display.Views
                 ReferencePoint =
                     new Cairo.PointD(sampleSequence.ReferenceX, _referenceLevel),
                 Vertices = sampleSequence.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.XInterval * timebaseVM.TimeScaleFactor, value)),
+                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.XInterval * graphbaseVM.ScaleFactor, value)),
             };
         }
 
         /// <summary>
-        /// Creates the timebase cursors.
+        /// Creates the graphbase (e.g. timebase) cursors.
         /// </summary>
-        private IEnumerable<BoundCursor> CreateTimebaseCursors()
+        private IEnumerable<BoundCursor> CreateGraphbaseCursors()
         {
-            var timebaseVM = _viewModel.TimebaseVM;
-            var triggerVM = timebaseVM.TriggerVM;
+            var graphbaseVM = _viewModel.GraphbaseVM;
+            var triggerVM = graphbaseVM.TriggerVM;
             var channelVM = triggerVM.ChannelVM;
 
             var cursors = new List<BoundCursor>();
@@ -238,25 +238,25 @@ namespace ScopeLib.Display.Views
             // Add more cases for other types of triggers here.
             // ...
 
-            cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(timebaseVM));
+            cursors.Add(TriggerCursorFactory.CreateTriggerPointCursor(graphbaseVM));
 
             bool bothCursorsVisible =
-                timebaseVM.MeasurementCursor1VM.Visible &&
-                timebaseVM.MeasurementCursor2VM.Visible;
+                graphbaseVM.MeasurementCursor1VM.Visible &&
+                graphbaseVM.MeasurementCursor2VM.Visible;
 
-            if (timebaseVM.MeasurementCursor1VM.Visible)
+            if (graphbaseVM.MeasurementCursor1VM.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseVM.MeasurementCursor1VM, timebaseVM, bothCursorsVisible,
+                    graphbaseVM.MeasurementCursor1VM, graphbaseVM, bothCursorsVisible,
                     null,
                     () => _referenceTime));
             }
 
-            if (timebaseVM.MeasurementCursor2VM.Visible)
+            if (graphbaseVM.MeasurementCursor2VM.Visible)
             {
                 cursors.Add(MeasurementCursorFactory.CreateTimeMeasurementCursor(
-                    timebaseVM.MeasurementCursor2VM, timebaseVM, false,
-                    bothCursorsVisible ? () => timebaseVM.MeasurementCursor1VM.Value : (Func<double>)null,
+                    graphbaseVM.MeasurementCursor2VM, graphbaseVM, false,
+                    bothCursorsVisible ? () => graphbaseVM.MeasurementCursor1VM.Value : (Func<double>)null,
                     () => _referenceTime));
 
             }
@@ -321,7 +321,7 @@ namespace ScopeLib.Display.Views
                     SampleSequence = objects[1] as Func<SampleSequence>
                 },
                 _viewModel.ChannelVMs, _viewModel.SampleSequenceProviders)
-                .OrderByDescending(item => item.ChannelVM == _viewModel.TimebaseVM.TriggerVM.ChannelVM);
+                .OrderByDescending(item => item.ChannelVM == _viewModel.GraphbaseVM.TriggerVM.ChannelVM);
 
             // Create the scope graphs (essentially consisting of channel information and sample sequence providers).
             // Note that the trigger channel comes first.
@@ -362,7 +362,7 @@ namespace ScopeLib.Display.Views
 
             // Note that the last cursor in the list has the highest priority when 
             // searching them after a click.
-            var boundCursors = CreateChannelCursors().Concat(CreateTimebaseCursors());
+            var boundCursors = CreateChannelCursors().Concat(CreateGraphbaseCursors());
             _scopeGraphics.Cursors =
                 boundCursors.Select(cursor => cursor.EmbeddedCursor).Concat(demoCursors);
 

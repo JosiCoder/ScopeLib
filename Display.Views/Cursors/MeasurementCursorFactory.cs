@@ -43,7 +43,7 @@ namespace ScopeLib.Display.Views
         /// </summary>
         internal static BoundCursor CreateTimeMeasurementCursor(
             MeasurementCursorViewModel cursorVM,
-            TimebaseViewModel timebaseVM,
+            GraphbaseViewModel graphbaseVM,
             bool isReferenceCursor,
             Func<double> deltaReferenceLevelProvider,
             Func<double> referenceLevelProvider)
@@ -55,8 +55,8 @@ namespace ScopeLib.Display.Views
 
             var influencingObjects = new INotifyPropertyChanged[]
             {
-                timebaseVM,
-                timebaseVM.TriggerVM,
+                graphbaseVM,
+                graphbaseVM.TriggerVM,
             };
 
             return CreateMeasurementCursor(
@@ -65,11 +65,11 @@ namespace ScopeLib.Display.Views
                 () => cursorVM.Value,
                 bindingProvider,
                 deltaReferenceLevelProvider,
-                () => timebaseVM.TimeScaleFactor,
-                () => timebaseVM.TriggerVM.HorizontalPosition,
+                () => graphbaseVM.ScaleFactor,
+                () => graphbaseVM.TriggerVM.HorizontalPosition,
                 referenceLevelProvider,
-                timebaseVM.BaseUnitString,
-                timebaseVM.Color,
+                graphbaseVM.BaseUnitString,
+                graphbaseVM.Color,
                 influencingObjects);
         }
 

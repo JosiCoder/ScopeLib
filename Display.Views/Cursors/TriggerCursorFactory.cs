@@ -135,9 +135,9 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Creates a trigger point cursor.
         /// </summary>
-        internal static BoundCursor CreateTriggerPointCursor(TimebaseViewModel timebaseVM)
+        internal static BoundCursor CreateTriggerPointCursor(GraphbaseViewModel graphbaseVM)
         {
-            var triggerVM = timebaseVM.TriggerVM;
+            var triggerVM = graphbaseVM.TriggerVM;
 
             Func<String> triggerStateCaptionProvider = () =>
                 triggerVM.State == TriggerState.Armed ? _armedCaption
@@ -145,10 +145,10 @@ namespace ScopeLib.Display.Views
                 : "";
 
             Func<String> positionTextProvider = () =>
-                UnitHelper.BuildValueText(timebaseVM.BaseUnitString,
-                    triggerVM.HorizontalPosition / timebaseVM.TimeScaleFactor);
+                UnitHelper.BuildValueText(graphbaseVM.BaseUnitString,
+                    triggerVM.HorizontalPosition / graphbaseVM.ScaleFactor);
 
-            var markerColor = CairoHelpers.ToCairoColor(timebaseVM.Color);
+            var markerColor = CairoHelpers.ToCairoColor(graphbaseVM.Color);
 
             var cursor = new ScopeCursor
             {

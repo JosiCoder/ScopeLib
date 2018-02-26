@@ -42,7 +42,7 @@
     <Compile Include="Trigger\LevelTriggerViewModel.cs" />
     <Compile Include="Trigger\NullTriggerViewModel.cs" />
     <Compile Include="Trigger\TriggerViewModelBase.cs" />
-    <Compile Include="Measurement Base\TimebaseViewModel.cs" />
+    <Compile Include="Graphbase\GraphbaseViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -61,6 +61,6 @@
     <Folder Include="Miscellaneous\" />
     <Folder Include="Channels\" />
     <Folder Include="Trigger\" />
-    <Folder Include="Measurement Base\" />
+    <Folder Include="Graphbase\" />
   </ItemGroup>
 </Project>
