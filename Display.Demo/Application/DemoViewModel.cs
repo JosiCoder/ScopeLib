@@ -52,21 +52,37 @@ namespace ScopeLib.Display.Demo
 
         private IEnumerable<SampleSequence> CreateSampleSequences()
         {
-            var channel1SampleFrequency = 64;
-            var channel1XInterval = 1/(double)channel1SampleFrequency;
-            var channel1values =
-                FunctionValueGenerator.GenerateSineValuesForFrequency(1, channel1SampleFrequency, 4,
-                    (x, y) => y).Take(256); //TODO: must be a power of 2 for FFT
+            yield return CreateDemoSampleSequenceA();
+            yield return CreateDemoSampleSequenceB();
+        }
 
-            var channel2SampleFrequency = 1;
-            var channel2XInterval = 1/(double)channel2SampleFrequency;
-            var channel2values =  new []{ -1d, 0d, 2d, 3d };
+        private SampleSequence CreateDemoSampleSequenceB()
+        {
+            var sampleFrequency = 1;
+            var sampleInterval = 1/(double)sampleFrequency;
+
+            var values =  new []{ -1d, 0d, 2d, 3d };
+
+            return new SampleSequence(sampleInterval, values);
+        }
+
+        private SampleSequence CreateDemoSampleSequenceA()
+        {
+            var sampleFrequency = 64;
+            var duration = 4;
+            var numberOfSamples = sampleFrequency * duration;
+
+            // Determine the largest possible FFT frame size, must be a power of 2.
+            var fftFrameSize = (int)(0.5 + Math.Pow(2, Math.Floor(Math.Log (numberOfSamples, 2))));
+            var sampleInterval = 1/(double)sampleFrequency;
+
+            var values =
+                FunctionValueGenerator.GenerateSineValuesForFrequency(1, sampleFrequency, duration,
+                    (x, y) => y).Take(fftFrameSize);
 
             // LogDeferredAccess shows us some details about how the values are accessed (see there).
-//            yield return new SampleSequence(channel1XInterval, channel1values);
-            yield return new SampleSequence(channel1XInterval, LogDeferredAccess(channel1values));
-            yield return new SampleSequence(channel2XInterval, channel2values);
-//            yield return new SampleSequence(channel2XInterval, LogDeferredAccess(channel2values));
+            return new SampleSequence(sampleInterval, values);
+            //return new SampleSequence(sampleInterval, LogDeferredAccess(values));
         }
 
         private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,

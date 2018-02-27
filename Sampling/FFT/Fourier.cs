@@ -5,7 +5,12 @@ using Lomont;
 
 namespace ScopeLib.Sampling
 {
-    //TODO
+    /// <summary>
+    /// Provides FFT transform for converting time-domain data to the frequency-domain
+    /// and vice versa. It is based on the work of other people I appreciate.
+    /// More information about different FFT implementations is available here:
+    /// https://www.codeproject.com/Articles/1095473/Comparison-of-FFT-implementations-for-NET
+    /// </summary>
     public class Fourier
     {
         private readonly LomontFFT _fft = new LomontFFT();
@@ -19,16 +24,13 @@ namespace ScopeLib.Sampling
         public SampleSequence TransformForward(SampleSequence timeDomainSamples)
         {
             var fftValues = timeDomainSamples.Values.ToArray();
+            var sampleRate = 1 / timeDomainSamples.XInterval;
 
-            // FFT frequency resolution is (sample rate) / (number of samples).
-            var frequencyResolution =
-                (1/timeDomainSamples.XInterval) / fftValues.Length;
+            // FFT frequency resolution is (sample rate) / (FFT window size).
+            var frequencyResolution = sampleRate / fftValues.Length;
 
-            _fft.RealFFT(fftValues, true);
-            var amplitudes = ComputeAmplitudes(fftValues);
-
-            //TODO Test
-            var a = amplitudes.ToArray();
+            _fft.RealFFT(fftValues, true); // fftValues is modified in place
+            var amplitudes = ComputeAmplitudes(fftValues).ToArray();
 
             return new SampleSequence(frequencyResolution, amplitudes);
         }
