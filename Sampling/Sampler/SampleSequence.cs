@@ -30,21 +30,30 @@ namespace ScopeLib.Sampling
         /// <summary>
         /// Initializes an instance of this class.
         /// </summary>
-        /// <param name="xInterval">The increment along the X axis between two successive samples.</param>
+        /// <param name="sampleInterval">The increment along the X axis between two successive samples.</param>
         /// <param name="values">
         /// The sample values. They are cached to ensure that they aren't accessed multiple times.
         /// </param>
-        public SampleSequence (double xInterval, IEnumerable<double> values)
+        public SampleSequence (double sampleInterval, IEnumerable<double> values)
         {
-            XInterval = xInterval;
+            SampleInterval = sampleInterval;
             Values = values.ToCachedEnumerable();
         }
 
         /// <summary>
         /// Gets or sets the increment along the X axis between two successive samples.
         /// </summary>
-        public double XInterval
+        public double SampleInterval
         { get; set; }
+
+        /// <summary>
+        /// Gets the sample rate, i.e. the reverse of the sample interval.
+        /// </summary>
+        public double SampleRate
+        {
+            get { return 1f / SampleInterval; }
+            set { SampleInterval = 1f / value; }
+        }
 
         /// <summary>
         /// Gets or sets the sample values.

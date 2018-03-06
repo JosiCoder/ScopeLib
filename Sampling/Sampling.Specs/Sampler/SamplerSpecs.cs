@@ -186,7 +186,7 @@ namespace ScopeLib.Sampling.Specs
             [Test]
             public void then_each_sample_sequence_should_have_a_reference_x_corresponding_to_the_trigger_reference_time ()
             {
-                var triggerReferenceTime = _indexOfTriggeringItem * _sequences[_triggerChannelIndex].XInterval;
+                var triggerReferenceTime = _indexOfTriggeringItem * _sequences[_triggerChannelIndex].SampleInterval;
                 _sequences.ForEachDo(sequence => sequence.ReferenceX.ShouldEqual(triggerReferenceTime));
             }
         }

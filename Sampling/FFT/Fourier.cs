@@ -32,7 +32,7 @@ namespace ScopeLib.Sampling
         public SampleSequence TransformForward(SampleSequence timeDomainSamples)
         {
             var fftValues = timeDomainSamples.Values.ToArray();
-            var sampleRate = 1 / timeDomainSamples.XInterval;
+            var sampleRate = timeDomainSamples.SampleRate;
 
             // FFT frequency resolution is (sample rate) / (FFT window size).
             var frequencyResolution = sampleRate / fftValues.Length;

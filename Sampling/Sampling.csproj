@@ -39,12 +39,16 @@
     <Compile Include="Sampler\SampleSequence.cs" />
     <Compile Include="FFT\LomontFFT.cs" />
     <Compile Include="FFT\Fourier.cs" />
+    <Compile Include="Interpolation\IInterpolator.cs" />
+    <Compile Include="Interpolation\LinearInterpolator.cs" />
+    <Compile Include="Interpolation\SincInterpolator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Sampler\" />
     <Folder Include="Trigger\" />
     <Folder Include="FFT\" />
+    <Folder Include="Interpolation\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

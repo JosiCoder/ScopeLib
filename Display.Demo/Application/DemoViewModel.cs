@@ -57,32 +57,41 @@ namespace ScopeLib.Display.Demo
         {
             var duration = 4.000000001; // ensure that the last point is included.
 
-            yield return CreateDemoSampleSequenceA(duration, 64);
-            yield return CreateDemoSampleSequenceA(duration, 4, 64);
+            yield return CreateDemoSampleSequence(duration, 64);
+
+            //var interpolator = new LinearInterpolator();
+            var interpolator = new SincInterpolator();
+            yield return CreateDemoSampleSequence(duration, 4, interpolator, 64);
             //yield return CreateDemoSampleSequenceB();
         }
 
         /// <summary>
         /// Creates a sample sequence used to demonstrate scope features.
         /// </summary>
-        private SampleSequence CreateDemoSampleSequenceA(double duration, int sampleFrequency,
-            int? interpolatedSampleFrequency = null)
+        private SampleSequence CreateDemoSampleSequence(double duration, int sampleRate)
         {
-            var values = FunctionValueGenerator.GenerateSineValuesForFrequency (1, sampleFrequency,
+            return CreateDemoSampleSequence(duration, sampleRate, null, 0);
+        }
+        
+        /// <summary>
+        /// Creates a sample sequence used to demonstrate scope features.
+        /// </summary>
+        private SampleSequence CreateDemoSampleSequence(double duration, int sampleRate,
+            IInterpolator interpolator, int interpolatedSampleRate)
+        {
+            var values = FunctionValueGenerator.GenerateSineValuesForFrequency (1, sampleRate,
                 duration, (x, y) => y);
 
-            if (interpolatedSampleFrequency.HasValue)
+            if (interpolator != null)
             {
-//                values = CalculateLinearInterpolation(0, duration, 1f/sampleFrequency,
-//                    1f/interpolatedSampleFrequency.Value, values);
-                values = CalculateSincInterpolation(0, duration, 1f/sampleFrequency,
-                    1f/interpolatedSampleFrequency.Value, values);
+                values = interpolator.Interpolate(values, 0, duration,
+                    sampleRate, interpolatedSampleRate);
 
-                sampleFrequency = interpolatedSampleFrequency.Value;
+                sampleRate = interpolatedSampleRate;
             }
 
             // LogDeferredAccess shows us some details about how the values are accessed (see there).
-            return new SampleSequence(1f/sampleFrequency, values);
+            return new SampleSequence(1f/sampleRate, values);
             //return new SampleSequence(1/sampleFrequency, LogDeferredAccess(values));
         }
 
@@ -94,108 +103,6 @@ namespace ScopeLib.Display.Demo
             var sampleFrequency = 1;
             var values =  new []{ -1d, 0d, 2d, 3d };
             return new SampleSequence(1f/sampleFrequency, values);
-        }
-
-        /// <summary>
-        /// Interpolates the specified original values linearly, i.e. by calculating a weighted
-        /// average of the neighboring sample values of each target position.
-        /// See http://cdn.teledynelecroy.com/files/whitepapers/wp_interpolation_102203.pdf
-        /// for more details.
-        /// </summary>
-        /// <param name="startTime">
-        /// The point in time to return the first interpolated value for.
-        /// </param>
-        /// <param name="endTime">
-        /// The point in time to return the last interpolated value for.
-        /// </param>
-        /// <param name="originalSampleInterval">
-        /// The sample interval of the original sample values.
-        /// </param>
-        /// <param name="interpolatedSampleInterval">
-        /// The sample interval of the interpolated sample values returned.
-        /// </param>
-        /// <param name="originalValues">The original sample values.</param>
-        /// <returns>The interpolated sample values.</returns>
-        private IEnumerable<double> CalculateLinearInterpolation(
-            double startTime, double endTime,
-            double originalSampleInterval, double interpolatedSampleInterval,
-            IEnumerable<double> originalValues)
-        {
-            var T = originalSampleInterval;
-            var list = new List<double> ();
-
-            // For each interpolated value to create.
-            for (var t = startTime; t <= endTime; t += interpolatedSampleInterval)
-            {
-                // Use a triangular interpolation window in the closed interval from t-T to t+T. Get the
-                // values within that window (2 or 3 values are expected).
-                var windowValues = originalValues
-                    .Select ((y, n) => new {y, t = n*T})
-                    .Where(x_of_t => x_of_t.t >= (t-T) && x_of_t.t <= (t+T))
-                    .ToArray();
-
-                // If there are three values within the window, just take the center value as it corresponds to t.
-                // If there are two values within the window, take the average of both values, inversely weighted
-                // by their normalized distance to t.
-                var value =
-                    windowValues.Length == 3 ? windowValues[1].y
-                    : windowValues.Length == 2 ? windowValues.Sum(x_of_t => x_of_t.y * (1-Math.Abs(t-x_of_t.t)/T))
-                    : 0d;
-
-                list.Add (value);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// Interpolates the specified original values using the sinc interpolation.
-        /// See https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula
-        /// for more details.
-        /// </summary>
-        /// <param name="startTime">
-        /// The point in time to return the first interpolated value for.
-        /// </param>
-        /// <param name="endTime">
-        /// The point in time to return the last interpolated value for.
-        /// </param>
-        /// <param name="originalSampleInterval">
-        /// The sample interval of the original sample values.
-        /// </param>
-        /// <param name="interpolatedSampleInterval">
-        /// The sample interval of the interpolated sample values returned.
-        /// </param>
-        /// <param name="originalValues">The original sample values.</param>
-        /// <returns>The interpolated sample values.</returns>
-        private IEnumerable<double> CalculateSincInterpolation(
-            double startTime, double endTime,
-            double originalSampleInterval, double interpolatedSampleInterval,
-            IEnumerable<double> originalValues)
-        {
-            var T = originalSampleInterval;
-            var list = new List<double> ();
-
-            // For each interpolated value to create.
-            for (var t = startTime; t <= endTime; t += interpolatedSampleInterval)
-            {
-                // Interpolate using an interpolation window that spans across all available original values
-                // Ideally, it should be -infinity to +infinity. Thus, we get interpolation artifacts at both
-                // ends of the value sequence.
-                var value = originalValues
-                    .Select ((y, n) => new {y, n})
-                    .Sum(x_of_n => x_of_n.y * Sinc((t - x_of_n.n * T) / T));
-                list.Add (value);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// Calculates the normalized sinc value of the value specified.
-        /// See https://en.wikipedia.org/wiki/Sinc_function for more details.
-        /// </summary>
-        private double Sinc(double x)
-        {
-            var nv = Math.PI * x;
-            return x == 0f ? 1 : (Math.Sin (nv) / nv);
         }
 
         /// <summary>
@@ -311,7 +218,7 @@ namespace ScopeLib.Display.Demo
             // Determine the largest possible FFT frame size, must be a power of 2.
             var numberOfSamples = values.Length;
             var fftFrameSize = (int)(0.5 + Math.Pow (2, Math.Floor (Math.Log (numberOfSamples, 2))));
-            var trimmedSampleSequence = new SampleSequence (samples.XInterval, values.Take (fftFrameSize));
+            var trimmedSampleSequence = new SampleSequence (samples.SampleInterval, values.Take (fftFrameSize));
             return new Fourier().TransformForward (trimmedSampleSequence);
         }
 

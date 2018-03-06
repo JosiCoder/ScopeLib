@@ -101,7 +101,7 @@ namespace ScopeLib.Sampling
                         // TODO: Interpolate considering values before and after trigger. 
                         triggerX =
                             Trigger.State == TriggerState.Triggered ?
-                            numberOfValuesTakenBeforeTrigger * sampleSequence.XInterval
+                            numberOfValuesTakenBeforeTrigger * sampleSequence.SampleInterval
                             : 0;
                     }
 

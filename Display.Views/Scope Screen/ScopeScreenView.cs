@@ -210,7 +210,7 @@ namespace ScopeLib.Display.Views
                 ReferencePoint =
                     new Cairo.PointD(sampleSequence.ReferenceX, _referenceLevel),
                 Vertices = sampleSequence.Values
-                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.XInterval * graphbaseVM.ScaleFactor, value)),
+                    .Select((value, counter) => new Cairo.PointD (counter * sampleSequence.SampleInterval * graphbaseVM.ScaleFactor, value)),
             };
         }
 
