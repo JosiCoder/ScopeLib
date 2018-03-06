@@ -61,7 +61,7 @@ namespace ScopeLib.Display.Demo
 
             //var interpolator = new LinearInterpolator();
             var interpolator = new SincInterpolator();
-            yield return CreateDemoSampleSequence(duration, 4, interpolator, 64);
+            yield return CreateDemoSampleSequence(duration, 8, interpolator, 64);
             //yield return CreateDemoSampleSequenceB();
         }
 
@@ -79,8 +79,15 @@ namespace ScopeLib.Display.Demo
         private SampleSequence CreateDemoSampleSequence(double duration, int sampleRate,
             IInterpolator interpolator, int interpolatedSampleRate)
         {
-            var values = FunctionValueGenerator.GenerateSineValuesForFrequency (1, sampleRate,
+            var values1 = FunctionValueGenerator.GenerateSineValuesForFrequency (1, sampleRate,
                 duration, (x, y) => y);
+            var values3 = FunctionValueGenerator.GenerateSineValuesForFrequency (3, sampleRate,
+                duration, (x, y) => y/2);
+
+            var values = CollectionUtilities.Zip(
+                objects => ((double)objects[0]) + ((double)objects[1]),
+                values1,
+                values3);
 
             if (interpolator != null)
             {
