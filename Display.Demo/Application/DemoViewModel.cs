@@ -45,46 +45,162 @@ namespace ScopeLib.Display.Demo
         public DemoViewModel ()
         {
             var sampleSequences = CreateSampleSequences();
+
             ConfigureMainScopeScreenVM(_masterScopeScreenVM, sampleSequences);
-            //ConfigureZoomScopeScreenVM(_slaveScopeScreenVM);
-            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequences.First());
+            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequences);
         }
 
+        /// <summary>
+        /// Creates some sample sequences used to demonstrate scope features.
+        /// </summary>
         private IEnumerable<SampleSequence> CreateSampleSequences()
         {
-            yield return CreateDemoSampleSequenceA();
-            yield return CreateDemoSampleSequenceB();
+            var duration = 4.000000001; // ensure that the last point is included.
+
+            yield return CreateDemoSampleSequenceA(duration, 64);
+            yield return CreateDemoSampleSequenceA(duration, 4, 64);
+            //yield return CreateDemoSampleSequenceB();
         }
 
+        /// <summary>
+        /// Creates a sample sequence used to demonstrate scope features.
+        /// </summary>
+        private SampleSequence CreateDemoSampleSequenceA(double duration, int sampleFrequency,
+            int? interpolatedSampleFrequency = null)
+        {
+            var values = FunctionValueGenerator.GenerateSineValuesForFrequency (1, sampleFrequency,
+                duration, (x, y) => y);
+
+            if (interpolatedSampleFrequency.HasValue)
+            {
+//                values = CalculateLinearInterpolation(0, duration, 1f/sampleFrequency,
+//                    1f/interpolatedSampleFrequency.Value, values);
+                values = CalculateSincInterpolation(0, duration, 1f/sampleFrequency,
+                    1f/interpolatedSampleFrequency.Value, values);
+
+                sampleFrequency = interpolatedSampleFrequency.Value;
+            }
+
+            // LogDeferredAccess shows us some details about how the values are accessed (see there).
+            return new SampleSequence(1f/sampleFrequency, values);
+            //return new SampleSequence(1/sampleFrequency, LogDeferredAccess(values));
+        }
+
+        /// <summary>
+        /// Creates a sample sequence used to demonstrate scope features.
+        /// </summary>
         private SampleSequence CreateDemoSampleSequenceB()
         {
             var sampleFrequency = 1;
-            var sampleInterval = 1/(double)sampleFrequency;
-
             var values =  new []{ -1d, 0d, 2d, 3d };
-
-            return new SampleSequence(sampleInterval, values);
+            return new SampleSequence(1f/sampleFrequency, values);
         }
 
-        private SampleSequence CreateDemoSampleSequenceA()
+        /// <summary>
+        /// Interpolates the specified original values linearly, i.e. by calculating a weighted
+        /// average of the neighboring sample values of each target position.
+        /// See http://cdn.teledynelecroy.com/files/whitepapers/wp_interpolation_102203.pdf
+        /// for more details.
+        /// </summary>
+        /// <param name="startTime">
+        /// The point in time to return the first interpolated value for.
+        /// </param>
+        /// <param name="endTime">
+        /// The point in time to return the last interpolated value for.
+        /// </param>
+        /// <param name="originalSampleInterval">
+        /// The sample interval of the original sample values.
+        /// </param>
+        /// <param name="interpolatedSampleInterval">
+        /// The sample interval of the interpolated sample values returned.
+        /// </param>
+        /// <param name="originalValues">The original sample values.</param>
+        /// <returns>The interpolated sample values.</returns>
+        private IEnumerable<double> CalculateLinearInterpolation(
+            double startTime, double endTime,
+            double originalSampleInterval, double interpolatedSampleInterval,
+            IEnumerable<double> originalValues)
         {
-            var sampleFrequency = 64;
-            var duration = 4;
-            var numberOfSamples = sampleFrequency * duration;
+            var T = originalSampleInterval;
+            var list = new List<double> ();
 
-            // Determine the largest possible FFT frame size, must be a power of 2.
-            var fftFrameSize = (int)(0.5 + Math.Pow(2, Math.Floor(Math.Log (numberOfSamples, 2))));
-            var sampleInterval = 1/(double)sampleFrequency;
+            // For each interpolated value to create.
+            for (var t = startTime; t <= endTime; t += interpolatedSampleInterval)
+            {
+                // Use a triangular interpolation window in the closed interval from t-T to t+T. Get the
+                // values within that window (2 or 3 values are expected).
+                var windowValues = originalValues
+                    .Select ((y, n) => new {y, t = n*T})
+                    .Where(x_of_t => x_of_t.t >= (t-T) && x_of_t.t <= (t+T))
+                    .ToArray();
 
-            var values =
-                FunctionValueGenerator.GenerateSineValuesForFrequency(1, sampleFrequency, duration,
-                    (x, y) => y).Take(fftFrameSize);
+                // If there are three values within the window, just take the center value as it corresponds to t.
+                // If there are two values within the window, take the average of both values, inversely weighted
+                // by their normalized distance to t.
+                var value =
+                    windowValues.Length == 3 ? windowValues[1].y
+                    : windowValues.Length == 2 ? windowValues.Sum(x_of_t => x_of_t.y * (1-Math.Abs(t-x_of_t.t)/T))
+                    : 0d;
 
-            // LogDeferredAccess shows us some details about how the values are accessed (see there).
-            return new SampleSequence(sampleInterval, values);
-            //return new SampleSequence(sampleInterval, LogDeferredAccess(values));
+                list.Add (value);
+            }
+            return list;
         }
 
+        /// <summary>
+        /// Interpolates the specified original values using the sinc interpolation.
+        /// See https://en.wikipedia.org/wiki/Whittaker%E2%80%93Shannon_interpolation_formula
+        /// for more details.
+        /// </summary>
+        /// <param name="startTime">
+        /// The point in time to return the first interpolated value for.
+        /// </param>
+        /// <param name="endTime">
+        /// The point in time to return the last interpolated value for.
+        /// </param>
+        /// <param name="originalSampleInterval">
+        /// The sample interval of the original sample values.
+        /// </param>
+        /// <param name="interpolatedSampleInterval">
+        /// The sample interval of the interpolated sample values returned.
+        /// </param>
+        /// <param name="originalValues">The original sample values.</param>
+        /// <returns>The interpolated sample values.</returns>
+        private IEnumerable<double> CalculateSincInterpolation(
+            double startTime, double endTime,
+            double originalSampleInterval, double interpolatedSampleInterval,
+            IEnumerable<double> originalValues)
+        {
+            var T = originalSampleInterval;
+            var list = new List<double> ();
+
+            // For each interpolated value to create.
+            for (var t = startTime; t <= endTime; t += interpolatedSampleInterval)
+            {
+                // Interpolate using an interpolation window that spans across all available original values
+                // Ideally, it should be -infinity to +infinity. Thus, we get interpolation artifacts at both
+                // ends of the value sequence.
+                var value = originalValues
+                    .Select ((y, n) => new {y, n})
+                    .Sum(x_of_n => x_of_n.y * Sinc((t - x_of_n.n * T) / T));
+                list.Add (value);
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Calculates the normalized sinc value of the value specified.
+        /// See https://en.wikipedia.org/wiki/Sinc_function for more details.
+        /// </summary>
+        private double Sinc(double x)
+        {
+            var nv = Math.PI * x;
+            return x == 0f ? 1 : (Math.Sin (nv) / nv);
+        }
+
+        /// <summary>
+        /// Configures the main scope screen viewmodel.
+        /// </summary>
         private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
             IEnumerable<SampleSequence> sampleSequences)
         {
@@ -93,7 +209,7 @@ namespace ScopeLib.Display.Demo
             var timeScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("V", new Position(0.0, 1.0), timeScaleFactor, 1,
+                new ChannelViewModel("V", new Position(0, 1), timeScaleFactor, 1,
                     BuildChannelCaptionFromIndex(0), _channelColors[0]),
                 new ChannelViewModel("V", new Position(0, -2), timeScaleFactor, 1,
                     BuildChannelCaptionFromIndex(1), _channelColors[1]),
@@ -104,11 +220,11 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Visible = true;
             channelVMs[index].MeasurementCursor1VM.Value = 2.0;
             channelVMs[index].MeasurementCursor2VM.Value = 3.0;
-            index++;
-            channelVMs[index].MeasurementCursor1VM.Visible = true;
-            channelVMs[index].MeasurementCursor2VM.Visible = true;
-            channelVMs[index].MeasurementCursor1VM.Value = -0.5;
-            channelVMs[index].MeasurementCursor2VM.Value = 0.5;
+            //            index++;
+            //            channelVMs[index].MeasurementCursor1VM.Visible = true;
+            //            channelVMs[index].MeasurementCursor2VM.Visible = true;
+            //            channelVMs[index].MeasurementCursor1VM.Value = -0.5;
+            //            channelVMs[index].MeasurementCursor2VM.Value = 0.5;
             scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Graphbase configuration ===
@@ -135,16 +251,21 @@ namespace ScopeLib.Display.Demo
             scopeScreenVM.SampleSequenceProviders = sampler.SampleSequenceProviders;
         }
 
+        /// <summary>
+        /// Configures the FFT scope screen viewmodel.
+        /// </summary>
         private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            SampleSequence sampleSequence)
+            IEnumerable<SampleSequence> sampleSequences)
         {
             // === Channels configuration ===
 
             var frequencyScaleFactor = 1;
             var channelVMs = new[]
             {
-                new ChannelViewModel("dB?", new Position(0, -2), frequencyScaleFactor, 0.5,
+                new ChannelViewModel("dB?", new Position(0, 1), frequencyScaleFactor, 0.5,
                     BuildChannelCaptionFromIndex(0), _channelColors[0]),//TODO Unit
+                new ChannelViewModel("dB?", new Position(0, -2), frequencyScaleFactor, 0.5,
+                    BuildChannelCaptionFromIndex(1), _channelColors[1]),//TODO Unit
             };
 
             var index = 0;
@@ -152,6 +273,11 @@ namespace ScopeLib.Display.Demo
             channelVMs[index].MeasurementCursor2VM.Visible = true;
             channelVMs[index].MeasurementCursor1VM.Value = -0.5;
             channelVMs[index].MeasurementCursor2VM.Value = 0.5;
+            //            index++;
+            //            channelVMs[index].MeasurementCursor1VM.Visible = true;
+            //            channelVMs[index].MeasurementCursor2VM.Visible = true;
+            //            channelVMs[index].MeasurementCursor1VM.Value = -0.5;
+            //            channelVMs[index].MeasurementCursor2VM.Value = 0.5;
             scopeScreenVM.ChannelVMs = channelVMs;
 
             // === Graphbase configuration ===
@@ -166,15 +292,27 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var channel1FourierSamples =
-                new Fourier().TransformForward(sampleSequence);
-
-            var sampleSequenceProviders = new Func<SampleSequence>[]
-            {
-                () => channel1FourierSamples,
-            };
+            var sampleSequenceProviders =
+                sampleSequences.Select(ss =>
+                    {
+                        var fftSamples = DoFourierTransform(ss);
+                        return new Func<SampleSequence>(() => fftSamples);
+                    });
 
             scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+        }
+
+        /// <summary>
+        /// Transforms a time domain samples sequence to the frequency domain.
+        /// </summary>
+        private SampleSequence DoFourierTransform(SampleSequence samples)
+        {
+            var values = samples.Values.ToArray ();
+            // Determine the largest possible FFT frame size, must be a power of 2.
+            var numberOfSamples = values.Length;
+            var fftFrameSize = (int)(0.5 + Math.Pow (2, Math.Floor (Math.Log (numberOfSamples, 2))));
+            var trimmedSampleSequence = new SampleSequence (samples.XInterval, values.Take (fftFrameSize));
+            return new Fourier().TransformForward (trimmedSampleSequence);
         }
 
         /// <summary>
@@ -211,4 +349,3 @@ namespace ScopeLib.Display.Demo
         }
     }
 }
-
