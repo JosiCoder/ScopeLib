@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Builds the CtLab Library component.
+
+solution="ScopeLib.sln"
+
+cd "$(dirname "$0")"
+
+./do-build "$1" "$solution"

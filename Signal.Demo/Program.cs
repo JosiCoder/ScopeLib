@@ -27,7 +27,7 @@ namespace ScopeLib.Signal.Demo
 {
     class MainClass
     {
-        private const string _inFilePath = @"../../Demo Data/DemoWaveformFile.wav";
+        private const string _inFilePath = @"DemoWaveformFile.wav";
         private const string _copyFile1Path = @"TempDemoStreamCopy.wav";
         private const string _copyFile2Path = @"TempDemoMemoryCopy.wav";
         private const string _createFile3Path = @"TempDemoGenerated.wav";

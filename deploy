@@ -1,0 +1,24 @@
+#!/bin/bash
+# Performs some post-build steps.
+# $1 is expected to be set to the build output directory to get the
+# files to deploy from.
+
+set -e
+trap "exit" INT TERM EXIT
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <buildDir>"
+    exit
+fi
+
+projectDir=$(dirname "$0")
+buildDir="$1"
+artifactsDir="$projectDir/Artifacts"
+deploymentDir="$projectDir/Deployment"
+
+[ ! -d "$deploymentDir" ] && mkdir "$deploymentDir"
+[ -d "$buildDir" ] && cp --preserve=timestamps "$buildDir"/* "$deploymentDir"
+[ -d "$artifactsDir" ] && cp --preserve=timestamps "$artifactsDir"/* "$deploymentDir"
+
+[ -f "$deploymentDir"/displaydemo ] && chmod u+x "$deploymentDir"/displaydemo
+[ -f "$deploymentDir"/signaldemo ] && chmod u+x "$deploymentDir"/signaldemo
