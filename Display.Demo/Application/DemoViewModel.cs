@@ -114,7 +114,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the main scope screen viewmodel.
         /// </summary>
         private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            Func<IEnumerable<SampleSequence>> sampleSequenceGenerator)
+            Func<IEnumerable<SampleSequence>> sampleSequencesGenerator)
         {
             // === Channels configuration ===
 
@@ -156,9 +156,9 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequence = sampleSequenceGenerator();
+            var sampleSequences = sampleSequencesGenerator();
             var sampleSequenceProviders =
-                sampleSequence.Select(ss => {
+                sampleSequences.Select(ss => {
                     return new Func<SampleSequence>(() => {
                         return ss;
                     });
@@ -172,7 +172,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the FFT scope screen viewmodel.
         /// </summary>
         private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            Func<IEnumerable<SampleSequence>> sampleSequenceGenerator)
+            Func<IEnumerable<SampleSequence>> sampleSequencesGenerator)
         {
             // === Channels configuration ===
 
@@ -209,9 +209,9 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequence = sampleSequenceGenerator();
+            var sampleSequences = sampleSequencesGenerator();
             var sampleSequenceProviders =
-                sampleSequence.Select(ss =>
+                sampleSequences.Select(ss =>
                     {
                         var fftSamples = DoFourierTransform(ss);
                         return new Func<SampleSequence>(() => fftSamples);
