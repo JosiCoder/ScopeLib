@@ -44,8 +44,10 @@ namespace ScopeLib.Display.Demo
         //TODO: comments (see also below)
         public DemoViewModel ()
         {
-            ConfigureMainScopeScreenVM(_masterScopeScreenVM, () => CreateSampleSequences());
-            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, () => CreateSampleSequences());
+            var sampleSequenceGenerators = CreateSampleSequences().Select(ss => new Func<SampleSequence>(() => ss));
+
+            ConfigureMainScopeScreenVM(_masterScopeScreenVM, sampleSequenceGenerators);
+            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequenceGenerators);
         }
 
         /// <summary>
@@ -114,7 +116,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the main scope screen viewmodel.
         /// </summary>
         private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            Func<IEnumerable<SampleSequence>> sampleSequencesGenerator)
+            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
         {
             // === Channels configuration ===
 
@@ -156,11 +158,10 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequences = sampleSequencesGenerator();
             var sampleSequenceProviders =
-                sampleSequences.Select(ss => {
+                sampleSequenceGenerators.Select(ssg => {
                     return new Func<SampleSequence>(() => {
-                        return ss;
+                        return ssg();
                     });
                 });
 
@@ -172,7 +173,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the FFT scope screen viewmodel.
         /// </summary>
         private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            Func<IEnumerable<SampleSequence>> sampleSequencesGenerator)
+            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
         {
             // === Channels configuration ===
 
@@ -209,11 +210,10 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequences = sampleSequencesGenerator();
             var sampleSequenceProviders =
-                sampleSequences.Select(ss =>
+                sampleSequenceGenerators.Select(ssg =>
                     {
-                        var fftSamples = DoFourierTransform(ss);
+                    var fftSamples = DoFourierTransform(ssg());
                         return new Func<SampleSequence>(() => fftSamples);
                     });
 
