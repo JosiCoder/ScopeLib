@@ -28,6 +28,12 @@ namespace ScopeLib.Display.ViewModels
     public interface ITriggerViewModel : INotifyPropertyChanged
     {
         /// <summary>
+        /// Gets the trigger.
+        /// </summary>
+        ITrigger Trigger
+        { get; }
+
+        /// <summary>
         /// Gets the trigger state.
         /// </summary>
         TriggerState State
@@ -53,7 +59,7 @@ namespace ScopeLib.Display.ViewModels
     public abstract class TriggerViewModelBase<TTrigger> : ViewModelBase, ITriggerViewModel
         where TTrigger : TriggerBase
     {
-        protected readonly TTrigger Trigger;
+        protected TTrigger InternalTrigger;
 
         /// <summary>
         /// Initializes an instance of this class.
@@ -64,8 +70,19 @@ namespace ScopeLib.Display.ViewModels
         /// </param>
         protected TriggerViewModelBase (TTrigger trigger, ChannelViewModel channelVM)
         {
-            Trigger = trigger;
+            InternalTrigger = trigger;
             ChannelVM = channelVM;
+        }
+
+        /// <summary>
+        /// Gets the trigger.
+        /// </summary>
+        public ITrigger Trigger
+        {
+            get
+            {
+                return InternalTrigger;
+            }
         }
 
         /// <summary>
@@ -75,7 +92,7 @@ namespace ScopeLib.Display.ViewModels
         {
             get
             {
-                return Trigger.State;
+                return InternalTrigger.State;
             }
         }
 

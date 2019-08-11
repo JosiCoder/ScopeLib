@@ -56,11 +56,11 @@ namespace ScopeLib.Display.ViewModels
         {
             get
             {
-                return Trigger.Mode;
+                return InternalTrigger.Mode;
             }
             set
             {
-                Trigger.Mode = value;
+                InternalTrigger.Mode = value;
                 RaisePropertyChanged();
             }
         }
@@ -72,11 +72,11 @@ namespace ScopeLib.Display.ViewModels
         {
             get
             {
-                return Trigger.Level;
+                return InternalTrigger.Level;
             }
             set
             {
-                Trigger.Level = value;
+                InternalTrigger.Level = value;
                 RaisePropertyChanged();
             }
         }

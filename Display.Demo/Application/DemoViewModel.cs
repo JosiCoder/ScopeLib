@@ -29,6 +29,8 @@ namespace ScopeLib.Display.Demo
     /// </summary>
     public class DemoViewModel
     {
+        private const int demoTriggerChannelIndex = 0;
+
         private const char _channelCaptionBaseSymbol = '\u278A';// one of '\u2460', '\u2776', '\u278A';
 
         private readonly Color _baseColor = new Color(0.5, 0.8, 1.0);
@@ -42,7 +44,7 @@ namespace ScopeLib.Display.Demo
         private readonly IScopeScreenViewModel _slaveScopeScreenVM = new ScopeScreenViewModel();
 
         //TODO: comments (see also below)
-        public DemoViewModel ()
+        public DemoViewModel()
         {
             var sampleSequenceGenerators = CreateSampleSequences().Select(ss => new Func<SampleSequence>(() => ss));
 
@@ -146,7 +148,7 @@ namespace ScopeLib.Display.Demo
             var graphbaseVM = new GraphbaseViewModel ("s", 1, _baseColor);
 
             var trigger = new LevelTrigger(LevelTriggerMode.RisingEdge, 0.5);
-            var triggerChannelIndex = 0;
+            var triggerChannelIndex = demoTriggerChannelIndex;
 
             graphbaseVM.TriggerVM =
                 new LevelTriggerViewModel(trigger, channelVMs[triggerChannelIndex]);
@@ -158,23 +160,25 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequenceProviders = BuildMainSampleSequenceProviders(sampleSequenceGenerators, trigger, triggerChannelIndex);
-            scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+            BuildMainSampleSequenceProviders(scopeScreenVM, sampleSequenceGenerators);
         }
 
         /// <summary>
         /// Builds a sequence provider for the main scope screen.
         /// </summary>
-        private IEnumerable<Func<SampleSequence>> BuildMainSampleSequenceProviders(
-            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators,
-            ITrigger trigger, int triggerChannelIndex)
+        private void BuildMainSampleSequenceProviders(
+            IScopeScreenViewModel scopeScreenVM,
+            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
         {
+            var triggerChannelIndex = demoTriggerChannelIndex;
+
             var sampleSequenceProviders = sampleSequenceGenerators.Select(ssg =>
             {
                 return new Func<SampleSequence>(() => ssg());
             });
+            var trigger = scopeScreenVM.GraphbaseVM.TriggerVM.Trigger;
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
-            return sampler.SampleSequenceProviders;
+            scopeScreenVM.SampleSequenceProviders = sampler.SampleSequenceProviders;
         }
 
         /// <summary>
@@ -218,17 +222,17 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequenceProviders = BuildFFTSampleSequenceProviders(sampleSequenceGenerators);
-            scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+            BuildFFTSampleSequenceProviders(scopeScreenVM, sampleSequenceGenerators);
         }
 
         /// <summary>
         /// Builds a sequence provider for the FFT scope screen.
         /// </summary>
-        private IEnumerable<Func<SampleSequence>> BuildFFTSampleSequenceProviders(
+        private void BuildFFTSampleSequenceProviders(
+            IScopeScreenViewModel scopeScreenVM,
             IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
         {
-            return sampleSequenceGenerators.Select(ssg =>
+            var sampleSequenceProviders = sampleSequenceGenerators.Select(ssg =>
             {
                 SampleSequence fftSamples;
                 try
@@ -241,6 +245,7 @@ namespace ScopeLib.Display.Demo
                 }
                 return new Func<SampleSequence>(() => fftSamples);
             });
+            scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
         }
 
         /// <summary>
