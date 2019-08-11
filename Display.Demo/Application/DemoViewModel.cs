@@ -158,14 +158,22 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequenceProviders =
-                sampleSequenceGenerators.Select(ssg =>
-                {
-                    return new Func<SampleSequence>(() => ssg());
-                });
-
+            var sampleSequenceProviders = BuildMainSampleSequenceProviders(sampleSequenceGenerators);
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
             scopeScreenVM.SampleSequenceProviders = sampler.SampleSequenceProviders;
+        }
+
+        /// <summary>
+        /// Builds a sequence provider for the main scope screen.
+        /// </summary>
+        private IEnumerable<Func<SampleSequence>> BuildMainSampleSequenceProviders(
+            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+        {
+            var sampleSequenceProviders = sampleSequenceGenerators.Select(ssg =>
+            {
+                return new Func<SampleSequence>(() => ssg());
+            });
+            return sampleSequenceProviders;
         }
 
         /// <summary>
@@ -209,22 +217,29 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            var sampleSequenceProviders =
-                sampleSequenceGenerators.Select(ssg =>
-                {
-                    SampleSequence fftSamples;
-                    try
-                    {
-                        fftSamples = DoFourierTransform(ssg());
-                    }
-                    catch
-                    {
-                        fftSamples = new SampleSequence(1, new double[0]);
-                    }
-                    return new Func<SampleSequence>(() => fftSamples);
-                });
-
+            var sampleSequenceProviders = BuildFFTSampleSequenceProviders(sampleSequenceGenerators);
             scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
+        }
+
+        /// <summary>
+        /// Builds a sequence provider for the FFT scope screen.
+        /// </summary>
+        private IEnumerable<Func<SampleSequence>> BuildFFTSampleSequenceProviders(
+            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+        {
+            return sampleSequenceGenerators.Select(ssg =>
+            {
+                SampleSequence fftSamples;
+                try
+                {
+                    fftSamples = DoFourierTransform(ssg());
+                }
+                catch
+                {
+                    fftSamples = new SampleSequence(1, new double[0]);
+                }
+                return new Func<SampleSequence>(() => fftSamples);
+            });
         }
 
         /// <summary>
