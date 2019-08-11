@@ -159,10 +159,9 @@ namespace ScopeLib.Display.Demo
             // === Sample Sequences ===
 
             var sampleSequenceProviders =
-                sampleSequenceGenerators.Select(ssg => {
-                    return new Func<SampleSequence>(() => {
-                        return ssg();
-                    });
+                sampleSequenceGenerators.Select(ssg =>
+                {
+                    return new Func<SampleSequence>(() => ssg());
                 });
 
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
@@ -212,10 +211,18 @@ namespace ScopeLib.Display.Demo
 
             var sampleSequenceProviders =
                 sampleSequenceGenerators.Select(ssg =>
+                {
+                    SampleSequence fftSamples;
+                    try
                     {
-                    var fftSamples = DoFourierTransform(ssg());
-                        return new Func<SampleSequence>(() => fftSamples);
-                    });
+                        fftSamples = DoFourierTransform(ssg());
+                    }
+                    catch
+                    {
+                        fftSamples = new SampleSequence(1, new double[0]);
+                    }
+                    return new Func<SampleSequence>(() => fftSamples);
+                });
 
             scopeScreenVM.SampleSequenceProviders = sampleSequenceProviders;
         }
