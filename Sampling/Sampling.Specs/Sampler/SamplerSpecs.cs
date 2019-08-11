@@ -48,8 +48,7 @@ namespace ScopeLib.Sampling.Specs
                 () => new SampleSequence(20, UseDeferred(_channel1values)),
             };
 
-            SUT = new Sampler(_triggerMock.Object, _triggerChannelIndex);
-            SUT.SetExternalSampleSequenceProviders(_sampleSequenceProviders);
+            SUT = new Sampler(_sampleSequenceProviders, _triggerMock.Object, _triggerChannelIndex);
         }
 
         private IEnumerable<double> UseDeferred(IEnumerable<double> values)
