@@ -27,29 +27,22 @@ namespace ScopeLib.Sampling
     /// </summary>
     public class Sampler
     {
-        private IEnumerable<Func<SampleSequence>> _wrappedSampleSequenceProviders;
+        private readonly IEnumerable<Func<SampleSequence>> _wrappedSampleSequenceProviders;
 
         /// <summary>
         /// Initializes an instance of this class.
-        /// </summary>
-        /// <param name="trigger">The trigger to use.</param>
-        /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
-        public Sampler (ITrigger trigger, int triggerChannelIndex)
-        {
-            Trigger = trigger;
-            TriggerChannelIndex = triggerChannelIndex;
-        }
-
-        /// <summary>
-        /// Sets the functions that provide the external signal sample sequences, one function per channel.
         /// </summary>
         /// <param name="externalSampleSequenceProviders">
         /// The functions that provide the external signal sample sequences, one function per channel.
         /// </param>
         /// <param name="trigger">The trigger to use.</param>
         /// <param name="triggerChannelIndex">The index of the channel to apply the trigger on.</param>
-        public void SetExternalSampleSequenceProviders (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders)
+        public Sampler (IEnumerable<Func<SampleSequence>> externalSampleSequenceProviders, ITrigger trigger,
+            int triggerChannelIndex)
         {
+            Trigger = trigger;
+            TriggerChannelIndex = triggerChannelIndex;
+
             _wrappedSampleSequenceProviders = ApplyTriggerAndAlignSampleSequences(externalSampleSequenceProviders);
         }
 
