@@ -38,7 +38,7 @@ namespace ScopeLib.Display.Views
 
         private const double _referenceTime = 0.0;
         private const double _referenceLevel = 0.0;
-        private const bool _captureContinuously = false;
+        private const bool _drawContinuously = false;
         private const double _xMinimumGraticuleUnits = 10.0;
         private const double _yMinimumGraticuleUnits = 8.0;
 
@@ -113,7 +113,7 @@ namespace ScopeLib.Display.Views
         {
             _scopeGraphics.Draw(scopeDrawingArea.Window);
 
-            if (_captureContinuously)
+            if (_drawContinuously)
             {
                 RefreshData();
                 RefreshGraphics();
@@ -398,7 +398,7 @@ namespace ScopeLib.Display.Views
                     Line = 1,
                     Column = 4,
                     TextProvider = () =>
-                        _captureContinuously ? string.Format ("{0} fps", _framesPerSecond) : "hold",
+                        string.Format ("{0} fps ({1})", _framesPerSecond, _drawContinuously ? "cont" : "evnt"),
                 },
             };
         }
