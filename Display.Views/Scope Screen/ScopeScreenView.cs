@@ -115,8 +115,8 @@ namespace ScopeLib.Display.Views
 
             if (_drawContinuously)
             {
-                RefreshData();
-                RefreshGraphics();
+                RefreshData(); // TODO: don't call for pure redraw, only for data refresh
+                Redraw();
             }
         }
 
@@ -133,7 +133,7 @@ namespace ScopeLib.Display.Views
             {
                 _scopeGraphics.FindAndHighlightCursorLines(new Cairo.PointD(args.Event.X, args.Event.Y));
             }
-            RefreshGraphics ();
+            Redraw();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace ScopeLib.Display.Views
         {
             _currentMouseButtons = args.Event.Button;
             _scopeGraphics.FindAndSelectCursorLines (new Cairo.PointD(args.Event.X, args.Event.Y));
-            RefreshGraphics ();
+            Redraw();
         }
 
         /// <summary>
@@ -154,13 +154,13 @@ namespace ScopeLib.Display.Views
             _currentMouseButtons = 0;
             _scopeGraphics.DeselectScopeCursorLines ();
             _scopeGraphics.FindAndHighlightCursorLines (new Cairo.PointD(args.Event.X, args.Event.Y));
-            RefreshGraphics ();
+            Redraw();
         }
 
         /// <summary>
-        /// Initiates a refresh of the scope graphics.
+        /// Initiates a redraw of the scope graphics.
         /// </summary>
-        private void RefreshGraphics()
+        private void Redraw()
         {
             var currentDrawSecond = DateTime.Now.Second;
             if (currentDrawSecond == _lastDrawSecond)
