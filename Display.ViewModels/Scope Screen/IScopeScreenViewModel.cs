@@ -16,6 +16,7 @@
 //--------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using ScopeLib.Sampling;
 
@@ -24,12 +25,12 @@ namespace ScopeLib.Display.ViewModels
     /// <summary>
     /// Provides access to a viewmodel of a scope screen.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public interface IScopeScreenViewModel: INotifyPropertyChanged
     {
         /// <summary>
-        /// Occurs when the sample sequences have been refreshed.
+        /// Occurs when the sample sequences have changed.
         /// </summary>
-        event EventHandler<SampleSequencesRefreshedEventArgs> SampleSequencesRefreshed;
+        event EventHandler<EventArgs> SampleSequencesChanged;
 
         /// <summary>
         /// Gets or sets the graphbase viewmodel.
@@ -51,9 +52,10 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Refreshes the sample sequences.
+        /// Gets or sets sample sequences.
         /// </summary>
-        void RefreshSampleSequences(IEnumerable<SampleSequence> sampleSequences);
+        IEnumerable<SampleSequence> SampleSequences
+        { get; set; }
     }
 }
 

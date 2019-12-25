@@ -43,7 +43,6 @@
     <Compile Include="Trigger\NullTriggerViewModel.cs" />
     <Compile Include="Trigger\TriggerViewModelBase.cs" />
     <Compile Include="Graphbase\GraphbaseViewModel.cs" />
-    <Compile Include="Scope Screen\SampleSequencesRefreshedEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

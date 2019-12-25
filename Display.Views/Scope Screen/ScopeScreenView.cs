@@ -80,7 +80,8 @@ namespace ScopeLib.Display.Views
 
             // === Register event handlers. ===
 
-            viewModel.SampleSequencesRefreshed += SampleSequencesRefreshedEventHandler;
+            viewModel.SampleSequencesChanged += ViewModel_SampleSequencesChangedEventHandler;
+            viewModel.PropertyChanged += ViewModel_PropertyChangedEventHandler;
 
             scopeDrawingArea.Drawn += ScopeDrawingArea_DrawnEventHandler;
 
@@ -109,12 +110,19 @@ namespace ScopeLib.Display.Views
         }
 
         /// <summary>
-        /// Performs actions whenever the sample sequences shown have been refreshed.
+        /// Performs actions whenever the view model's sample sequences have changed.
         /// </summary>
-        private void SampleSequencesRefreshedEventHandler (object o, SampleSequencesRefreshedEventArgs args)
+        private void ViewModel_SampleSequencesChangedEventHandler (object o, EventArgs args)
         {
             RefreshData();
             Redraw();
+        }
+
+        /// <summary>
+        /// Performs actions whenever a view model's property has changed.
+        /// </summary>
+        private void ViewModel_PropertyChangedEventHandler (object o, PropertyChangedEventArgs args)
+        {
         }
 
         /// <summary>

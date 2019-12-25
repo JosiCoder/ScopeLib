@@ -28,9 +28,9 @@ namespace ScopeLib.Display.ViewModels
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
         /// <summary>
-        /// Occurs when the sample sequences have been refreshed.
+        /// Occurs when the sample sequences have changed.
         /// </summary>
-        public event EventHandler<SampleSequencesRefreshedEventArgs> SampleSequencesRefreshed;
+        public event EventHandler<EventArgs> SampleSequencesChanged;
 
         /// <summary>
         /// Gets or sets the graphbase viewmodel.
@@ -51,12 +51,22 @@ namespace ScopeLib.Display.ViewModels
         public IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         { get; set; }
 
+        IEnumerable<SampleSequence> _sampleSequences;
         /// <summary>
-        /// Refreshes the sample sequences.
+        /// Gets or sets the sample sequences.
         /// </summary>
-        public void RefreshSampleSequences(IEnumerable<SampleSequence> sampleSequences)
+        public IEnumerable<SampleSequence> SampleSequences
         {
-            SampleSequencesRefreshed.Raise(this, new SampleSequencesRefreshedEventArgs(sampleSequences));
+            get
+            {
+                return _sampleSequences;
+            }
+            set
+            {
+                _sampleSequences = value;
+                RaisePropertyChanged();
+                SampleSequencesChanged.Raise(this, EventArgs.Empty);
+            }
         }
     }
 }
