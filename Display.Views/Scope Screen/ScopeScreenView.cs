@@ -111,7 +111,7 @@ namespace ScopeLib.Display.Views
         /// <summary>
         /// Performs actions whenever the sample sequences shown have been refreshed.
         /// </summary>
-        private void SampleSequencesRefreshedEventHandler (object o, EventArgs args)
+        private void SampleSequencesRefreshedEventHandler (object o, SampleSequencesRefreshedEventArgs args)
         {
             RefreshData();
             Redraw();

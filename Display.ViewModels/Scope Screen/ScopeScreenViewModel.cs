@@ -30,7 +30,7 @@ namespace ScopeLib.Display.ViewModels
         /// <summary>
         /// Occurs when the sample sequences have been refreshed.
         /// </summary>
-        public event EventHandler<EventArgs> SampleSequencesRefreshed;
+        public event EventHandler<SampleSequencesRefreshedEventArgs> SampleSequencesRefreshed;
 
         /// <summary>
         /// Gets or sets the graphbase viewmodel.
@@ -54,11 +54,9 @@ namespace ScopeLib.Display.ViewModels
         /// <summary>
         /// Refreshes the sample sequences.
         /// </summary>
-        public void RefreshSampleSequences()
+        public void RefreshSampleSequences(IEnumerable<SampleSequence> sampleSequences)
         {
-            //TODO: Parameters?
-            SampleSequencesRefreshed.Raise(this, EventArgs.Empty);
+            SampleSequencesRefreshed.Raise(this, new SampleSequencesRefreshedEventArgs(sampleSequences));
         }
     }
 }
-

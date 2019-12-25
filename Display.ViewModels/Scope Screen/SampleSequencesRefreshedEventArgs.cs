@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------------
-// Copyright (C) 2017 Josi Coder
+// Copyright (C) 2016 Josi Coder
 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -22,38 +22,22 @@ using ScopeLib.Sampling;
 namespace ScopeLib.Display.ViewModels
 {
     /// <summary>
-    /// Provides access to a viewmodel of a scope screen.
+    /// Provides data for the SampleSequencesRefreshed event.
     /// </summary>
-    public interface IScopeScreenViewModel
+    public class SampleSequencesRefreshedEventArgs : EventArgs
     {
         /// <summary>
-        /// Occurs when the sample sequences have been refreshed.
+        /// Initializes a new instance of this class.
         /// </summary>
-        event EventHandler<SampleSequencesRefreshedEventArgs> SampleSequencesRefreshed;
+        /// <param name="sampleSequences">The new sample sequences.</param>
+        public SampleSequencesRefreshedEventArgs(IEnumerable<SampleSequence> sampleSequences)
+        {
+            SampleSequences = sampleSequences;
+        }
 
         /// <summary>
-        /// Gets or sets the graphbase viewmodel.
+        /// Gets or sets the new sample sequences.
         /// </summary>
-        GraphbaseViewModel GraphbaseVM
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the channel viewmodels, one item per channel.
-        /// </summary>
-        IEnumerable<ChannelViewModel> ChannelVMs
-        { get; set; }
-
-        /// <summary>
-        /// Gets or sets the functions that provide the signal sample sequences,
-        /// one function per channel.
-        /// </summary>
-        IEnumerable<Func<SampleSequence>> SampleSequenceProviders
-        { get; set; }
-
-        /// <summary>
-        /// Refreshes the sample sequences.
-        /// </summary>
-        void RefreshSampleSequences(IEnumerable<SampleSequence> sampleSequences);
+        public IEnumerable<SampleSequence> SampleSequences;
     }
 }
-
