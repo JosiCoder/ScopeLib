@@ -46,10 +46,10 @@ namespace ScopeLib.Display.Demo
         //TODO: comments (see also below)
         public DemoViewModel()
         {
-            var sampleSequenceGenerators = CreateSampleSequences().Select(ss => new Func<SampleSequence>(() => ss));
+            var sampleSequences = CreateSampleSequences();
 
-            ConfigureMainScopeScreenVM(_masterScopeScreenVM, sampleSequenceGenerators);
-            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequenceGenerators);
+            ConfigureMainScopeScreenVM(_masterScopeScreenVM, sampleSequences);
+            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequences);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the main scope screen viewmodel.
         /// </summary>
         private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+            IEnumerable<SampleSequence> sampleSequences)
         {
             // === Channels configuration ===
 
@@ -160,21 +160,21 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            BuildMainSampleSequenceProviders(scopeScreenVM, sampleSequenceGenerators);
+            BuildMainSampleSequences(scopeScreenVM, sampleSequences);
         }
 
         /// <summary>
         /// Builds a sequence provider for the main scope screen.
         /// </summary>
-        private void BuildMainSampleSequenceProviders(
+        private void BuildMainSampleSequences(
             IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+            IEnumerable<SampleSequence> sampleSequences)
         {
             var triggerChannelIndex = demoTriggerChannelIndex;
 
-            var sampleSequenceProviders = sampleSequenceGenerators.Select(ssg =>
+            var sampleSequenceProviders = sampleSequences.Select(ss =>
             {
-                return new Func<SampleSequence>(() => ssg());
+                return new Func<SampleSequence>(() => ss);
             });
             var trigger = scopeScreenVM.GraphbaseVM.TriggerVM.Trigger;
             var sampler = new Sampler(sampleSequenceProviders, trigger, triggerChannelIndex);
@@ -185,7 +185,7 @@ namespace ScopeLib.Display.Demo
         /// Configures the FFT scope screen viewmodel.
         /// </summary>
         private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+            IEnumerable<SampleSequence> sampleSequences)
         {
             // === Channels configuration ===
 
@@ -222,22 +222,22 @@ namespace ScopeLib.Display.Demo
 
             // === Sample Sequences ===
 
-            BuildFFTSampleSequenceProviders(scopeScreenVM, sampleSequenceGenerators);
+            BuildFFTSampleSequences(scopeScreenVM, sampleSequences);
         }
 
         /// <summary>
         /// Builds a sequence provider for the FFT scope screen.
         /// </summary>
-        private void BuildFFTSampleSequenceProviders(
+        private void BuildFFTSampleSequences(
             IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<Func<SampleSequence>> sampleSequenceGenerators)
+            IEnumerable<SampleSequence> sampleSequences)
         {
-            var sampleSequenceProviders = sampleSequenceGenerators.Select(ssg =>
+            var sampleSequenceProviders = sampleSequences.Select(ss =>
             {
                 SampleSequence fftSamples;
                 try
                 {
-                    fftSamples = DoFourierTransform(ssg());
+                    fftSamples = DoFourierTransform(ss);
                 }
                 catch
                 {
