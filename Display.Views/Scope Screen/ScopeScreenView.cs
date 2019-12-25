@@ -80,6 +80,8 @@ namespace ScopeLib.Display.Views
 
             // === Register event handlers. ===
 
+            viewModel.SampleSequencesRefreshed += SampleSequencesRefreshedEventHandler;
+
             scopeDrawingArea.Drawn += ScopeDrawingArea_DrawnEventHandler;
 
             // Raise motion events even if no button is pressed.
@@ -107,6 +109,15 @@ namespace ScopeLib.Display.Views
         }
 
         /// <summary>
+        /// Performs actions whenever the sample sequences shown have been refreshed.
+        /// </summary>
+        private void SampleSequencesRefreshedEventHandler (object o, EventArgs args)
+        {
+            RefreshData();
+            Redraw();
+        }
+
+        /// <summary>
         /// Performs actions whenever the scope drawing area has been drawn.
         /// </summary>
         private void ScopeDrawingArea_DrawnEventHandler (object o, DrawnArgs args)
@@ -115,7 +126,6 @@ namespace ScopeLib.Display.Views
 
             if (_drawContinuously)
             {
-                RefreshData(); // TODO: don't call for pure redraw, only for data refresh
                 Redraw();
             }
         }

@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using ScopeLib.Utilities;
 using ScopeLib.Sampling;
 
 namespace ScopeLib.Display.ViewModels
@@ -26,6 +27,11 @@ namespace ScopeLib.Display.ViewModels
     /// </summary>
     public class ScopeScreenViewModel : ViewModelBase, IScopeScreenViewModel
     {
+        /// <summary>
+        /// Occurs when the sample sequences have been refreshed.
+        /// </summary>
+        public event EventHandler<EventArgs> SampleSequencesRefreshed;
+
         /// <summary>
         /// Gets or sets the graphbase viewmodel.
         /// </summary>
@@ -44,6 +50,15 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         public IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         { get; set; }
+
+        /// <summary>
+        /// Refreshes the sample sequences.
+        /// </summary>
+        public void RefreshSampleSequences()
+        {
+            //TODO: Parameters?
+            SampleSequencesRefreshed.Raise(this, EventArgs.Empty);
+        }
     }
 }
 

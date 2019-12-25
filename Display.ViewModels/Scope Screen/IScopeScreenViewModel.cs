@@ -27,6 +27,11 @@ namespace ScopeLib.Display.ViewModels
     public interface IScopeScreenViewModel
     {
         /// <summary>
+        /// Occurs when the sample sequences have been refreshed.
+        /// </summary>
+        event EventHandler<EventArgs> SampleSequencesRefreshed;
+
+        /// <summary>
         /// Gets or sets the graphbase viewmodel.
         /// </summary>
         GraphbaseViewModel GraphbaseVM
@@ -44,6 +49,11 @@ namespace ScopeLib.Display.ViewModels
         /// </summary>
         IEnumerable<Func<SampleSequence>> SampleSequenceProviders
         { get; set; }
+
+        /// <summary>
+        /// Refreshes the sample sequences.
+        /// </summary>
+        void RefreshSampleSequences();
     }
 }
 
