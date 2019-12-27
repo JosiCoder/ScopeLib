@@ -28,9 +28,9 @@ namespace ScopeLib.Display.ViewModels
     public interface IScopeScreenViewModel: INotifyPropertyChanged
     {
         /// <summary>
-        /// Occurs when the sample sequences have changed.
+        /// Occurs when the sample sequences have been refreshed.
         /// </summary>
-        event EventHandler<EventArgs> SampleSequencesChanged;
+        event EventHandler<EventArgs> SampleSequencesRefreshed;
 
         /// <summary>
         /// Gets or sets the graphbase viewmodel.
@@ -52,10 +52,9 @@ namespace ScopeLib.Display.ViewModels
         { get; set; }
 
         /// <summary>
-        /// Gets or sets sample sequences.
+        /// Refreshes (i.e. re-enumerates) the sample sequences.
         /// </summary>
-        IEnumerable<SampleSequence> SampleSequences
-        { get; set; }
+        void RefreshSampleSequences();
     }
 }
 
