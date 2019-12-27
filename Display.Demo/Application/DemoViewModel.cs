@@ -46,10 +46,12 @@ namespace ScopeLib.Display.Demo
         //TODO: comments (see also below)
         public DemoViewModel()
         {
-            var sampleSequences = CreateSampleSequences();
+            ConfigureMainScopeScreenVM(_masterScopeScreenVM);
+            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM);
 
-            ConfigureMainScopeScreenVM(_masterScopeScreenVM, sampleSequences);
-            ConfigureFFTScopeScreenVM(_slaveScopeScreenVM, sampleSequences);
+            var sampleSequences = CreateSampleSequences();
+            SetMainScopeScreenSampleSequences(_masterScopeScreenVM, sampleSequences);
+            SetFFTScopeScreenSampleSequences(_slaveScopeScreenVM, sampleSequences);
         }
 
         /// <summary>
@@ -117,8 +119,7 @@ namespace ScopeLib.Display.Demo
         /// <summary>
         /// Configures the main scope screen viewmodel.
         /// </summary>
-        private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<SampleSequence> sampleSequences)
+        private void ConfigureMainScopeScreenVM (IScopeScreenViewModel scopeScreenVM)
         {
             // === Channels configuration ===
 
@@ -157,16 +158,12 @@ namespace ScopeLib.Display.Demo
             graphbaseVM.MeasurementCursor1VM.Value = 2.0;
             graphbaseVM.MeasurementCursor2VM.Value = 3.0;
             scopeScreenVM.GraphbaseVM = graphbaseVM;
-
-            // === Sample Sequences ===
-
-            BuildMainSampleSequences(scopeScreenVM, sampleSequences);
         }
 
         /// <summary>
-        /// Builds a sequence provider for the main scope screen.
+        /// Sets the sequence provider for the main scope screen.
         /// </summary>
-        private void BuildMainSampleSequences(
+        private void SetMainScopeScreenSampleSequences(
             IScopeScreenViewModel scopeScreenVM,
             IEnumerable<SampleSequence> sampleSequences)
         {
@@ -184,8 +181,7 @@ namespace ScopeLib.Display.Demo
         /// <summary>
         /// Configures the FFT scope screen viewmodel.
         /// </summary>
-        private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM,
-            IEnumerable<SampleSequence> sampleSequences)
+        private void ConfigureFFTScopeScreenVM (IScopeScreenViewModel scopeScreenVM)
         {
             // === Channels configuration ===
 
@@ -219,16 +215,12 @@ namespace ScopeLib.Display.Demo
             graphbaseVM.MeasurementCursor1VM.Value = 2.0;
             graphbaseVM.MeasurementCursor2VM.Value = 3.0;
             scopeScreenVM.GraphbaseVM = graphbaseVM;
-
-            // === Sample Sequences ===
-
-            BuildFFTSampleSequences(scopeScreenVM, sampleSequences);
         }
 
         /// <summary>
-        /// Builds a sequence provider for the FFT scope screen.
+        /// Sets the sequence provider for the FFT scope screen.
         /// </summary>
-        private void BuildFFTSampleSequences(
+        private void SetFFTScopeScreenSampleSequences(
             IScopeScreenViewModel scopeScreenVM,
             IEnumerable<SampleSequence> sampleSequences)
         {
